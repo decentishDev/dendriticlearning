@@ -1,24 +1,223 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.16" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hw7-sh-ECA">
+    <device id="ipad10_2" orientation="landscape" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.12"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Standard SetVC-->
+        <scene sceneID="Guk-E4-4ck">
+            <objects>
+                <viewController id="FIP-K8-yah" customClass="StandardSetVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Cwc-Eq-mnx">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="l27-JP-IAh"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="P7A-TL-8Km"/>
+                    <connections>
+                        <segue destination="lP9-U8-zXT" kind="unwind" identifier="standardSetVC_unwind" unwindAction="cancel:" id="XPC-uJ-LW5"/>
+                        <segue destination="p2I-rF-R5p" kind="show" identifier="flashcards" id="aXo-84-qxA"/>
+                        <segue destination="5am-Nv-7bx" kind="show" identifier="standardEditor" id="jK2-7A-mz0"/>
+                        <segue destination="BYZ-38-t0r" kind="show" identifier="standardLearnVC" id="m1X-CK-1Tb"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1aP-U6-MTS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="lP9-U8-zXT" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="195" y="-930"/>
+        </scene>
+        <!--Web SetVC-->
+        <scene sceneID="XoN-UA-5vJ">
+            <objects>
+                <viewController id="o57-tv-PwE" customClass="WebSetVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="TUI-B2-tRt">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="ury-Yf-eZA"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="RXg-Es-FhM"/>
+                    <connections>
+                        <segue destination="y4f-Rr-eRH" kind="unwind" identifier="webSetVC_unwind" unwindAction="cancel:" id="GFj-oO-Xhn"/>
+                        <segue destination="f2G-xL-ZWJ" kind="show" identifier="editWebSet" id="3mK-3r-PdI"/>
+                        <segue destination="xrB-Kn-VpP" kind="show" identifier="webStudy" id="a5f-Eb-SYI"/>
+                        <segue destination="nc8-Oa-BiA" kind="show" identifier="webViewer" id="qeu-Ci-u2i"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gi6-rD-c4i" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="y4f-Rr-eRH" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="1052" y="-930"/>
+        </scene>
+        <!--Web StudyVC-->
+        <scene sceneID="l1y-64-ywZ">
+            <objects>
+                <viewController id="xrB-Kn-VpP" customClass="WebStudyVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="VAv-uT-3uf">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="nU7-8o-Slr"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="zPr-hE-r8j"/>
+                    <connections>
+                        <segue destination="Vl4-KV-FNS" kind="unwind" identifier="webStudyVC_unwind" unwindAction="cancel:" id="5ZV-HB-R6w"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="c1y-6E-YBT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="Vl4-KV-FNS" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="1734" y="-930"/>
+        </scene>
+        <!--FlashcardsVC-->
+        <scene sceneID="6xP-LW-9nb">
+            <objects>
+                <viewController id="p2I-rF-R5p" customClass="FlashcardsVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="NVv-6G-daE">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="sQc-UA-dnk"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="EAM-WD-zt5"/>
+                    <connections>
+                        <segue destination="ITH-bJ-YO5" kind="unwind" identifier="flashcardsVC_unwind" unwindAction="cancel:" id="nJ2-MS-pWs"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="c8W-XO-VkC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="ITH-bJ-YO5" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="195" y="-202"/>
+        </scene>
+        <!--Standard LearnVC-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="StandardLearnVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" xcode11CocoaTouchSystemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <navigationItem key="navigationItem" id="f4E-pQ-jSk"/>
+                    <connections>
+                        <segue destination="V6M-tV-wCe" kind="unwind" identifier="standardLearnVC_unwind" unwindAction="cancel:" id="nmk-gG-3dU"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <exit id="V6M-tV-wCe" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
+            <point key="canvasLocation" x="-518" y="-930"/>
+        </scene>
+        <!--Standard EditorVC-->
+        <scene sceneID="5be-fr-Src">
+            <objects>
+                <viewController id="5am-Nv-7bx" customClass="StandardEditorVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="CBS-Yn-s6a">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="doo-W2-Qax"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="S7I-of-fmw"/>
+                    <connections>
+                        <segue destination="oFd-DI-ZPD" kind="unwind" identifier="standardEditorVC_unwind" unwindAction="cancel:" id="pzC-o1-W6o"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="XqE-MA-A9a" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="oFd-DI-ZPD" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="-518" y="-202"/>
+        </scene>
+        <!--Main Page-->
+        <scene sceneID="QaO-3V-Ppz">
+            <objects>
+                <viewController id="hw7-sh-ECA" customClass="MainPage" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="l6C-GA-Qkv">
+                        <rect key="frame" x="0.0" y="0.0" width="1080" height="810"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="0eg-OR-uTT"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <connections>
+                        <segue destination="FIP-K8-yah" kind="show" identifier="viewStandardSet" id="rHk-hI-Fbs"/>
+                        <segue destination="o57-tv-PwE" kind="show" identifier="viewWebSet" id="s1d-gY-Yty"/>
+                        <segue destination="Xpx-KQ-zv9" kind="show" identifier="settingsVC" id="mdz-NW-Lqh"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="QPn-Te-KUs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="651" y="-1765"/>
+        </scene>
+        <!--Web EditorVC-->
+        <scene sceneID="X0a-7W-hl5">
+            <objects>
+                <viewController id="f2G-xL-ZWJ" customClass="WebEditorVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="tME-Ed-Uq7">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="57C-Ob-5yJ"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="Fa5-Zs-LLB"/>
+                    <connections>
+                        <segue destination="fHV-gJ-jc7" kind="unwind" identifier="webEditorVC_unwind" unwindAction="cancel:" id="TOk-OC-LGP"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qJ3-nX-XDJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="fHV-gJ-jc7" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="1052" y="-202"/>
+        </scene>
+        <!--Web ViewerVC-->
+        <scene sceneID="BNq-qe-5sZ">
+            <objects>
+                <viewController id="nc8-Oa-BiA" customClass="WebViewerVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="bk3-u4-ZxL">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="XHr-9G-G0A"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="0NX-8Q-7fq"/>
+                    <connections>
+                        <segue destination="rsB-C8-V8S" kind="unwind" identifier="webViewerVC_unwind" unwindAction="cancel:" id="Oel-bj-byt"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="yu5-Ke-E7c" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="rsB-C8-V8S" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="1734" y="-202"/>
+        </scene>
+        <!--SettingsVC-->
+        <scene sceneID="sB1-4I-2NU">
+            <objects>
+                <viewController id="Xpx-KQ-zv9" customClass="SettingsVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="GAw-r7-n12">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="wvt-0g-3TT"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="mO3-zv-dLd"/>
+                    <connections>
+                        <segue destination="SRQ-us-emV" kind="unwind" identifier="settingsVC_unwind" unwindAction="cancel:" id="TnV-Ri-fDr"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rfe-b9-nNQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="SRQ-us-emV" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="1415" y="-2005"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>
