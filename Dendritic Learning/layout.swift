@@ -67,48 +67,20 @@ func centerDrawing(_ canvasView: PKCanvasView) {
         return CGPoint(x: centeredX, y: centeredY)
     }
 	
-func dateString() -> String {
+func formatDate(_ date: Date) -> String {
         // Get the current date
-        let currentDate = Date()
-        
-        // Create a DateFormatter for the full month name
-        let monthFormatter = DateFormatter()
-        monthFormatter.dateFormat = "MMMM"
-        
-        // Create a DateFormatter for the day of the month
-        let dayFormatter = DateFormatter()
-        dayFormatter.dateFormat = "d"
-        
-        // Create a DateFormatter for the year
-        let yearFormatter = DateFormatter()
-        yearFormatter.dateFormat = "yyyy"
-        
-        // Get the month, day, and year as strings
-        let monthString = monthFormatter.string(from: currentDate)
-        let dayString = dayFormatter.string(from: currentDate)
-        let yearString = yearFormatter.string(from: currentDate)
-        
-        // Get the day as an integer to determine the suffix
-        let dayInt = Int(dayString) ?? 0
-        let daySuffix: String
-        switch dayInt {
-        case 11, 12, 13:
-            daySuffix = "th"
-        default:
-            switch dayInt % 10 {
-            case 1:
-                daySuffix = "st"
-            case 2:
-                daySuffix = "nd"
-            case 3:
-                daySuffix = "rd"
-            default:
-                daySuffix = "th"
-            }
-        }
-        
-        // Combine the date components into the desired format
-        let formattedDate = "\(monthString) \(dayString)\(daySuffix), \(yearString)"
-        
-        return formattedDate
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "MMM d'\(daySuffix(from: date))', yyyy"
+    return dateFormatter.string(from: date)
+}
+
+func daySuffix(from date: Date) -> String {
+    let calender = Calendar.current
+    let day = calender.component(.day, from: date)
+    switch day {
+    case 1, 21, 31: return "st"
+    case 2, 22: return "nd"
+    case 3, 23: return "rd"
+    default: return "th"
     }
+}

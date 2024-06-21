@@ -6,15 +6,19 @@
 //
 
 import UIKit
+import FirebaseAuth
+import FirebaseStorage
+import FirebaseFirestore
 
 class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     let defaults = UserDefaults.standard
 
-    var set = 0
+    var set = ""
     var name = "Revolutionary War"
     var rectangles: [UIView] = []
     var scrollView: UIScrollView!
+    var image: String? = nil
     var web: [[Any]] = []
     var currentEdit: Int = -1
     var selectedButton: UIButton? = nil
@@ -29,15 +33,19 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     let imageButton = UIButton()
     let titleField = UITextField()
     
+    let db = Firestore.firestore()
+    let storage = Storage.storage()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Colors.background
         imagePicker.delegate = self
         imagePicker.sourceType = .photoLibrary
-        let data = (defaults.value(forKey: "sets") as! [Dictionary<String, Any>])[set]
+        let data = defaults.value(forKey: "set") as! [String: Any]
         //print(data)
         name = data["name"] as! String
         web = data["set"] as! [[Any]]
+        image = data["image"] as! String?
         
         scrollView = UIScrollView(frame: view.bounds)
         scrollView.contentSize = CGSize(width: view.bounds.width, height: view.bounds.height)
@@ -88,29 +96,30 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         
         view.addSubview(addButton)
         
-        let themesButton = UIButton()
-        themesButton.setTitle("Themes", for: .normal)
-        themesButton.setTitleColor(Colors.highlight, for: .normal)
-        themesButton.titleLabel?.font = UIFont(name: "LilGrotesk-Bold", size: 25)
-        themesButton.addTarget(self, action: #selector(themeButtonTapped(_:)), for: .touchUpInside)
-        themesButton.frame = CGRect(x: view.frame.width - 260, y: 30, width: 110, height: 50)
-        themesButton.backgroundColor = Colors.secondaryBackground
-        themesButton.layer.cornerRadius = 10
-        
-        view.addSubview(themesButton)
-        if((defaults.value(forKey: "images") as! [Data?])[set] == Colors.placeholderI){
-            imageButton.setImage(UIImage(systemName: "photo"), for: .normal)
-        }else{
-            imageButton.setImage(UIImage(systemName: "rectangle.badge.xmark.fill"), for: .normal)
+//        let themesButton = UIButton()
+//        themesButton.setTitle("Themes", for: .normal)
+//        themesButton.setTitleColor(Colors.highlight, for: .normal)
+//        themesButton.titleLabel?.font = UIFont(name: "LilGrotesk-Bold", size: 25)
+//        themesButton.addTarget(self, action: #selector(themeButtonTapped(_:)), for: .touchUpInside)
+//        themesButton.frame = CGRect(x: view.frame.width - 260, y: 30, width: 110, height: 50)
+//        themesButton.backgroundColor = Colors.secondaryBackground
+//        themesButton.layer.cornerRadius = 10
+//        
+//        view.addSubview(themesButton)
+        if(defaults.value(forKey: "isPaid") as! Bool == true){
+            if(data["image"] == nil){
+                imageButton.setImage(UIImage(systemName: "photo"), for: .normal)
+            }else{
+                imageButton.setImage(UIImage(systemName: "rectangle.badge.xmark.fill"), for: .normal)
+            }
+            imageButton.addTarget(self, action: #selector(changeImage(_:)), for: .touchUpInside)
+            imageButton.frame = CGRect(x: view.frame.width - 140, y: 30, width: 50, height: 50)
+            imageButton.backgroundColor = Colors.secondaryBackground
+            imageButton.layer.cornerRadius = 10
+            imageButton.tintColor = Colors.highlight
+            
+            view.addSubview(imageButton)
         }
-        imageButton.addTarget(self, action: #selector(changeImage(_:)), for: .touchUpInside)
-        imageButton.frame = CGRect(x: view.frame.width - 140, y: 30, width: 50, height: 50)
-        imageButton.backgroundColor = Colors.secondaryBackground
-        imageButton.layer.cornerRadius = 10
-        imageButton.tintColor = Colors.highlight
-        
-        view.addSubview(imageButton)
-        
         let deleteButton = UIButton()
         deleteButton.setImage(UIImage(systemName: "trash"), for: .normal)
         deleteButton.addTarget(self, action: #selector(deleteSet(_:)), for: .touchUpInside)
@@ -302,14 +311,36 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     @objc func deleteSet(_ sender: UIButton) {
         let alertController = UIAlertController(title: nil, message: "Are you sure you want to delete this set?", preferredStyle: .alert)
         let deleteAction = UIAlertAction(title: "Delete", style: .destructive) {_ in
-            var sets = self.defaults.object(forKey: "sets") as! [Any]
-            sets.remove(at: self.set)
-            self.defaults.setValue(sets, forKey: "sets")
-            var images = self.defaults.array(forKey: "images") as? [Data?] ?? []
-            images.remove(at: self.set)
-            self.defaults.setValue(images, forKey: "images")
-            self.performSegue(withIdentifier: "webEditorVC_unwind", sender: nil)
-            self.performSegue(withIdentifier: "webEditorVC_unwind", sender: nil)
+            var oldUser: [String: Any] = [:]
+            let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
+            userRef.getDocument { (document, error) in
+                if let document = document, document.exists {
+                    oldUser = document.data()!
+                } else {
+                    print("Document does not exist")
+                }
+            }
+            
+            var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
+            for (i, set) in oldStudied.enumerated() {
+                if(set["setID"] as! String == self.set){
+                    oldStudied.remove(at: i)
+                    break
+                }
+            }
+            oldUser["studiedSets"] = oldStudied
+            
+            var oldCreated = oldUser["createdSets"] as! [String]
+            for (i, set) in oldCreated.enumerated() {
+                if(set == self.set){
+                    oldCreated.remove(at: i)
+                    break
+                }
+            }
+            oldUser["createdSets"] = oldCreated
+            
+            self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true)
+            self.db.collection("sets").document(self.set).delete()
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         
@@ -352,11 +383,20 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     }
     
     func save(){
-        var previousData = defaults.object(forKey: "sets") as! [Dictionary<String, Any>]
-        previousData[set]["set"] = web
-        previousData[set]["name"] = name
-        previousData[set]["date"] = "Last edited: " + dateString()
-        defaults.set(previousData, forKey: "sets")
+        var oldSet: [String: Any] = [:]
+        let setRef = self.db.collection("sets").document(set)
+        setRef.getDocument { (document, error) in
+            if let document = document, document.exists {
+                oldSet = document.data()!
+            } else {
+                print("Document does not exist")
+            }
+        }
+        oldSet["name"] = name
+        oldSet["date"] = Timestamp()
+        oldSet["set"] = web
+        oldSet["image"] = image
+        db.collection("sets").document(set).setData(oldSet)
     }
     
     func updateLines(){
@@ -689,23 +729,56 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     }
     
     @objc func changeImage(_ sender: UIButton) {
-        var images = (defaults.value(forKey: "images") as! [Data?])
-        if images[set] == Colors.placeholderI {
+        if image == nil {
             present(imagePicker, animated: true, completion: nil)
         }else{
-            images[set] = Colors.placeholderI
-            defaults.setValue(images, forKey: "images")
+            defaults.removeObject(forKey: image!)
+            image = nil
             imageButton.setImage(UIImage(systemName: "photo"), for: .normal)
         }
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            if let imageData = pickedImage.pngData() {
-                var images = (defaults.value(forKey: "images") as! [Data?])
-                images[set] = imageData
-                defaults.setValue(images, forKey: "images")
+            if let imageData = pickedImage.jpegData(compressionQuality: 0.8) {
+                let imagesRef = storage.reference().child("images")
+                let imageName = UUID().uuidString
+                let imageRef = imagesRef.child("\(imageName).jpg")
+                
+                let metadata = StorageMetadata()
+                metadata.contentType = "image/jpeg"
+                
+                let uploadTask = imageRef.putData(imageData, metadata: metadata) { (metadata, error) in
+                    guard metadata != nil else {
+                        print("Error uploading image: \(String(describing: error?.localizedDescription))")
+                        return
+                    }
+                }
+                
+                image = imageRef.fullPath
+                defaults.set(imageData, forKey: image!)
                 imageButton.setImage(UIImage(systemName: "rectangle.badge.xmark.fill"), for: .normal)
+                
+                var oldUser: [String: Any] = [:]
+                let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
+                userRef.getDocument { (document, error) in
+                    if let document = document, document.exists {
+                        oldUser = document.data()!
+                    } else {
+                        print("Document does not exist")
+                    }
+                }
+                
+                var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
+                for (i, set) in oldStudied.enumerated() {
+                    if(set["setID"] as! String == self.set){
+                        oldStudied[i]["image"] = image
+                        break
+                    }
+                }
+                oldUser["studiedSets"] = oldStudied
+                
+                self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true)
             }
         }
         dismiss(animated: true, completion: nil)

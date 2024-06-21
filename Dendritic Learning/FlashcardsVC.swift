@@ -7,10 +7,13 @@
 
 import UIKit
 import PencilKit
+import FirebaseAuth
+import FirebaseFirestore
+import FirebaseStorage
 
 class FlashcardsVC: UIViewController {
     
-    var set = 0
+    var set = ""
     
     let cardCounter = UILabel()
     
@@ -44,13 +47,38 @@ class FlashcardsVC: UIViewController {
     let endScreen = UIView()
     let endLabel = UILabel()
     
+    let db = Firestore.firestore()
+    let storage = Storage.storage()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Colors.background
         
-        let data = (defaults.value(forKey: "sets") as! [Dictionary<String, Any>])[set]
+        let data = defaults.value(forKey: "set") as! [String: Any]
         cards = data["set"] as! [[Any]]
-        known = data["flashcards"] as! [Bool]
+        var userData: [String: Any] = [:]
+        let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
+        userRef.getDocument { (document, error) in
+            if let document = document, document.exists {
+                userData = document.data()!
+            } else {
+                print("Document does not exist")
+            }
+        }
+        for i in userData["studiedSets"] as! [[String: Any]]{
+            if i["setID"] as! String == set {
+                known = i["flashcards"] as! [Bool]
+                break
+            }
+        }
+        if(known.count != cards.count){
+            var c: [Bool] = []
+            for i in 0..<cards.count{
+                c.append(false)
+            }
+            known = c
+            save()
+        }
         var t = true
         for i in known {
             if(!i){
@@ -140,16 +168,44 @@ class FlashcardsVC: UIViewController {
                 CardDrawing.isHidden = true
                 CardImage.isHidden = true
             }else if(cards[cardOrder[index]][0] as! String == "d"){
-                do {
-                    try CardDrawing.drawing = recolor(PKDrawing(data: cards[cardOrder[index]][1] as! Data))
-                } catch {
-                    
+                if let drawingData = self.defaults.value(forKey: cards[cardOrder[index]][1] as! String){
+                    do {
+                        try self.CardDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
+                    } catch {
+                        print("Error converting Data to PkDrawing: \(error)")
+                    }
+                }else {
+                    let storageRef = self.storage.reference().child(cards[cardOrder[index]][1] as! String)
+                    storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                        if let error = error {
+                            print("Error downloading drawing from Firebase Storage: \(error)")
+                        }else if let data = data {
+                            do {
+                                try self.CardDrawing.drawing = recolor(PKDrawing(data: data ))
+                            } catch {
+                                print("Error converting Data to PkDrawing: \(error)")
+                            }
+                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][1] as! String)
+                        }
+                    }
                 }
                 CardLabel.isHidden = true
                 CardDrawing.isHidden = false
                 CardImage.isHidden = true
             }else{
-                CardImage.image = UIImage(data: cards[cardOrder[index]][1] as! Data)
+                if let imageData = self.defaults.value(forKey: self.cards[self.cardOrder[self.index]][1] as! String){
+                    self.CardImage.image = UIImage(data: imageData as! Data)
+                }else {
+                    let storageRef = self.storage.reference().child(self.cards[self.cardOrder[self.index]][1] as! String)
+                    storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                        if let error = error {
+                            print("Error downloading drawing from Firebase Storage: \(error)")
+                        }else if let data = data {
+                            self.CardImage.image = UIImage(data: data )
+                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][1] as! String)
+                        }
+                    }
+                }
                 CardLabel.isHidden = true
                 CardDrawing.isHidden = true
                 CardImage.isHidden = false
@@ -306,16 +362,44 @@ class FlashcardsVC: UIViewController {
                 self.CardDrawing.isHidden = true
                 self.CardImage.isHidden = true
             }else if(self.cards[self.cardOrder[self.index]][0] as! String == "d"){
-                do {
-                    try self.CardDrawing.drawing = recolor(PKDrawing(data: self.cards[self.cardOrder[self.index]][1] as! Data))
-                } catch {
-                    
+                if let drawingData = self.defaults.value(forKey: self.cards[self.cardOrder[self.index]][1] as! String){
+                    do {
+                        try self.CardDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
+                    } catch {
+                        print("Error converting Data to PkDrawing: \(error)")
+                    }
+                }else {
+                    let storageRef = self.storage.reference().child(self.cards[self.cardOrder[self.index]][1] as! String)
+                    storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                        if let error = error {
+                            print("Error downloading drawing from Firebase Storage: \(error)")
+                        }else if let data = data {
+                            do {
+                                try self.CardDrawing.drawing = recolor(PKDrawing(data: data ))
+                            } catch {
+                                print("Error converting Data to PkDrawing: \(error)")
+                            }
+                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][1] as! String)
+                        }
+                    }
                 }
                 self.CardLabel.isHidden = true
                 self.CardDrawing.isHidden = false
                 self.CardImage.isHidden = true
             }else{
-                self.CardImage.image = UIImage(data: self.cards[self.cardOrder[self.index]][1] as! Data)
+                if let imageData = self.defaults.value(forKey: self.cards[self.cardOrder[self.index]][1] as! String){
+                    self.CardImage.image = UIImage(data: imageData as! Data)
+                }else {
+                    let storageRef = self.storage.reference().child(self.cards[self.cardOrder[self.index]][1] as! String)
+                    storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                        if let error = error {
+                            print("Error downloading drawing from Firebase Storage: \(error)")
+                        }else if let data = data {
+                            self.CardImage.image = UIImage(data: data )
+                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][1] as! String)
+                        }
+                    }
+                }
                 self.CardLabel.isHidden = true
                 self.CardDrawing.isHidden = true
                 self.CardImage.isHidden = false
@@ -391,16 +475,44 @@ class FlashcardsVC: UIViewController {
                 self.CardDrawing.isHidden = true
                 self.CardImage.isHidden = true
             }else if(self.cards[self.cardOrder[self.index]][0] as! String == "d"){
-                do {
-                    try self.CardDrawing.drawing = recolor(PKDrawing(data: self.cards[self.cardOrder[self.index]][1] as! Data))
-                } catch {
-                    
+                if let drawingData = self.defaults.value(forKey: self.cards[self.cardOrder[self.index]][1] as! String){
+                    do {
+                        try self.CardDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
+                    } catch {
+                        print("Error converting Data to PkDrawing: \(error)")
+                    }
+                }else {
+                    let storageRef = self.storage.reference().child(self.cards[self.cardOrder[self.index]][1] as! String)
+                    storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                        if let error = error {
+                            print("Error downloading drawing from Firebase Storage: \(error)")
+                        }else if let data = data {
+                            do {
+                                try self.CardDrawing.drawing = recolor(PKDrawing(data: data ))
+                            } catch {
+                                print("Error converting Data to PkDrawing: \(error)")
+                            }
+                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][1] as! String)
+                        }
+                    }
                 }
                 self.CardLabel.isHidden = true
                 self.CardDrawing.isHidden = false
                 self.CardImage.isHidden = true
             }else{
-                self.CardImage.image = UIImage(data: self.cards[self.cardOrder[self.index]][1] as! Data)
+                if let imageData = self.defaults.value(forKey: self.cards[self.cardOrder[self.index]][1] as! String){
+                    self.CardImage.image = UIImage(data: imageData as! Data)
+                }else {
+                    let storageRef = self.storage.reference().child(self.cards[self.cardOrder[self.index]][1] as! String)
+                    storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                        if let error = error {
+                            print("Error downloading drawing from Firebase Storage: \(error)")
+                        }else if let data = data {
+                            self.CardImage.image = UIImage(data: data )
+                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][1] as! String)
+                        }
+                    }
+                }
                 self.CardLabel.isHidden = true
                 self.CardDrawing.isHidden = true
                 self.CardImage.isHidden = false
@@ -418,16 +530,44 @@ class FlashcardsVC: UIViewController {
                 OverlayDrawing.isHidden = true
                 OverlayImage.isHidden = true
             }else if(cards[cardOrder[overlayI]][0] as! String == "d"){
-                do {
-                    try OverlayDrawing.drawing = recolor(PKDrawing(data: cards[cardOrder[overlayI]][1] as! Data))
-                } catch {
-                    
+                if let drawingData = self.defaults.value(forKey: cards[cardOrder[overlayI]][1] as! String){
+                    do {
+                        try self.OverlayDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
+                    } catch {
+                        print("Error converting Data to PkDrawing: \(error)")
+                    }
+                }else {
+                    let storageRef = self.storage.reference().child(cards[cardOrder[overlayI]][1] as! String)
+                    storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                        if let error = error {
+                            print("Error downloading drawing from Firebase Storage: \(error)")
+                        }else if let data = data {
+                            do {
+                                try self.OverlayDrawing.drawing = recolor(PKDrawing(data: data ))
+                            } catch {
+                                print("Error converting Data to PkDrawing: \(error)")
+                            }
+                            self.defaults.set(data, forKey: self.cards[self.cardOrder[overlayI]][1] as! String)
+                        }
+                    }
                 }
                 OverlayLabel.isHidden = true
                 OverlayDrawing.isHidden = false
                 OverlayImage.isHidden = true
             }else{
-                OverlayImage.image = UIImage(data: cards[cardOrder[overlayI]][1] as! Data)
+                if let imageData = self.defaults.value(forKey: self.cards[self.cardOrder[overlayI]][1] as! String){
+                    self.OverlayImage.image = UIImage(data: imageData as! Data)
+                }else {
+                    let storageRef = self.storage.reference().child(self.cards[self.cardOrder[overlayI]][1] as! String)
+                    storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                        if let error = error {
+                            print("Error downloading drawing from Firebase Storage: \(error)")
+                        }else if let data = data {
+                            self.OverlayImage.image = UIImage(data: data )
+                            self.defaults.set(data, forKey: self.cards[self.cardOrder[overlayI]][1] as! String)
+                        }
+                    }
+                }
                 OverlayLabel.isHidden = true
                 OverlayDrawing.isHidden = true
                 OverlayImage.isHidden = false
@@ -439,10 +579,26 @@ class FlashcardsVC: UIViewController {
                 OverlayDrawing.isHidden = true
                 OverlayImage.isHidden = true
             }else if(cards[cardOrder[overlayI]][2] as! String == "d"){
-                do {
-                    try OverlayDrawing.drawing = recolor(PKDrawing(data: cards[cardOrder[overlayI]][3] as! Data))
-                } catch {
-                    
+                if let drawingData = self.defaults.value(forKey: cards[cardOrder[overlayI]][3] as! String){
+                    do {
+                        try self.OverlayDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
+                    } catch {
+                        print("Error converting Data to PkDrawing: \(error)")
+                    }
+                }else {
+                    let storageRef = self.storage.reference().child(cards[cardOrder[overlayI]][3] as! String)
+                    storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                        if let error = error {
+                            print("Error downloading drawing from Firebase Storage: \(error)")
+                        }else if let data = data {
+                            do {
+                                try self.OverlayDrawing.drawing = recolor(PKDrawing(data: data ))
+                            } catch {
+                                print("Error converting Data to PkDrawing: \(error)")
+                            }
+                            self.defaults.set(data, forKey: self.cards[self.cardOrder[overlayI]][3] as! String)
+                        }
+                    }
                 }
                 OverlayLabel.isHidden = true
                 OverlayDrawing.isHidden = false
@@ -489,9 +645,24 @@ class FlashcardsVC: UIViewController {
     }
     
     func save(){
-        var previousData = defaults.object(forKey: "sets") as! [Dictionary<String, Any>]
-        previousData[set]["flashcards"] = known
-        defaults.set(previousData, forKey: "sets")
+        var oldUser: [String: Any] = [:]
+        let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
+        userRef.getDocument { (document, error) in
+            if let document = document, document.exists {
+                oldUser = document.data()!
+            } else {
+                print("Document does not exist")
+            }
+        }
+        var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
+        for (i, set) in oldStudied.enumerated() {
+            if(set["setID"] as! String == self.set){
+                oldStudied[i]["flashcards"] = known
+                break
+            }
+        }
+        oldUser["studiedSets"] = oldStudied
+        db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true)
     }
     
     @objc func CardButton(sender: UIButton) {
@@ -504,10 +675,26 @@ class FlashcardsVC: UIViewController {
                     self.CardDrawing.isHidden = true
                     self.CardImage.isHidden = true
                 }else if(self.cards[self.cardOrder[self.index]][2] as! String == "d"){
-                    do {
-                        try self.CardDrawing.drawing = recolor(PKDrawing(data: self.cards[self.cardOrder[self.index]][3] as! Data))
-                    } catch {
-                        
+                    if let drawingData = self.defaults.value(forKey: self.cards[self.cardOrder[self.index]][3] as! String){
+                        do {
+                            try self.CardDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
+                        } catch {
+                            print("Error converting Data to PkDrawing: \(error)")
+                        }
+                    }else {
+                        let storageRef = self.storage.reference().child(self.cards[self.cardOrder[self.index]][3] as! String)
+                        storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                            if let error = error {
+                                print("Error downloading drawing from Firebase Storage: \(error)")
+                            }else if let data = data {
+                                do {
+                                    try self.CardDrawing.drawing = recolor(PKDrawing(data: data ))
+                                } catch {
+                                    print("Error converting Data to PkDrawing: \(error)")
+                                }
+                                self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][3] as! String)
+                            }
+                        }
                     }
                     self.CardDrawing.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 1, 0, 0)
                     self.CardLabel.isHidden = true
@@ -527,17 +714,48 @@ class FlashcardsVC: UIViewController {
                     self.CardDrawing.isHidden = true
                     self.CardImage.isHidden = true
                 }else if(self.cards[self.cardOrder[self.index]][0] as! String == "d"){
-                    do {
-                        try self.CardDrawing.drawing = recolor(PKDrawing(data: self.cards[self.cardOrder[self.index]][1] as! Data))
-                    } catch {
-                        
+                    if let drawingData = self.defaults.value(forKey: self.cards[self.cardOrder[self.index]][1] as! String){
+                        do {
+                            try self.CardDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
+                        } catch {
+                            print("Error converting Data to PkDrawing: \(error)")
+                        }
+                    }else {
+                        let storageRef = self.storage.reference().child(self.cards[self.cardOrder[self.index]][1] as! String)
+                        storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                            if let error = error {
+                                print("Error downloading drawing from Firebase Storage: \(error)")
+                            }else if let data = data {
+                                do {
+                                    try self.CardDrawing.drawing = recolor(PKDrawing(data: data ))
+                                } catch {
+                                    print("Error converting Data to PkDrawing: \(error)")
+                                }
+                                self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][1] as! String)
+                            }
+                        }
                     }
                     self.CardDrawing.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 0, 0, 0)
                     self.CardLabel.isHidden = true
                     self.CardDrawing.isHidden = false
                     self.CardImage.isHidden = true
                 }else{
-                    self.CardImage.image = UIImage(data: self.cards[self.cardOrder[self.index]][1] as! Data)
+                    if let imageData = self.defaults.value(forKey: self.cards[self.cardOrder[self.index]][1] as! String){
+                        self.CardImage.image = UIImage(data: imageData as! Data)
+                    }else {
+                        let storageRef = self.storage.reference().child(self.cards[self.cardOrder[self.index]][1] as! String)
+                        storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                            if let error = error {
+                                print("Error downloading drawing from Firebase Storage: \(error)")
+                            }else if let data = data {
+                                self.CardImage.image = UIImage(data: data )
+                                self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][1] as! String)
+                            }
+                        }
+                    }
+                    
+                    
+                    
                     self.CardImage.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 0, 0, 0)
                     self.CardLabel.isHidden = true
                     self.CardDrawing.isHidden = true

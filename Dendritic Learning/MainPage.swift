@@ -5,6 +5,9 @@
 //  Created by Tirth D. Patel on 4/16/24.
 //
 import UIKit
+import FirebaseAuth
+import FirebaseFirestore
+import Firebase
 
 class MainPage: UIViewController, NewSetDelegate {
 //    var isDarkMode = false // State variable to track dark mode
@@ -16,27 +19,20 @@ class MainPage: UIViewController, NewSetDelegate {
     let scrollView = UIScrollView()
     let stackView = UIStackView()
     
-    var destination = -1
+    var destination = ""
+    var destinationSet = ""
     
-    var sets: [[Any?]] = []
+    var recentSets: [[String: Any]] = []
+    var mySets: [[String: Any]] = []
     
     var goToEditor = false
     
+    let db = Firestore.firestore()
+    
+    var userData: [String: Any] = [:]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let theme = defaults.value(forKey: "theme") as? String{
-            for j in Colors.themes {
-                if j[0] as! String == theme {
-                    Colors.background = j[1] as! UIColor
-                    Colors.secondaryBackground = j[2] as! UIColor
-                    Colors.darkHighlight = j[3] as! UIColor
-                    Colors.highlight = j[4] as! UIColor
-                    Colors.lightHighlight = j[5] as! UIColor
-                    Colors.text = j[6] as! UIColor
-                }
-            }
-        }
-            
 //        for family in UIFont.familyNames {
 //            print("family: \(family)")
 //            for name in UIFont.fontNames(forFamilyName: family){
@@ -46,73 +42,59 @@ class MainPage: UIViewController, NewSetDelegate {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        
         setup()
     }
     
-//    @objc func toggleDarkMode(_ sender: UISwitch) {
-//        isDarkMode = sender.isOn
-//        view.backgroundColor = isDarkMode ? .black : .white
-//    }
-    
     func setup(){
-        sets = []
+        recentSets = []
+        mySets = []
         if let data = defaults.value(forKey: "sets") as? [Dictionary<String, Any>]{
-            //print("yeah")
-            //print(data)
-            for (index, i) in data.enumerated() {
-//                if i["image"] != nil {
-                sets.append([i["name"] as! String, i["type"] as! String, (defaults.value(forKey: "images") as! [Data?])[index]])
-                    
-//                }else{
-//                    sets.append([i["name"] as! String, i["type"] as! String, nil])
-//                }
+            if let uid = Auth.auth().currentUser?.uid{
+                let dataRef = db.collection("users").document(uid)
+                dataRef.getDocument { (document, error) in
+                    if let document = document, document.exists {
+                        self.userData = document.data()!
+                        if let theme = (self.userData["settings"] as? [String: Any])!["theme"]{
+                            for j in Colors.themes {
+                                if j[0] as! String == theme as! String {
+                                    Colors.background = j[1] as! UIColor
+                                    Colors.secondaryBackground = j[2] as! UIColor
+                                    Colors.darkHighlight = j[3] as! UIColor
+                                    Colors.highlight = j[4] as! UIColor
+                                    Colors.lightHighlight = j[5] as! UIColor
+                                    Colors.text = j[6] as! UIColor
+                                }
+                            }
+                        }
+                        
+                         
+                        if let sets = self.userData["studiedSets"]{
+                            self.recentSets = sets as! [[String: Any]]
+                        }
+                        let mySetIDs = self.userData["createdSets"] as! [String]
+                        for i in self.recentSets {
+                            if(mySetIDs.firstIndex(of: i["setID"] as! String) != nil){
+                                self.mySets.append(i)
+                            }
+                        }
+                        
+                        if let subscription = self.userData["subscription"] as? [String: Any] {
+                            if subscription["status"] as! String == "inactive" {
+                                self.defaults.set(false, forKey: "isPaid")
+                            }
+                        }
+                    } else {
+                        print("Document does not exist")
+                    }
+                }
             }
+//            for (index, i) in data.enumerated() {
+//                sets.append([i["name"] as! String, i["type"] as! String, (defaults.value(forKey: "images") as! [Data?])[index]])
+//            }
         }else{
-            //PLACEHOLDER SETS - add blank stuff and 'create first set' screen soon
-            
-//            var revwar: Dictionary<String, Any> = Dictionary()
-//            revwar["name"] = "American Revolution"
-//            revwar["type"] = "web"
-//            revwar["author"] = "mlundeen5270"
-//            revwar["date"] = "Last edited: May 20th, 2024"
-//            revwar["set"] = []
-            var trivia: Dictionary<String, Any> = Dictionary()
-            trivia["name"] = "Trivia"
-            trivia["type"] = "standard"
-            trivia["author"] = "mlundeen5270"
-            trivia["flashcards"] = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
-            trivia["date"] = "Last edited: May 20th, 2024"
-            trivia["learn"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            trivia["set"] = [
-                ["t", "What is the boiling point of water in Celsius?", "t", "100°C"],
-                ["t", "Who wrote the novel 'Pride and Prejudice'?", "t", "Jane Austen"],
-                ["t", "What is the chemical symbol for gold?", "t", "Au"],
-                ["t", "What is the tallest mountain in the world?", "t", "Mount Everest"],
-                ["t", "What year did the Titanic sink?", "t", "1912"],
-                ["t", "What is the capital of Brazil?", "t", "Brasília"],
-                ["t", "Who painted the 'Mona Lisa'?", "t", "Leonardo da Vinci"],
-                ["t", "What is the currency of Japan?", "t", "Japanese yen"],
-                ["t", "What is the largest mammal in the world?", "t", "Blue whale"],
-                ["t", "What is the chemical formula for water?", "t", "H2O"],
-                ["t", "Who discovered penicillin?", "t", "Alexander Fleming"],
-                ["t", "What is the main ingredient in guacamole?", "t", "Avocado"],
-                ["t", "What is the capital of Australia?", "t", "Canberra"],
-                ["t", "What is the square root of 144?", "t", "12"],
-                ["t", "Who wrote 'To Kill a Mockingbird'?", "t", "Harper Lee"],
-                ["t", "What is the chemical symbol for iron?", "t", "Fe"],
-                ["t", "What is the largest ocean on Earth?", "t", "Pacific Ocean"],
-                ["t", "What is the speed of light in a vacuum?", "t", "299,792,458 meters per second"],
-                ["t", "Who was the first woman to ever win a Nobel Prize in the whole entire large global world?", "t", "Marie Curie"],
-                ["t", "What is the capital of South Africa?", "t", "Pretoria"]
-            ]
-            trivia["version"] = Colors.version
-            defaults.setValue([trivia], forKey: "sets")
-            defaults.setValue([Colors.placeholderI] as [Data?], forKey: "images")
-            sets.append(["Trivia", "standard", Colors.placeholderI])
             defaults.setValue(false, forKey: "fingerDrawing")
-//            let image = UIImage(named: "samuel-branch-ZPVisr0s_hQ-unsplash.jpg")?.pngData()
-//            sets.append(["American Revolution", "web", image])
+            
+            performSegue(withIdentifier: "newUserVC", sender: nil)
         }
         
         for subview in stackView.arrangedSubviews {
@@ -146,12 +128,9 @@ class MainPage: UIViewController, NewSetDelegate {
         ])
         
         let topBar = UIView()
-        //topBar.frame = CGRect(x: 0, y: 0, width: stackView.frame.width, height: 50)
         topBar.heightAnchor.constraint(equalToConstant: 50).isActive = true
         stackView.addArrangedSubview(topBar)
         topBar.widthAnchor.constraint(equalTo: stackView.widthAnchor).isActive = true
-        //topBar.translatesAutoresizingMaskIntoConstraints = false
-        //topBar.backgroundColor = .red
         let icon = UIImageView(image: UIImage(named: "DendriticLearningIcon-01.svg")?.withRenderingMode(.alwaysTemplate))
         icon.tintColor = Colors.highlight
         icon.contentMode = .scaleAspectFit
@@ -169,10 +148,8 @@ class MainPage: UIViewController, NewSetDelegate {
         titleLabel.widthAnchor.constraint(equalToConstant: 400).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 10).isActive = true
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        //titleLabel.backgroundColor = .green
         
         let settingsIcon = UIImageView()
-        //settingsButton.setImage(UIImage(systemName: "gear"), for: .normal)
         settingsIcon.image = UIImage(systemName: "gear")
         settingsIcon.contentMode = .scaleAspectFit
         settingsIcon.tintColor = Colors.highlight
@@ -183,7 +160,6 @@ class MainPage: UIViewController, NewSetDelegate {
         settingsIcon.translatesAutoresizingMaskIntoConstraints = false
         
         let settingsButton = UIButton()
-        //settingsButton.setImage(UIImage(systemName: "gear"), for: .normal)
         settingsButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         settingsButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
         topBar.addSubview(settingsButton)
@@ -197,7 +173,7 @@ class MainPage: UIViewController, NewSetDelegate {
         stackView.addArrangedSubview(breakView0)
         
         let recentLabel = UILabel()
-        recentLabel.text = "Your sets"
+        recentLabel.text = "Recent sets"
         recentLabel.font = UIFont(name: "LilGrotesk-Black", size: 50)
         con(recentLabel, 300, 50)
         recentLabel.textColor = Colors.text
@@ -212,9 +188,8 @@ class MainPage: UIViewController, NewSetDelegate {
         newButton.imageView?.contentMode = .scaleAspectFit
         newButton.tintColor = Colors.highlight
         newButton.addTarget(self, action: #selector(newSet(_:)), for: .touchUpInside)
-        //recentLabel.backgroundColor = .purple
-        if(sets.count > 0){
-            for i in 0...((sets.count - 1)/3) {
+        if(recentSets.count > 0){
+            for i in 0...((recentSets.count - 1)/3) {
                 let row = UIStackView()
                 row.axis = .horizontal
                 row.spacing = 20
@@ -226,12 +201,12 @@ class MainPage: UIViewController, NewSetDelegate {
                     row.heightAnchor.constraint(equalToConstant: 100)
                 ])
                 for j in 3*i...(3*i) + 2 {
-                    if(sets.count > j){
+                    if(recentSets.count > j){
                         let setView = UIView()
                         row.addArrangedSubview(setView)
                         var image = UIImageView()
-                        if sets[j][2] as? Data != Colors.placeholderI {
-                            image = UIImageView(image: UIImage(data: sets[j][2] as! Data))
+                        if recentSets[j]["image"] as? Data != nil && recentSets[j]["image"] as? Data != Colors.placeholderI {
+                            image = UIImageView(image: UIImage(data: recentSets[j]["image"] as! Data))
                             image.layer.cornerRadius = 10
                             image.contentMode = .scaleAspectFill
                             image.clipsToBounds = true
@@ -240,7 +215,7 @@ class MainPage: UIViewController, NewSetDelegate {
                         }
                         setView.addSubview(image)
                         let setLabel = UILabel()
-                        setLabel.text = sets[j][0] as? String
+                        setLabel.text = recentSets[j]["name"] as? String
                         setView.addSubview(setLabel)
                         image.translatesAutoresizingMaskIntoConstraints = false
                         setView.translatesAutoresizingMaskIntoConstraints = false
@@ -250,7 +225,91 @@ class MainPage: UIViewController, NewSetDelegate {
                         setLabel.font = UIFont(name: "LilGrotesk-Regular", size: 25)
                         setView.layer.cornerRadius = 10
                         let setButton = UIButton()
-                        setButton.accessibilityIdentifier = String(j)
+                        setButton.accessibilityIdentifier = "r" + String(j)
+                        setButton.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
+                        setButton.translatesAutoresizingMaskIntoConstraints = false
+                        setView.addSubview(setButton)
+                        NSLayoutConstraint.activate([
+                            setView.widthAnchor.constraint(equalToConstant: (view.frame.width - 160)/3),
+                            setView.heightAnchor.constraint(equalTo: row.heightAnchor),
+                            setLabel.topAnchor.constraint(equalTo: setView.topAnchor),
+                            setLabel.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
+                            setLabel.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
+                            setLabel.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
+                            setButton.topAnchor.constraint(equalTo: setView.topAnchor),
+                            setButton.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
+                            setButton.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
+                            setButton.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
+                            image.topAnchor.constraint(equalTo: setView.topAnchor),
+                            image.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
+                            image.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
+                            image.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
+                        ])
+                    }else{
+                        let setView = UIView()
+                        row.addArrangedSubview(setView)
+                        NSLayoutConstraint.activate([
+                            setView.widthAnchor.constraint(equalToConstant: (view.frame.width - 160)/3),
+                            setView.heightAnchor.constraint(equalTo: row.heightAnchor),
+                        ])
+                    }
+                }
+            }
+        }
+        let yourLabel = UILabel()
+        yourLabel.text = "Your sets"
+        yourLabel.font = UIFont(name: "LilGrotesk-Black", size: 50)
+        con(yourLabel, 300, 50)
+        yourLabel.textColor = Colors.text
+        yourLabel.isUserInteractionEnabled = true
+        stackView.addArrangedSubview(yourLabel)
+//        let newButton = UIButton()
+//        newButton.frame = CGRect(x: 250, y: 5, width: 40, height: 40)
+//        recentLabel.addSubview(newButton)
+//        newButton.setImage(UIImage(systemName: "plus.app.fill"), for: .normal)
+//        newButton.contentHorizontalAlignment = .fill
+//        newButton.contentVerticalAlignment = .fill
+//        newButton.imageView?.contentMode = .scaleAspectFit
+//        newButton.tintColor = Colors.highlight
+//        newButton.addTarget(self, action: #selector(newSet(_:)), for: .touchUpInside)
+        if(mySets.count > 0){
+            for i in 0...((mySets.count - 1)/3) {
+                let row = UIStackView()
+                row.axis = .horizontal
+                row.spacing = 20
+                row.alignment = .leading
+                row.translatesAutoresizingMaskIntoConstraints = false
+                stackView.addArrangedSubview(row)
+                NSLayoutConstraint.activate([
+                    row.widthAnchor.constraint(equalTo: stackView.widthAnchor),
+                    row.heightAnchor.constraint(equalToConstant: 100)
+                ])
+                for j in 3*i...(3*i) + 2 {
+                    if(mySets.count > j){
+                        let setView = UIView()
+                        row.addArrangedSubview(setView)
+                        var image = UIImageView()
+                        if mySets[j]["image"] as? Data != nil && mySets[j]["image"] as? Data != Colors.placeholderI  {
+                            image = UIImageView(image: UIImage(data: mySets[j]["image"] as! Data))
+                            image.layer.cornerRadius = 10
+                            image.contentMode = .scaleAspectFill
+                            image.clipsToBounds = true
+                        }else{
+                            setView.backgroundColor = Colors.secondaryBackground
+                        }
+                        setView.addSubview(image)
+                        let setLabel = UILabel()
+                        setLabel.text = mySets[j]["name"] as? String
+                        setView.addSubview(setLabel)
+                        image.translatesAutoresizingMaskIntoConstraints = false
+                        setView.translatesAutoresizingMaskIntoConstraints = false
+                        setLabel.translatesAutoresizingMaskIntoConstraints = false
+                        setLabel.textColor = Colors.text
+                        setLabel.textAlignment = .center
+                        setLabel.font = UIFont(name: "LilGrotesk-Regular", size: 25)
+                        setView.layer.cornerRadius = 10
+                        let setButton = UIButton()
+                        setButton.accessibilityIdentifier = "m" + String(j)
                         setButton.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
                         setButton.translatesAutoresizingMaskIntoConstraints = false
                         setView.addSubview(setButton)
@@ -283,21 +342,7 @@ class MainPage: UIViewController, NewSetDelegate {
         }
     }
     
-//    func createButton(title: String, color: UIColor) -> UIButton {
-//        let button = UIButton()
-//        button.setTitle(title, for: .normal)
-//        button.setTitleColor(.white, for: .normal)
-//        button.backgroundColor = color
-//        button.layer.cornerRadius = 25
-//        button.titleLabel?.font = UIFont(name: "Times New Roman", size: 20)
-//        button.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
-//        button.layer.borderWidth = 2
-//        button.layer.borderColor = UIColor.white.cgColor
-//        return button
-//    }
-    
     @objc func newSet(_ sender: UIButton){
-        print("hi")
         let popupVC = NewSetVC()
         popupVC.delegate = self
         popupVC.modalPresentationStyle = .overCurrentContext
@@ -306,40 +351,56 @@ class MainPage: UIViewController, NewSetDelegate {
     }
     
     @objc func settings(_ sender: UIButton){
+        destination = "settings"
         performSegue(withIdentifier: "settingsVC", sender: nil)
     }
     
     @objc func buttonTapped(_ sender: UIButton) {
-        //performSegue(withIdentifier: "viewStandardSet", sender: self)
-        //performSegue(withIdentifier: "viewWebSet", sender: self)
-        destination = Int(sender.accessibilityIdentifier!)!
-        if(sets[Int(sender.accessibilityIdentifier!)!][1] as! String == "standard"){
-                self.performSegue(withIdentifier: "viewStandardSet", sender: self)
-        }else{
+        
+        if(String(sender.accessibilityIdentifier!.first!) == "r"){
+            destinationSet = recentSets[Int(sender.accessibilityIdentifier!.dropFirst())!]["setID"] as! String
+            if(recentSets[Int(sender.accessibilityIdentifier!.dropFirst())!]["type"] as! String == "standard"){
+                destination = "standard"
+                performSegue(withIdentifier: "viewStandardSet", sender: self)
+            }else{
+                destination = "web"
                 performSegue(withIdentifier: "viewWebSet", sender: self)
+            }
+        }else{
+            destinationSet = mySets[Int(sender.accessibilityIdentifier!.dropFirst())!]["setID"] as! String
+            if(mySets[Int(sender.accessibilityIdentifier!.dropFirst())!]["type"] as! String == "standard"){
+                destination = "standard"
+                performSegue(withIdentifier: "viewStandardSet", sender: self)
+            }else{
+                destination = "web"
+                performSegue(withIdentifier: "viewWebSet", sender: self)
+            }
         }
+        
+        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         segue.destination.modalPresentationStyle = .fullScreen
-        if(destination == -1){
+        if(destination == "settings"){
             //guard let vc = segue.destination as? SettingsVC else {return}
             //idk
-        }else if(sets[destination][1] as! String == "standard"){
+        }else if(destination == "newUser"){
+            //guard let vc = segue.destination as? NewUserVC else {return}
+        }else if(destination == "standard"){
             guard let vc = segue.destination as? StandardSetVC else {return}
             if(goToEditor){
                 vc.goToEditor = true
             }
-            vc.set = destination
+            vc.set = destinationSet
         }else{
             guard let vc = segue.destination as? WebSetVC else {return}
             if(goToEditor){
                 vc.goToEditor = true
             }
-            vc.set = destination
+            vc.set = destinationSet
         }
         goToEditor = false
-        destination = -1
     }
     
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
@@ -347,52 +408,55 @@ class MainPage: UIViewController, NewSetDelegate {
     }
     
     func newSetType(type: String){
+        goToEditor = true
+        var newSet: [String: Any] = [:]
+        newSet["name"] = "New Set"
+        newSet["author"] = userData["username"]!
+        newSet["authorID"] = Auth.auth().currentUser?.uid
+        newSet["date"] = Timestamp()
+        newSet["version"] = Colors.version
+        newSet["image"] = nil
+        var studiedSet: [String: Any] = [:]
+        studiedSet["name"] = "New Set"
+        studiedSet["image" ] = nil
         if(type == "Standard"){
-            goToEditor = true
-            destination = sets.count
-            var trivia: Dictionary<String, Any> = Dictionary()
-            trivia["name"] = "New Set"
-            trivia["type"] = "standard"
-            trivia["author"] = "mlundeen5270"
-            trivia["flashcards"] = [false]
-            trivia["date"] = "Last edited: " + dateString()
-            trivia["image"] = Colors.placeholderI
-            trivia["set"] = [["t", "Example term", "t", "Example definition"]]
-            trivia["learn"] = [0]
-            trivia["version"] = Colors.version
-            sets.append(["New Set", "standard", Colors.placeholderI])
-            var oldData = defaults.value(forKey: "sets") as! [Any]
-            oldData.append(trivia)
-            defaults.setValue(oldData, forKey: "sets")
-            var images = (defaults.value(forKey: "images") as! [Data?])
-            images.append(Colors.placeholderI)
-            defaults.setValue(images, forKey: "images")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-                self.performSegue(withIdentifier: "viewStandardSet", sender: self)
-                //goToEditor = false
-            }
+            newSet["type"] = "standard"
+            newSet["set"] = [["t", "Example term", "t", "Example definition"]]
+            studiedSet["type"] = "standard"
+            studiedSet["learn"] = [0]
+            studiedSet["flashcards"] = [false]
         }else if(type == "Web"){
-            goToEditor = true
-            destination = sets.count
-            var revwar: Dictionary<String, Any> = Dictionary()
-            revwar["name"] = "New Web"
-            revwar["type"] = "web"
-            revwar["author"] = "mlundeen5270"
-            revwar["date"] = "Last edited: " + dateString()
-            revwar["set"] = []
-            revwar["version"] = Colors.version
-            sets.append(["New Web", "web", Colors.placeholderI])
-            var oldData = defaults.value(forKey: "sets") as! [Any]
-            oldData.append(revwar)
-            defaults.setValue(oldData, forKey: "sets")
-            var images = (defaults.value(forKey: "images") as! [Data?])
-            images.append(Colors.placeholderI)
-            defaults.setValue(images, forKey: "images")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-                self.performSegue(withIdentifier: "viewWebSet", sender: self)
-            }
-            //goToEditor = false
+            newSet["type"] = "web"
+            newSet["set"] = []
+            studiedSet["type"] = "web"
         }
+        
+        let ref = db.collection("sets").addDocument(data: newSet) { error in
+            if let error = error {
+                print("Error adding document: \(error)")
+                return
+            } else {
+                if(type == "Standard"){
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                        self.performSegue(withIdentifier: "viewStandardSet", sender: self)
+                    }
+                }else{
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                        self.performSegue(withIdentifier: "viewWebSet", sender: self)
+                    }
+                }
+            }
+        }
+        self.destination = ref.documentID
+        studiedSet["setID"] = ref.documentID
+        var newMy = userData["mySets"] as! [String]
+        newMy.append(ref.documentID)
+        var newStudied = userData["studiedSets"] as! [[String: Any]]
+        
+        db.collection("users").document(Auth.auth().currentUser!.uid).setData([
+            "mySets": newMy,
+            "studiedSets": newStudied
+        ], merge: true)
     }
     
     func newImport() {

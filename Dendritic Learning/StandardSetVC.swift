@@ -7,6 +7,9 @@
 
 import UIKit
 import PencilKit
+import FirebaseAuth
+import FirebaseFirestore
+import FirebaseStorage
 
 class StandardSetVC: UIViewController {
 
@@ -15,14 +18,19 @@ class StandardSetVC: UIViewController {
     let scrollView = UIScrollView()
     let stackView = UIStackView()
     
-    var set = 0 // passed through mainpage
+    var set = "" // passed through mainpage
     var cards: [[Any]] = [] //t: text, d: drawing, s: speech - maybe
     var name: String = ""
     var date: String = ""
     
-    var image: Data? = Colors.placeholderI
+    var setData: [String: Any] = [:]
+    
+    var image: String? = nil
     
     var goToEditor = false
+    
+    let db = Firestore.firestore()
+    let storage = Storage.storage()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,26 +48,43 @@ class StandardSetVC: UIViewController {
 //        print("//////////////////////////////////////////////")
 //        print(cards)
         
-        setup()
+        //setup()
     }
     override func viewDidAppear(_ animated: Bool) {
         setup()
     }
     
     func setup(){
-        let sets = defaults.value(forKey: "sets") as! [Dictionary<String, Any>]
-        if sets.count == set {
-            performSegue(withIdentifier: "standardSetVC_unwind", sender: nil)
-        }else{
-            let data = sets[set]
-            if(name != "" && (name != data["name"] as! String)){
-                performSegue(withIdentifier: "standardSetVC_unwind", sender: nil)
+        let storageRef = storage.reference()
+        //if sets.count == set {
+        //    performSegue(withIdentifier: "standardSetVC_unwind", sender: nil)
+        //}else{
+        let dataRef = db.collection("sets").document(set)
+        dataRef.getDocument { (document, error) in
+            if let document = document, document.exists {
+                self.setData = document.data()!
+                self.defaults.set(self.setData, forKey: "set")
+                if let cards = self.setData["set"] as? [[Any]]{
+                    self.cards = cards
+                }
+                if let name = self.setData["name"] as? String{
+                    self.name = name
+                }
+                if let image = self.setData["image"] as? String?{
+                    self.image = image
+                }
+                if let timestamp = self.setData["date"] as? Timestamp {
+                    let date = timestamp.dateValue()
+                    self.date = formatDate(date)
+                }
+                
+            } else {
+                print("Document does not exist")
             }
-            name = data["name"] as! String
-            date = data["date"] as! String
-            cards = data["set"] as! [[Any]]
-
-            image = (defaults.value(forKey: "images") as! [Data?])[set]
+        }
+//            if(name != "" && (name != data["name"] as! String)){
+//                performSegue(withIdentifier: "standardSetVC_unwind", sender: nil)
+//            }
             for subview in stackView.arrangedSubviews {
                 stackView.removeArrangedSubview(subview)
                 subview.removeFromSuperview()
@@ -68,10 +93,24 @@ class StandardSetVC: UIViewController {
             for subview in view.subviews {
                 subview.removeFromSuperview()
             }
-            if(image == Colors.placeholderI){
+            if(image == nil){
                 view.backgroundColor = Colors.background
             }else{
-                let backgroundImage = UIImageView(image: UIImage(data: image!))
+                var actualImage = UIImage()
+                if let imageData = defaults.object(forKey: image!) {
+                    actualImage = UIImage(data: imageData as! Data)!
+                }else{
+                    let imageRef = storageRef.child(image!)
+                    imageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
+                        if let error = error {
+                            print("error retrieving image: \(error)")
+                        } else {
+                            let actualImage = UIImage(data: data!)
+                            self.defaults.set(data!, forKey: self.image!)
+                        }
+                    }
+                }
+                let backgroundImage = UIImageView(image: actualImage)
                 backgroundImage.contentMode = .scaleAspectFill
                 view.addSubview(backgroundImage)
                 backgroundImage.translatesAutoresizingMaskIntoConstraints = false
@@ -127,33 +166,33 @@ class StandardSetVC: UIViewController {
             dateLabel.textColor = Colors.text
             stackView.addArrangedSubview(dateLabel)
             
-            let breakView5 = UIView()
-            breakView5.widthAnchor.constraint(equalToConstant: 30).isActive = true
-            breakView5.heightAnchor.constraint(equalToConstant: 30).isActive = true
-            stackView.addArrangedSubview(breakView5)
-            
-            let shareButton = UIButton()
-            con(shareButton, 200, 30)
-            shareButton.addTarget(self, action: #selector(self.export(sender:)), for: .touchUpInside)
-            shareButton.translatesAutoresizingMaskIntoConstraints = false
-            stackView.addArrangedSubview(shareButton)
-            let shareIcon = UIImageView()
-            shareIcon.translatesAutoresizingMaskIntoConstraints = false
-            con(shareIcon, 30, 30)
-            shareButton.addSubview(shareIcon)
-            shareIcon.image = UIImage(systemName: "arrow.down.square.fill")
-            shareIcon.leadingAnchor.constraint(equalTo: shareButton.leadingAnchor).isActive = true
-            shareIcon.tintColor = Colors.highlight
-            shareIcon.contentMode = .scaleAspectFit
-            let shareText = UILabel()
-            shareText.translatesAutoresizingMaskIntoConstraints = false
-            shareButton.addSubview(shareText)
-            conH(shareText, 30)
-            shareText.leadingAnchor.constraint(equalTo: shareIcon.trailingAnchor, constant: 10).isActive = true
-            shareText.trailingAnchor.constraint(equalTo: shareButton.trailingAnchor).isActive = true
-            shareText.text = "Download"
-            shareText.font = UIFont(name: "LilGrotesk-Bold", size: 20)
-            shareText.textColor = Colors.highlight
+//            let breakView5 = UIView()
+//            breakView5.widthAnchor.constraint(equalToConstant: 30).isActive = true
+//            breakView5.heightAnchor.constraint(equalToConstant: 30).isActive = true
+//            stackView.addArrangedSubview(breakView5)
+//            
+//            let shareButton = UIButton()
+//            con(shareButton, 200, 30)
+//            shareButton.addTarget(self, action: #selector(self.export(sender:)), for: .touchUpInside)
+//            shareButton.translatesAutoresizingMaskIntoConstraints = false
+//            stackView.addArrangedSubview(shareButton)
+//            let shareIcon = UIImageView()
+//            shareIcon.translatesAutoresizingMaskIntoConstraints = false
+//            con(shareIcon, 30, 30)
+//            shareButton.addSubview(shareIcon)
+//            shareIcon.image = UIImage(systemName: "arrow.down.square.fill")
+//            shareIcon.leadingAnchor.constraint(equalTo: shareButton.leadingAnchor).isActive = true
+//            shareIcon.tintColor = Colors.highlight
+//            shareIcon.contentMode = .scaleAspectFit
+//            let shareText = UILabel()
+//            shareText.translatesAutoresizingMaskIntoConstraints = false
+//            shareButton.addSubview(shareText)
+//            conH(shareText, 30)
+//            shareText.leadingAnchor.constraint(equalTo: shareIcon.trailingAnchor, constant: 10).isActive = true
+//            shareText.trailingAnchor.constraint(equalTo: shareButton.trailingAnchor).isActive = true
+//            shareText.text = "Download"
+//            shareText.font = UIFont(name: "LilGrotesk-Bold", size: 20)
+//            shareText.textColor = Colors.highlight
             
             let breakView1 = UIView()
             breakView1.widthAnchor.constraint(equalToConstant: 30).isActive = true
@@ -305,7 +344,7 @@ class StandardSetVC: UIViewController {
                 termDefinitionStackView.spacing = 15
                 conW(termDefinitionStackView, view.frame.width - 100)
                 
-                if(image == Colors.placeholderI){
+                if(image == nil){
                     termDefinitionStackView.backgroundColor = Colors.secondaryBackground
                     termDefinitionStackView.layer.cornerRadius = 10
                 }else{
@@ -325,7 +364,7 @@ class StandardSetVC: UIViewController {
                 
                 allTermsStackView.addArrangedSubview(termDefinitionStackView)
             }
-        }
+        //}
     }
     
     func createButton(withTitle title: String) -> UIButton {
@@ -340,7 +379,7 @@ class StandardSetVC: UIViewController {
         conW(button, (title as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont(name: "LilGrotesk-Bold", size: 30)!]).width + 40)
         button.layer.masksToBounds = true
 
-        if(image == Colors.placeholderI){
+        if(image == nil){
             button.backgroundColor = Colors.secondaryBackground
         }else{
             var blurEffect = UIBlurEffect(style: .systemThinMaterial)
@@ -395,38 +434,38 @@ class StandardSetVC: UIViewController {
         performSegue(withIdentifier: "standardSetVC_unwind", sender: nil)
     }
     
-    @objc func export(sender: UIButton){
-        var cardsDictionary: [String: Any] = (defaults.object(forKey: "sets") as! [Dictionary<String, Any>])[set]
-        var oldLearn: [Int] = []
-        for _ in 0 ..< cardsDictionary.count {
-            oldLearn.append(0)
-        }
-        var oldFlash: [Bool] = []
-        for _ in 0 ..< cardsDictionary.count {
-            oldFlash.append(false)
-        }
-        cardsDictionary["flashcards"] = oldFlash
-        cardsDictionary["learn"] = oldLearn
-        //cardsDictionary["images"] = (defaults.object(forKey: "images") as! [Data?])[set]
-        guard let data = try? NSKeyedArchiver.archivedData(withRootObject: cardsDictionary, requiringSecureCoding: false) else {
-            print("Failed to archive data.")
-            return
-        }
-        
-        let temporaryDirectoryURL = FileManager.default.temporaryDirectory
-        let timeString = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
-        let fileURL = temporaryDirectoryURL.appendingPathComponent(name).appendingPathExtension("dlset")
-        
-        do {
-            try data.write(to: fileURL)
-            
-            let documentPicker = UIDocumentPickerViewController(url: fileURL, in: .exportToService)
-            documentPicker.shouldShowFileExtensions = true
-            self.present(documentPicker, animated: true, completion: nil)
-        } catch {
-            print("Error exporting cards: \(error.localizedDescription)")
-        }
-    }
+//    @objc func export(sender: UIButton){
+//        var cardsDictionary: [String: Any] = (defaults.object(forKey: "sets") as! [Dictionary<String, Any>])[set]
+//        var oldLearn: [Int] = []
+//        for _ in 0 ..< cardsDictionary.count {
+//            oldLearn.append(0)
+//        }
+//        var oldFlash: [Bool] = []
+//        for _ in 0 ..< cardsDictionary.count {
+//            oldFlash.append(false)
+//        }
+//        cardsDictionary["flashcards"] = oldFlash
+//        cardsDictionary["learn"] = oldLearn
+//        //cardsDictionary["images"] = (defaults.object(forKey: "images") as! [Data?])[set]
+//        guard let data = try? NSKeyedArchiver.archivedData(withRootObject: cardsDictionary, requiringSecureCoding: false) else {
+//            print("Failed to archive data.")
+//            return
+//        }
+//        
+//        let temporaryDirectoryURL = FileManager.default.temporaryDirectory
+//        let timeString = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
+//        let fileURL = temporaryDirectoryURL.appendingPathComponent(name).appendingPathExtension("dlset")
+//        
+//        do {
+//            try data.write(to: fileURL)
+//            
+//            let documentPicker = UIDocumentPickerViewController(url: fileURL, in: .exportToService)
+//            documentPicker.shouldShowFileExtensions = true
+//            self.present(documentPicker, animated: true, completion: nil)
+//        } catch {
+//            print("Error exporting cards: \(error.localizedDescription)")
+//        }
+//    }
     
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
         

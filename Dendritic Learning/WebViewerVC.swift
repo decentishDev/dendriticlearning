@@ -10,7 +10,7 @@ import UIKit
 class WebViewerVC: UIViewController, UIScrollViewDelegate {
     let defaults = UserDefaults.standard
 
-    var set = 0
+    var set = ""
     var name = "Revolutionary War"
     var rectangles: [UIView] = []
     var scrollView: UIScrollView!
@@ -28,12 +28,10 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate {
         super.viewDidLoad()
         view.backgroundColor = Colors.background
 
-        let data = (defaults.value(forKey: "sets") as! [Dictionary<String, Any>])[set]
+        let data = defaults.value(forKey: "set") as! [String: Any]
         //print(data)
         name = data["name"] as! String
         web = data["set"] as! [[Any]]
-        
-        
         
         scrollView = UIScrollView(frame: view.bounds)
         scrollView.contentSize = CGSize(width: view.bounds.width, height: view.bounds.height)

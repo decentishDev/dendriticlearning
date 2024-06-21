@@ -21,7 +21,7 @@ class SettingsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setup()
+        //setup()
     }
     
     override func viewDidAppear(_ animated: Bool) {

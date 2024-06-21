@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hw7-sh-ECA">
-    <device id="ipad10_2" orientation="landscape" layout="fullscreen" appearance="light"/>
+    <device id="ipad10_2" orientation="landscape" layout="fullscreen" appearance="dark"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -8,6 +8,26 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--New UserVC-->
+        <scene sceneID="y5W-Bs-0UI">
+            <objects>
+                <viewController id="Ga0-Av-FmX" customClass="NewUserVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="f7q-fm-057">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="ZkS-BW-C5X"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="Mjf-N5-h6j"/>
+                    <connections>
+                        <segue destination="c2A-3D-Ktm" kind="unwind" identifier="newUser_unwind" unwindAction="cancel:" id="JdH-aU-ckt"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="T9g-Li-PsI" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="c2A-3D-Ktm" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="-19" y="-1765"/>
+        </scene>
         <!--Standard SetVC-->
         <scene sceneID="Guk-E4-4ck">
             <objects>
@@ -148,6 +168,7 @@
                         <segue destination="FIP-K8-yah" kind="show" identifier="viewStandardSet" id="rHk-hI-Fbs"/>
                         <segue destination="o57-tv-PwE" kind="show" identifier="viewWebSet" id="s1d-gY-Yty"/>
                         <segue destination="Xpx-KQ-zv9" kind="show" identifier="settingsVC" id="mdz-NW-Lqh"/>
+                        <segue destination="Ga0-Av-FmX" kind="show" identifier="newUserVC" animates="NO" id="rdL-81-wd4"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QPn-Te-KUs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

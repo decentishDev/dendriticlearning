@@ -11,7 +11,7 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
 
     let defaults = UserDefaults.standard
 
-    var set = 0
+    var set = ""
     var web: [[Any]] = []
     var round: [Int] = []
     var termCounter = UILabel()
@@ -48,7 +48,7 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
 //        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardDidChangeFrameNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         view.backgroundColor = Colors.background
-        let data = (defaults.value(forKey: "sets") as! [Dictionary<String, Any>])[set]
+        let data = defaults.value(forKey: "set") as! [String: Any]
         web = data["set"] as! [[Any]]
         
         if(web.count > 0){

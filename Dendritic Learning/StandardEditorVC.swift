@@ -7,6 +7,9 @@
 
 import UIKit
 import PencilKit
+import FirebaseAuth
+import FirebaseFirestore
+import FirebaseStorage
 
 class StandardEditorVC: UIViewController, UITextFieldDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DrawingEditorDelegate {
     
@@ -16,12 +19,14 @@ class StandardEditorVC: UIViewController, UITextFieldDelegate, UITextViewDelegat
     let stackView = UIStackView()
     let allTermsStackView = UIStackView()
     
-    var set = 0 // passed through mainpage
+    var set = "" // passed through mainpage
     var cards: [[Any]] = [] //t: text, d: drawing, s: speech - maybe
     var name: String = ""
     var date: String = ""
-    var flashcards: [Bool] = []
-    var learn: [Int] = []
+    var image: String? = nil
+    var isPaid = false
+//    var flashcards: [Bool] = []
+//    var learn: [Int] = []
     
     var currentImagePicker = -1
     
@@ -35,14 +40,19 @@ class StandardEditorVC: UIViewController, UITextFieldDelegate, UITextViewDelegat
     
     var indexes: [Int] = []
     
+    let db = Firestore.firestore()
+    let storage = Storage.storage()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        let data = (defaults.value(forKey: "sets") as! [Dictionary<String, Any>])[set]
+        let data = defaults.value(forKey: "set") as! [String: Any]
         name = data["name"] as! String
         date = data["date"] as! String
         cards = data["set"] as! [[Any]]
-        flashcards = data["flashcards"] as! [Bool]
-        learn = data["learn"] as! [Int]
+        image = data["image"] as! String?
+        isPaid = defaults.value(forKey: "isPaid") as! Bool
+//        flashcards = data["flashcards"] as! [Bool]
+//        learn = data["learn"] as! [Int]
         view.backgroundColor = Colors.background
         imagePicker.delegate = self
         imagePicker.sourceType = .photoLibrary
@@ -54,8 +64,6 @@ class StandardEditorVC: UIViewController, UITextFieldDelegate, UITextViewDelegat
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         
         setup()
-        
-        
     }
 
 deinit {
@@ -128,7 +136,7 @@ deinit {
         
         topBar.addSubview(titleField)
         
-        if((defaults.value(forKey: "images") as! [Data?])[set] == Colors.placeholderI){
+        if(image == nil){
             imageButton.setImage(UIImage(systemName: "photo"), for: .normal)
         }else{
             imageButton.setImage(UIImage(systemName: "rectangle.badge.xmark.fill"), for: .normal)
@@ -227,10 +235,10 @@ deinit {
                 drawingButton.insertSubview(termDrawing, at: 0)
                 termDrawing.anchorPoint = CGPoint(x: 1, y: 1)
                 
-//                termDrawing.leadingAnchor.constraint(equalTo: drawingButton.leadingAnchor).isActive = true
-//                termDrawing.trailingAnchor.constraint(equalTo: drawingButton.trailingAnchor).isActive = true
-//                termDrawing.topAnchor.constraint(equalTo: drawingButton.topAnchor).isActive = true
-//                termDrawing.bottomAnchor.constraint(equalTo: drawingButton.bottomAnchor).isActive = true
+                //                termDrawing.leadingAnchor.constraint(equalTo: drawingButton.leadingAnchor).isActive = true
+                //                termDrawing.trailingAnchor.constraint(equalTo: drawingButton.trailingAnchor).isActive = true
+                //                termDrawing.topAnchor.constraint(equalTo: drawingButton.topAnchor).isActive = true
+                //                termDrawing.bottomAnchor.constraint(equalTo: drawingButton.bottomAnchor).isActive = true
                 
                 termDefinitionStackView.addArrangedSubview(drawingButton)
                 
@@ -280,10 +288,10 @@ deinit {
                 definitionDrawing.translatesAutoresizingMaskIntoConstraints = false
                 //definitionDrawing.backgroundColor = .red
                 drawingButton.insertSubview(definitionDrawing, at: 0)
-//                definitionDrawing.leadingAnchor.constraint(equalTo: drawingButton.leadingAnchor).isActive = true
-//                definitionDrawing.trailingAnchor.constraint(equalTo: drawingButton.trailingAnchor).isActive = true
-//                definitionDrawing.topAnchor.constraint(equalTo: drawingButton.topAnchor).isActive = true
-//                definitionDrawing.bottomAnchor.constraint(equalTo: drawingButton.bottomAnchor).isActive = true
+                //                definitionDrawing.leadingAnchor.constraint(equalTo: drawingButton.leadingAnchor).isActive = true
+                //                definitionDrawing.trailingAnchor.constraint(equalTo: drawingButton.trailingAnchor).isActive = true
+                //                definitionDrawing.topAnchor.constraint(equalTo: drawingButton.topAnchor).isActive = true
+                //                definitionDrawing.bottomAnchor.constraint(equalTo: drawingButton.bottomAnchor).isActive = true
                 definitionDrawing.anchorPoint = CGPoint(x: 1, y: 1)
                 definitionDrawing.backgroundColor = Colors.background
                 
@@ -315,15 +323,17 @@ deinit {
             button1.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
             button1.accessibilityIdentifier = "1" + String(i)
             let button2 = UIButton()
-            button2.frame = CGRect(x: 30, y: 0, width: 30, height: 30)
-            button2.setImage(UIImage(systemName: "photo"), for: .normal)
-            if(cards[i][0] as! String == "i"){
-                button2.tintColor = Colors.highlight
-            }else{
-                button2.tintColor = Colors.darkHighlight
+            if(isPaid){
+                button2.frame = CGRect(x: 30, y: 0, width: 30, height: 30)
+                button2.setImage(UIImage(systemName: "photo"), for: .normal)
+                    if(cards[i][0] as! String == "i"){
+                    button2.tintColor = Colors.highlight
+                }else{
+                    button2.tintColor = Colors.darkHighlight
+                }
+                button2.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
+                button2.accessibilityIdentifier = "2" + String(i)
             }
-            button2.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
-            button2.accessibilityIdentifier = "2" + String(i)
             let button3 = UIButton()
             button3.frame = CGRect(x: 60, y: 0, width: 30, height: 30)
             button3.setImage(UIImage(systemName: "pencil.and.scribble"), for: .normal)
@@ -428,11 +438,13 @@ deinit {
         button1.addTarget(self, action: #selector(changeDefaultInput(_:)), for: .touchUpInside)
         button1.accessibilityIdentifier = "1" + String(cards.count)
         let button2 = UIButton()
-        button2.frame = CGRect(x: 30, y: 0, width: 30, height: 30)
-        button2.setImage(UIImage(systemName: "photo"), for: .normal)
-        button2.tintColor = Colors.darkHighlight
-        button2.addTarget(self, action: #selector(changeDefaultInput(_:)), for: .touchUpInside)
-        button2.accessibilityIdentifier = "2" + String(cards.count)
+        if isPaid {
+            button2.frame = CGRect(x: 30, y: 0, width: 30, height: 30)
+            button2.setImage(UIImage(systemName: "photo"), for: .normal)
+            button2.tintColor = Colors.darkHighlight
+            button2.addTarget(self, action: #selector(changeDefaultInput(_:)), for: .touchUpInside)
+            button2.accessibilityIdentifier = "2" + String(cards.count)
+        }
         let button3 = UIButton()
         button3.frame = CGRect(x: 60, y: 0, width: 30, height: 30)
         button3.setImage(UIImage(systemName: "pencil.and.scribble"), for: .normal)
@@ -632,8 +644,6 @@ deinit {
         termDefinitionStackView.layer.cornerRadius = 10
         
         cards.append([defaultTerm, term, defaultDefinition, definition])
-        flashcards.append(false)
-        learn.append(0)
         save()
         
         let i = indexes[cards.count - 2] + 1
@@ -653,15 +663,17 @@ deinit {
         button1.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
         button1.accessibilityIdentifier = "1" + String(i)
         let button2 = UIButton()
-        button2.frame = CGRect(x: 30, y: 0, width: 30, height: 30)
-        button2.setImage(UIImage(systemName: "photo"), for: .normal)
-        if(cards[i][0] as! String == "i"){
-            button2.tintColor = Colors.highlight
-        }else{
-            button2.tintColor = Colors.darkHighlight
+        if isPaid {
+            button2.frame = CGRect(x: 30, y: 0, width: 30, height: 30)
+            button2.setImage(UIImage(systemName: "photo"), for: .normal)
+            if(cards[i][0] as! String == "i"){
+                button2.tintColor = Colors.highlight
+            }else{
+                button2.tintColor = Colors.darkHighlight
+            }
+            button2.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
+            button2.accessibilityIdentifier = "2" + String(i)
         }
-        button2.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
-        button2.accessibilityIdentifier = "2" + String(i)
         let button3 = UIButton()
         button3.frame = CGRect(x: 60, y: 0, width: 30, height: 30)
         button3.setImage(UIImage(systemName: "pencil.and.scribble"), for: .normal)
@@ -956,13 +968,20 @@ deinit {
     }
     
     func save(){
-        var previousData = defaults.object(forKey: "sets") as! [Dictionary<String, Any>]
-        previousData[set]["set"] = cards
-        previousData[set]["name"] = name
-        previousData[set]["flashcards"] = flashcards
-        previousData[set]["learn"] = learn
-        previousData[set]["date"] = "Last edited: " + dateString()
-        defaults.set(previousData, forKey: "sets")
+        var oldSet: [String: Any] = [:]
+        let setRef = self.db.collection("sets").document(set)
+        setRef.getDocument { (document, error) in
+            if let document = document, document.exists {
+                oldSet = document.data()!
+            } else {
+                print("Document does not exist")
+            }
+        }
+        oldSet["name"] = name
+        oldSet["date"] = Timestamp()
+        oldSet["set"] = web
+        oldSet["image"] = image
+        db.collection("sets").document(set).setData(oldSet)
     }
     
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
@@ -1017,8 +1036,6 @@ deinit {
         allTermsStackView.arrangedSubviews[actualI].removeFromSuperview()
         //allTermsStackView.removeArrangedSubview(allTermsStackView.arrangedSubviews[i])
         cards.remove(at: actualI)
-        flashcards.remove(at: actualI)
-        learn.remove(at: actualI)
         indexes.remove(at: actualI)
         save()
     }
