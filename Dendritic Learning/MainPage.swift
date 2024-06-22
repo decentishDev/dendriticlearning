@@ -48,7 +48,7 @@ class MainPage: UIViewController, NewSetDelegate {
     func setup(){
         recentSets = []
         mySets = []
-        if let data = defaults.value(forKey: "sets") as? [Dictionary<String, Any>]{
+        if let data = defaults.value(forKey: "fingerDrawing") as? Bool{
             if let uid = Auth.auth().currentUser?.uid{
                 let dataRef = db.collection("users").document(uid)
                 dataRef.getDocument { (document, error) in
@@ -69,10 +69,12 @@ class MainPage: UIViewController, NewSetDelegate {
                         
                          
                         if let sets = self.userData["studiedSets"]{
+                            print("heyy")
                             self.recentSets = sets as! [[String: Any]]
                         }
                         let mySetIDs = self.userData["createdSets"] as! [String]
                         for i in self.recentSets {
+                            print("heyy")
                             if(mySetIDs.firstIndex(of: i["setID"] as! String) != nil){
                                 self.mySets.append(i)
                             }
@@ -87,6 +89,8 @@ class MainPage: UIViewController, NewSetDelegate {
                         print("Document does not exist")
                     }
                 }
+            }else{
+                performSegue(withIdentifier: "newUserVC", sender: nil)
             }
 //            for (index, i) in data.enumerated() {
 //                sets.append([i["name"] as! String, i["type"] as! String, (defaults.value(forKey: "images") as! [Data?])[index]])
@@ -96,6 +100,9 @@ class MainPage: UIViewController, NewSetDelegate {
             
             performSegue(withIdentifier: "newUserVC", sender: nil)
         }
+        
+        print(mySets)
+        print(recentSets)
         
         for subview in stackView.arrangedSubviews {
             stackView.removeArrangedSubview(subview)
@@ -421,7 +428,12 @@ class MainPage: UIViewController, NewSetDelegate {
         studiedSet["image" ] = nil
         if(type == "Standard"){
             newSet["type"] = "standard"
-            newSet["set"] = [["t", "Example term", "t", "Example definition"]]
+            newSet["set"] = [[
+                "termType": "t",
+                "term": "Example term",
+                "defType": "t",
+                "def": "Example definition"
+            ]]
             studiedSet["type"] = "standard"
             studiedSet["learn"] = [0]
             studiedSet["flashcards"] = [false]
@@ -447,14 +459,14 @@ class MainPage: UIViewController, NewSetDelegate {
                 }
             }
         }
-        self.destination = ref.documentID
+        self.destinationSet = ref.documentID
         studiedSet["setID"] = ref.documentID
-        var newMy = userData["mySets"] as! [String]
+        var newMy = userData["createdSets"] as! [String]
         newMy.append(ref.documentID)
         var newStudied = userData["studiedSets"] as! [[String: Any]]
-        
+        newStudied.append(studiedSet)
         db.collection("users").document(Auth.auth().currentUser!.uid).setData([
-            "mySets": newMy,
+            "createdSets": newMy,
             "studiedSets": newStudied
         ], merge: true)
     }

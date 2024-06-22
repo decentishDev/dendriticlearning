@@ -59,6 +59,9 @@ class StandardSetVC: UIViewController {
         //if sets.count == set {
         //    performSegue(withIdentifier: "standardSetVC_unwind", sender: nil)
         //}else{
+        print("///")
+        print(set)
+        print("///")
         let dataRef = db.collection("sets").document(set)
         dataRef.getDocument { (document, error) in
             if let document = document, document.exists {

@@ -73,7 +73,7 @@ class NewSetVC: UIViewController, UIDocumentPickerDelegate {
         let importButton = UIButton()
         importButton.frame = CGRect(x: 30, y: 240, width: 500, height: 75)
         importButton.backgroundColor = Colors.secondaryBackground
-        importButton.addTarget(self, action: #selector(importSet(_:)), for: .touchUpInside)
+        //importButton.addTarget(self, action: #selector(importSet(_:)), for: .touchUpInside)
         importButton.layer.cornerRadius = 10
         centeredView.addSubview(importButton)
         let importIcon = UIImageView(image: UIImage(systemName: "doc.badge.arrow.up.fill"))

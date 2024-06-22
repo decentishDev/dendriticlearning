@@ -276,7 +276,11 @@ class NewUserVC: UIViewController {
                                 ],
                                 "transactions": [],
                                 "createdSets": [],
-                                "studiedSets": []
+                                "studiedSets": [],
+                                "settings": [
+                                    "theme": "Dark"
+                                ]
+                                
                             ]) { err in
                                 if let err = err {
                                     print("Error adding document: \(err)")

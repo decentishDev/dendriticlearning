@@ -33,7 +33,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
     var currentInput = "t" //t, d, d-r, s, s-r
     var startOnFront = true
     var cardOrder: [Int] = []
-    var cards: [[Any]] = []
+    var cards: [[String: Any?]] = []
     var known: [Int] = []
     var index: Int = 0
     
@@ -63,7 +63,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         let data = defaults.value(forKey: "set") as! [String: Any]
-        cards = data["set"] as! [[Any]]
+        cards = data["set"] as! [[String: Any]]
         var userData: [String: Any] = [:]
         let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
         userRef.getDocument { (document, error) in
@@ -296,24 +296,24 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
                 self.CardLabel.alpha = 0
                 self.CardDrawing.alpha = 0
             }, completion: {_ in
-                self.CardLabel.text = self.cards[i][3] as? String
+                self.CardLabel.text = self.cards[i]["def"] as? String
                 UIView.animate(withDuration: 1, animations: {
                     self.CardLabel.alpha = 1
                 }, completion: {_ in
                     UIView.animate(withDuration: 1, animations: {
                         self.CardLabel.alpha = 0
                     }, completion: {_ in
-                        if(self.cards[i][0] as! String == "t"){
-                            self.CardLabel.text = self.cards[i][1] as? String
+                        if(self.cards[i]["termType"] as! String == "t"){
+                            self.CardLabel.text = self.cards[i]["term"] as? String
                         }else{
-                            if let drawingData = self.defaults.value(forKey: self.cards[i][1] as! String){
+                            if let drawingData = self.defaults.value(forKey: self.cards[i]["term"] as! String){
                                 do {
                                     try self.CardDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
                                 } catch {
                                     print("Error converting Data to PkDrawing: \(error)")
                                 }
                             }else {
-                                let storageRef = self.storage.reference().child(self.cards[i][1] as! String)
+                                let storageRef = self.storage.reference().child(self.cards[i]["term"] as! String)
                                 storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
                                     if let error = error {
                                         print("Error downloading drawing from Firebase Storage: \(error)")
@@ -323,7 +323,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
                                         } catch {
                                             print("Error converting Data to PkDrawing: \(error)")
                                         }
-                                        self.defaults.set(data, forKey: self.cards[i][1] as! String)
+                                        self.defaults.set(data, forKey: self.cards[i]["term"] as! String)
                                     }
                                 }
                             }
@@ -401,7 +401,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
     }
     @objc func enter(sender: UIButton) {
         if currentInput == "t" {
-            let goal = getNormalizedString(from: cards[cardOrder[index]][3] as! String)
+            let goal = getNormalizedString(from: cards[cardOrder[index]]["def"] as! String)
             let current = getNormalizedString(from: TextField.text ?? "")
             
             if goal == current {
@@ -417,14 +417,14 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
             CardImage.isHidden = true
             
             
-            if let drawingData = self.defaults.value(forKey: cards[cardOrder[index]][3] as! String){
+            if let drawingData = self.defaults.value(forKey: cards[cardOrder[index]]["def"] as! String){
                 do {
                     try self.CardDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
                 } catch {
                     print("Error converting Data to PkDrawing: \(error)")
                 }
             }else {
-                let storageRef = self.storage.reference().child(cards[cardOrder[index]][3] as! String)
+                let storageRef = self.storage.reference().child(cards[cardOrder[index]]["def"] as! String)
                 storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
                     if let error = error {
                         print("Error downloading drawing from Firebase Storage: \(error)")
@@ -434,7 +434,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
                         } catch {
                             print("Error converting Data to PkDrawing: \(error)")
                         }
-                        self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][3] as! String)
+                        self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]]["def"] as! String)
                     }
                 }
             }
@@ -462,7 +462,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
     }
 
     private func processRecognitionResult() {
-        let goal = getNormalizedString(from: cards[cardOrder[index]][3] as! String)
+        let goal = getNormalizedString(from: cards[cardOrder[index]]["def"] as! String)
         let current = getNormalizedString(from: recognizedText)
         //print(current)
         if goal == current {
@@ -509,21 +509,21 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         }else{
             cardCounter.text = String(index + 1) + "/" + String(cardOrder.count)
             
-            if(cards[cardOrder[index]][0] as! String == "t"){
+            if(cards[cardOrder[index]]["termType"] as! String == "t"){
                 CardLabel.isHidden = false
-                CardLabel.text = cards[cardOrder[index]][1] as? String
-            }else if(cards[cardOrder[index]][0] as! String == "d"){
+                CardLabel.text = cards[cardOrder[index]]["term"] as? String
+            }else if(cards[cardOrder[index]]["termType"] as! String == "d"){
                 CardDrawing.isHidden = false
 
                 
-                if let drawingData = self.defaults.value(forKey: cards[cardOrder[index]][1] as! String){
+                if let drawingData = self.defaults.value(forKey: cards[cardOrder[index]]["term"] as! String){
                     do {
                         try self.CardDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
                     } catch {
                         print("Error converting Data to PkDrawing: \(error)")
                     }
                 }else {
-                    let storageRef = self.storage.reference().child(cards[cardOrder[index]][1] as! String)
+                    let storageRef = self.storage.reference().child(cards[cardOrder[index]]["term"] as! String)
                     storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
                         if let error = error {
                             print("Error downloading drawing from Firebase Storage: \(error)")
@@ -533,28 +533,28 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
                             } catch {
                                 print("Error converting Data to PkDrawing: \(error)")
                             }
-                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][1] as! String)
+                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]]["term"] as! String)
                         }
                     }
                 }
                 
             }else{
                 CardImage.isHidden = false
-                if let imageData = self.defaults.value(forKey: self.cards[self.cardOrder[self.index]][1] as! String){
+                if let imageData = self.defaults.value(forKey: self.cards[self.cardOrder[self.index]]["term"] as! String){
                     self.CardImage.image = UIImage(data: imageData as! Data)
                 }else {
-                    let storageRef = self.storage.reference().child(self.cards[self.cardOrder[self.index]][1] as! String)
+                    let storageRef = self.storage.reference().child(self.cards[self.cardOrder[self.index]]["term"] as! String)
                     storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
                         if let error = error {
                             print("Error downloading drawing from Firebase Storage: \(error)")
                         }else if let data = data {
                             self.CardImage.image = UIImage(data: data )
-                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]][1] as! String)
+                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]]["term"] as! String)
                         }
                     }
                 }
             }
-            currentInput = cards[cardOrder[index]][2] as! String
+            currentInput = cards[cardOrder[index]]["defType"] as! String
             if(currentInput == "t"){
                 TextField.isHidden = false
                 topHeight = view.frame.height - 90

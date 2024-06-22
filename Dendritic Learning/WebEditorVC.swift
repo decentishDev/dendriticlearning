@@ -341,6 +341,9 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             
             self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true)
             self.db.collection("sets").document(self.set).delete()
+            
+            self.performSegue(withIdentifier: "webEditorVC_unwind", sender: nil)
+            self.performSegue(withIdentifier: "webEditorVC_unwind", sender: nil)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         
@@ -733,6 +736,12 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             present(imagePicker, animated: true, completion: nil)
         }else{
             defaults.removeObject(forKey: image!)
+            let imageRef = storage.reference().child(image!)
+            imageRef.delete(){ error in
+                if let error = error{
+                    print("Error deleting image: \(error.localizedDescription)")
+                }
+            }
             image = nil
             imageButton.setImage(UIImage(systemName: "photo"), for: .normal)
         }

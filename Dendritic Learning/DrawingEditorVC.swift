@@ -7,18 +7,20 @@
 
 import UIKit
 import PencilKit
+import FirebaseStorage
 protocol DrawingEditorDelegate: AnyObject {
-    func updateDrawing()
+    func updateDrawing(_ i: Int, _ term: Bool)
 }
 class DrawingEditorVC: UIViewController, PKCanvasViewDelegate {
     weak var delegate: DrawingEditorDelegate?
-    var set = 0
+    var set = ""
     var i = 0
     var term = true
     let canvas = PKCanvasView()
     var usingEraser = false
     
     let defaults = UserDefaults.standard
+    let storage = Storage.storage()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,22 +49,33 @@ class DrawingEditorVC: UIViewController, PKCanvasViewDelegate {
         canvas.overrideUserInterfaceStyle = .light
         canvas.allowsFingerDrawing = defaults.value(forKey: "fingerDrawing") as! Bool
         
-        let card = ((UserDefaults.standard.value(forKey: "sets") as! [Dictionary<String, Any>])[set]["set"] as! [[Any]])
-
+        let card = (UserDefaults.standard.value(forKey: "set") as! [String: Any])["set"] as! [[Any]]
+        var tempI = 3
         if(term){
+            tempI = 1
+        }
+        if let drawingData = self.defaults.value(forKey: card[i][tempI] as! String){
             do {
-                try canvas.drawing = recolor(PKDrawing(data: card[i][1] as! Data))
+                try self.canvas.drawing = recolor(PKDrawing(data: drawingData as! Data))
             } catch {
-                
+                print("Error converting Data to PkDrawing: \(error)")
             }
-                
-        }else{
-            do {
-                try canvas.drawing = recolor(PKDrawing(data: card[i][3] as! Data))
-            } catch {
-                
+        }else {
+            let storageRef = self.storage.reference().child(card[i][tempI] as! String)
+            storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                if let error = error {
+                    print("Error downloading drawing from Firebase Storage: \(error)")
+                }else if let data = data {
+                    do {
+                        try self.canvas.drawing = recolor(PKDrawing(data: data ))
+                    } catch {
+                        print("Error converting Data to PkDrawing: \(error)")
+                    }
+                    self.defaults.set(data, forKey: card[self.i][tempI] as! String)
+                }
             }
         }
+        
         canvas.delegate = self
         centeredView.addSubview(canvas)
         
@@ -93,26 +106,27 @@ class DrawingEditorVC: UIViewController, PKCanvasViewDelegate {
     }
     
     @objc func dismissIt(_ sender: UITapGestureRecognizer){
-        delegate?.updateDrawing()
+        delegate?.updateDrawing(i, term)
         dismiss(animated: true, completion: nil)
     }
     
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
-        var card = ((UserDefaults.standard.value(forKey: "sets") as! [Dictionary<String, Any>])[set]["set"] as! [[Any]])
-        if(term){
-            card[i][1] = canvasView.drawing.dataRepresentation()
-        }else{
-            card[i][3] = canvasView.drawing.dataRepresentation()
-        }
-        var originalset = (UserDefaults.standard.value(forKey: "sets") as! [Dictionary<String, Any>])[set]
-        originalset["set"] = card
-        var allsets = UserDefaults.standard.value(forKey: "sets") as! [Dictionary<String, Any>]
-        allsets[set] = originalset
-        UserDefaults.standard.setValue(allsets, forKey: "sets")
+        defaults.set(canvasView.drawing.dataRepresentation(), forKey: "changedDrawing")
+//        var card = ((UserDefaults.standard.value(forKey: "sets") as! [Dictionary<String, Any>])[set]["set"] as! [[Any]])
+//        if(term){
+//            card[i][1] = canvasView.drawing.dataRepresentation()
+//        }else{
+//            card[i][3] = canvasView.drawing.dataRepresentation()
+//        }
+//        var originalset = (UserDefaults.standard.value(forKey: "sets") as! [Dictionary<String, Any>])[set]
+//        originalset["set"] = card
+//        var allsets = UserDefaults.standard.value(forKey: "sets") as! [Dictionary<String, Any>]
+//        allsets[set] = originalset
+//        UserDefaults.standard.setValue(allsets, forKey: "sets")
     }
     
     @objc func back(_ sender: UIButton) {
-        delegate?.updateDrawing()
+        delegate?.updateDrawing(i, term)
         dismiss(animated: true, completion: nil)
     }
     
