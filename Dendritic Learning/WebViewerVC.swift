@@ -14,7 +14,7 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate {
     var name = "Revolutionary War"
     var rectangles: [UIView] = []
     var scrollView: UIScrollView!
-    var web: [[Any]] = []
+    var web: [[String: Any]] = []
     var currentEdit: Int = -1
     var selectedButton: UIButton? = nil
     var addedButtons: [UIButton] = []
@@ -31,7 +31,7 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate {
         let data = defaults.value(forKey: "set") as! [String: Any]
         //print(data)
         name = data["name"] as! String
-        web = data["set"] as! [[Any]]
+        web = data["set"] as! [[String: Any]]
         
         scrollView = UIScrollView(frame: view.bounds)
         scrollView.contentSize = CGSize(width: view.bounds.width, height: view.bounds.height)
@@ -101,8 +101,8 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate {
             let rectWidth: CGFloat = 180
             let rectHeight: CGFloat = 180
             
-            let centerX = term[2] as! CGFloat
-            let centerY = term[3] as! CGFloat
+            let centerX = term["x"] as! CGFloat
+            let centerY = term["y"] as! CGFloat
             
             let newX = centerX - rectWidth / 2
             let newY = centerY - rectHeight / 2
@@ -144,7 +144,7 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate {
             ])
             
             let termLabel = UILabel(frame: CGRect(x: 5, y: 0, width: 170, height: 120))
-            termLabel.text = term[0] as? String
+            termLabel.text = term["term"] as? String
             termLabel.textColor = Colors.text
             termLabel.font = UIFont(name: "LilGrotesk-Regular", size: 18)
             termLabel.textAlignment = .center
@@ -164,7 +164,7 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate {
 //            web[web.count - 1][3] = newY
         }
         for (i, rect) in rectangles.enumerated(){
-            for connection in (web[i][4] as! [Int]){
+            for connection in (web[i]["connections"] as! [Int]){
                 let connectButton = UIButton()
                 //connectButton.addTarget(self, action: #selector(editConnection(_:)), for: .touchUpInside)
                 connectButton.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
@@ -278,7 +278,7 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate {
     func updateLines(){
         for (rectI, movedView) in rectangles.enumerated(){
 //            let rectI = rectangles.firstIndex(of: movedView)
-            let outgoing = web[rectI][4] as? [Int]
+            let outgoing = web[rectI]["connections"] as? [Int]
             if(outgoing!.count > 0){
                 for i in 0...outgoing!.count - 1 {
                     let thisButton = (movedView.subviews[2] as! UIStackView).arrangedSubviews[i]
@@ -312,9 +312,9 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate {
         guard let rectangle = gestureRecognizer.view else { return }
         //rectangle.backgroundColor = Colors.darkHighlight
         let i = rectangles.firstIndex(of: rectangle)!
-        if(web[i][0] as? String == (rectangle.subviews[0].subviews[0] as! UILabel).text){
+        if(web[i]["term"] as? String == (rectangle.subviews[0].subviews[0] as! UILabel).text){
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25){
-                (rectangle.subviews[0].subviews[0] as! UILabel).text = self.web[i][1] as? String
+                (rectangle.subviews[0].subviews[0] as! UILabel).text = self.web[i]["def"] as? String
                 (rectangle.subviews[0].subviews[0] as! UILabel).layer.transform = CATransform3DMakeRotation(CGFloat.pi, 1, 0, 0)
             }
             UIView.animate(withDuration: 0.5, animations: {
@@ -322,7 +322,7 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate {
             })
         }else{
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25){
-                (rectangle.subviews[0].subviews[0] as! UILabel).text = self.web[i][0] as? String
+                (rectangle.subviews[0].subviews[0] as! UILabel).text = self.web[i]["term"] as? String
                 (rectangle.subviews[0].subviews[0] as! UILabel).layer.transform = CATransform3DMakeRotation(CGFloat.pi, 0, 0, 0)
             }
             UIView.animate(withDuration: 0.5, animations: {

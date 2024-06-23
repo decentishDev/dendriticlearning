@@ -47,19 +47,11 @@ class WebSetVC: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        setup()
-    }
-    
-    func setup(){
-        let storageRef = storage.reference()
-//        if(sets.count == set){
-//            performSegue(withIdentifier: "webSetVC_unwind", sender: nil)
-//        }else{
         let dataRef = db.collection("sets").document(set)
         dataRef.getDocument { (document, error) in
             if let document = document, document.exists {
                 self.setData = document.data()!
-                self.defaults.set(self.setData, forKey: "set")
+                
                 if let name = self.setData["name"] as? String{
                     self.name = name
                 }
@@ -70,12 +62,22 @@ class WebSetVC: UIViewController {
                     let date = timestamp.dateValue()
                     self.date = formatDate(date)
                 }
-                
+                self.setup()
+                self.setData.removeValue(forKey: "date")
+                self.defaults.set(self.setData, forKey: "set")
             } else {
                 print("Document does not exist")
             }
         }
-            
+        
+    }
+    
+    func setup(){
+        let storageRef = storage.reference()
+//        if(sets.count == set){
+//            performSegue(withIdentifier: "webSetVC_unwind", sender: nil)
+//        }else{
+        
             for subview in stackView.arrangedSubviews {
                 stackView.removeArrangedSubview(subview)
                 subview.removeFromSuperview()

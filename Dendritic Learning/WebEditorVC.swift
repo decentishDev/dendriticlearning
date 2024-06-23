@@ -19,7 +19,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     var rectangles: [UIView] = []
     var scrollView: UIScrollView!
     var image: String = ""
-    var web: [[Any]] = []
+    var web: [[String: Any]] = []
     var currentEdit: Int = -1
     var selectedButton: UIButton? = nil
     var addedButtons: [UIButton] = []
@@ -44,7 +44,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         let data = defaults.value(forKey: "set") as! [String: Any]
         //print(data)
         name = data["name"] as! String
-        web = data["set"] as! [[Any]]
+        web = data["set"] as! [[String: Any]]
         image = (data["image"] as! String?)!
         
         scrollView = UIScrollView(frame: view.bounds)
@@ -140,8 +140,8 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             let rectWidth: CGFloat = 180
             let rectHeight: CGFloat = 180
             
-            let centerX = term[2] as! CGFloat
-            let centerY = term[3] as! CGFloat
+            let centerX = term["x"] as! CGFloat
+            let centerY = term["y"] as! CGFloat
             
             let newX = centerX - rectWidth / 2
             let newY = centerY - rectHeight / 2
@@ -181,7 +181,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             ])
             
             let termLabel = UILabel(frame: CGRect(x: 5, y: 0, width: 170, height: 120))
-            termLabel.text = term[0] as? String
+            termLabel.text = term["term"] as? String
             termLabel.textColor = Colors.text
             termLabel.font = UIFont(name: "LilGrotesk-Regular", size: 18)
             termLabel.textAlignment = .center
@@ -198,7 +198,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             rectangles.append(rectangle)
         }
         for (i, rect) in rectangles.enumerated(){
-            for connection in (web[i][4] as! [Int]){
+            for connection in (web[i]["connections"] as! [Int]){
                 let connectButton = UIButton()
                 connectButton.addTarget(self, action: #selector(editConnection(_:)), for: .touchUpInside)
                 connectButton.setImage(UIImage(systemName: "record.circle"), for: .normal)
@@ -377,8 +377,8 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
 
         let rectI = rectangles.firstIndex(of: movedView)
 
-        web[rectI!][2] = movedView.center.x
-        web[rectI!][3] = movedView.center.y
+        web[rectI!]["x"] = movedView.center.x
+        web[rectI!]["y"] = movedView.center.y
         
         save()
         
@@ -405,12 +405,12 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     func updateLines(){
         for (i, term) in web.enumerated() {
             var newOrder: [Int] = []
-            for j in (term[4] as! [Int]){
+            for j in (term["connections"] as! [Int]){
                 if newOrder.isEmpty {
                     newOrder.append(j)
                 }else{
                     for c in 0 ..< newOrder.count {
-                        if ((web[j][2] as! CGFloat) <= (web[newOrder[c]][2] as! CGFloat)){
+                        if ((web[j]["x"] as! CGFloat) <= (web[newOrder[c]]["x"] as! CGFloat)){
                             newOrder.insert(j, at: c)
                             break
                         }else if ((c + 1) == newOrder.count) {
@@ -419,10 +419,10 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
                     }
                 }
             }
-            web[i][4] = newOrder
+            web[i]["connections"] = newOrder
         }
         for (rectI, movedView) in rectangles.enumerated(){
-            let outgoing = web[rectI][4] as? [Int]
+            let outgoing = web[rectI]["connections"] as? [Int]
             if(outgoing!.count > 0){
                 for i in 0...outgoing!.count - 1 {
                     let thisButton = (movedView.subviews[2] as! UIStackView).arrangedSubviews[i]
@@ -457,8 +457,8 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         
         let i = rectangles.firstIndex(of: gestureRecognizer.view!)!
         currentEdit = i
-        popupVC.defField.text = web[i][1] as? String
-        popupVC.termField.text = web[i][0] as? String
+        popupVC.defField.text = web[i]["def"] as? String
+        popupVC.termField.text = web[i]["term"] as? String
         popupVC.addingTerm = false
         
         present(popupVC, animated: true, completion: nil)
@@ -470,7 +470,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         gestureRecognizer.setTranslation(.zero, in: view)
     }
     
-    func didAddTerm(data: [Any]){
+    func didAddTerm(data: [String: Any]){
         if(currentEdit == -1){
             let rectWidth: CGFloat = 180
             let rectHeight: CGFloat = 180
@@ -526,7 +526,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             ])
             
             let termLabel = UILabel(frame: CGRect(x: 5, y: 0, width: 170, height: 120))
-            termLabel.text = data[0] as? String
+            termLabel.text = data["term"] as? String
             termLabel.textColor = Colors.text
             termLabel.font = UIFont(name: "LilGrotesk-Regular", size: 15)
             termLabel.textAlignment = .center
@@ -541,14 +541,20 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             
             scrollView.addSubview(rectangle)
             rectangles.append(rectangle)
-            web.append([data[0], data[1], newX, newY, []])
-            web[web.count - 1][2] = newX
-            web[web.count - 1][3] = newY
+            web.append([
+                "term": data["term"],
+                "def": data["def"],
+                "x": newX,
+                "y": newY,
+                "connections": []
+            ])
+            web[web.count - 1]["x"] = newX
+            web[web.count - 1]["y"] = newY
             
             save()
         }else{
-            web[currentEdit] = [data[0], data[1], web[currentEdit][2], web[currentEdit][3], web[currentEdit][4]]
-            (rectangles[currentEdit].subviews[0].subviews[0] as! UILabel).text = data[0] as? String
+            web[currentEdit] = [data["term"], data["def"], web[currentEdit]["x"], web[currentEdit]["y"], web[currentEdit]["connections"]]
+            (rectangles[currentEdit].subviews[0].subviews[0] as! UILabel).text = data["term"] as? String
             save()
         }
     }
@@ -563,7 +569,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             
             let index = rectangles.firstIndex(of: (sender.superview?.superview)!)
             for (i, rectangle) in rectangles.enumerated() {
-                if(rectangle != sender.superview?.superview && !(web[index!][4] as! [Int]).contains(i)){
+                if(rectangle != sender.superview?.superview && !(web[index!]["connections"] as! [Int]).contains(i)){
                     sender.isEnabled = false
                     let addConnection = UIButton()
                     addConnection.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
@@ -628,9 +634,9 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         }
         let rectI = rectangles.firstIndex(of: (selectedButton?.superview?.superview)!)! as Int
         let outI = rectangles.firstIndex(of: (sender.superview?.superview)!)! as Int
-        if var webArray = web[rectI][4] as? [Int] {
+        if var webArray = web[rectI]["connections"] as? [Int] {
             webArray.append(outI)
-            web[rectI][4] = webArray
+            web[rectI]["connections"] = webArray
         }
         
         selectedButton?.removeTarget(self, action: #selector(newConnection(_:)), for: .touchUpInside)
@@ -654,21 +660,21 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     @objc func editConnection(_ sender: UIButton){
         let thisIndex = rectangles.firstIndex(of: (sender.superview?.superview)!)
         if let topIndex = sender.accessibilityIdentifier {
-            let topButtonStackI = (web[Int(topIndex)!][4] as! [Int]).firstIndex(of: thisIndex!)
+            let topButtonStackI = (web[Int(topIndex)!]["connections"] as! [Int]).firstIndex(of: thisIndex!)
             let topButton = (rectangles[Int(topIndex)!].subviews[2] as! UIStackView).arrangedSubviews[topButtonStackI!]
             topButton.removeFromSuperview()
-            var a = (web[Int(topIndex)!][4] as! [Int])
+            var a = (web[Int(topIndex)!]["connections"] as! [Int])
             a.remove(at: topButtonStackI!)
             var b = web[Int(topIndex)!]
-            b[4] = a
+            b["connections"] = a
             web[Int(topIndex)!] = b
         }else{
             let topButtonStackI = (sender.superview as! UIStackView).arrangedSubviews.firstIndex(of: sender)
-            let bottomI = (web[thisIndex!][4] as! [Int])[topButtonStackI!]
-            var a = (web[thisIndex!][4] as! [Int])
+            let bottomI = (web[thisIndex!]["connections"] as! [Int])[topButtonStackI!]
+            var a = (web[thisIndex!]["connections"] as! [Int])
             a.remove(at: topButtonStackI!)
             var b = web[thisIndex!]
-            b[4] = a
+            b["connections"] = a
             web[thisIndex!] = b
             for i in (rectangles[bottomI].subviews[1] as! UIStackView).arrangedSubviews {
                 if let x = i.accessibilityIdentifier {
@@ -692,7 +698,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     
     func deleteTerm() {
         print(web)
-        for i in (web[currentEdit][4] as! [Int]){
+        for i in (web[currentEdit]["connections"] as! [Int]){
             for button in (rectangles[i].subviews[1] as! UIStackView).arrangedSubviews {
                 if button.accessibilityIdentifier == String(currentEdit){
                     button.removeFromSuperview()
@@ -703,7 +709,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         rectangles.remove(at: currentEdit)
         web.remove(at: currentEdit)
         for (i, term) in web.enumerated() {
-            if var indices = term[4] as? [Int] {
+            if var indices = term["connections"] as? [Int] {
                 for (j, I) in indices.enumerated() {
                     if I == currentEdit{
                         indices.remove(at: j)
@@ -713,7 +719,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
                         indices[j] = I - 1
                     }
                 }
-                web[i][4] = indices
+                web[i]["connections"] = indices
             }
         }
         

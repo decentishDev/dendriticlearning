@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import FirebaseAuth
+import FirebaseFirestore
 
 class SettingsVC: UIViewController {
 
@@ -16,17 +18,38 @@ class SettingsVC: UIViewController {
     
     var colorSegment = UISegmentedControl()
     
+    var userData: [String: Any] = [:]
     
+    let db = Firestore.firestore()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        if let uid = Auth.auth().currentUser?.uid {
+            let dataRef = db.collection("users").document(uid)
+            dataRef.getDocument { (document, error) in
+                if let document = document, document.exists {
+                    self.userData = document.data()!
+//                    self.updateColors()
+//                    self.updateSets()
+                    
+                    DispatchQueue.main.async {
+                        self.setup()
+                    }
+                } else {
+                    print("Document does not exist")
+                    DispatchQueue.main.async {
+                        self.performSegue(withIdentifier: "newUserVC", sender: nil)
+                    }
+                }
+            }
+        }
         //setup()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        setup()
+        view.backgroundColor = Colors.background
+        //setup()
     }
     
     func setup() {
@@ -157,6 +180,9 @@ class SettingsVC: UIViewController {
     @objc func themeButton(sender: UIButton){
         let i = Int(sender.accessibilityIdentifier!)!
         defaults.set(Colors.themes[i][0] as! String, forKey: "theme")
+        var settings = userData["settings"] as? [String: Any]
+        settings!["theme"] = Colors.themes[i][0] as! String
+        userData["settings"] = settings
         Colors.background = Colors.themes[i][1] as! UIColor
         Colors.secondaryBackground = Colors.themes[i][2] as! UIColor
         Colors.darkHighlight = Colors.themes[i][3] as! UIColor
@@ -164,6 +190,7 @@ class SettingsVC: UIViewController {
         Colors.lightHighlight = Colors.themes[i][5] as! UIColor
         Colors.text = Colors.themes[i][6] as! UIColor
         setup()
+        save()
     }
     
     @objc func pencilSwitched(sender: UISwitch){
@@ -176,5 +203,9 @@ class SettingsVC: UIViewController {
     
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
         
+    }
+    
+    func save(){
+        db.document(Auth.auth().currentUser!.uid).setData(userData, merge: true)
     }
 }

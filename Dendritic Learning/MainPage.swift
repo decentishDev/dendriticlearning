@@ -60,7 +60,7 @@ class MainPage: UIViewController, NewSetDelegate {
         }
         
         // Check for user settings and auth status
-        if let data = defaults.value(forKey: "fingerDrawing") as? Bool, let uid = Auth.auth().currentUser?.uid {
+        if let fingerDrawing = defaults.value(forKey: "fingerDrawing") as? Bool, let uid = Auth.auth().currentUser?.uid {
             let dataRef = db.collection("users").document(uid)
             dataRef.getDocument { (document, error) in
                 if let document = document, document.exists {
@@ -249,7 +249,7 @@ class MainPage: UIViewController, NewSetDelegate {
         let setView = UIView()
         var image = UIImageView()
         if set["image"] as! String != "" {
-            loadImage(url: set["image"] as! String, imageView: image)
+            loadImage(url: set["image"] as? String, imageView: image)
             image.layer.cornerRadius = 10
             image.contentMode = .scaleAspectFill
             image.clipsToBounds = true
@@ -372,10 +372,12 @@ class MainPage: UIViewController, NewSetDelegate {
             studiedSet["type"] = "standard"
             studiedSet["learn"] = [0]
             studiedSet["flashcards"] = [false]
+            destination = "standard"
         }else if(type == "Web"){
             newSet["type"] = "web"
             newSet["set"] = []
             studiedSet["type"] = "web"
+            destination = "web"
         }
         
         let ref = db.collection("sets").addDocument(data: newSet) { error in

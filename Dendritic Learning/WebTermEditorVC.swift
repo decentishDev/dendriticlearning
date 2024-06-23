@@ -1,7 +1,7 @@
 import UIKit
 
 protocol EditorDelegate: AnyObject {
-    func didAddTerm(data: [Any])
+    func didAddTerm(data: [String: Any])
     func deleteTerm()
 }
 
@@ -101,7 +101,13 @@ class WebTermEditorVC: UIViewController {
     }
     
     @objc func confirm(_ sender: UIButton) {
-        delegate?.didAddTerm(data: [termField.text ?? "", defField.text ?? "", 0, 0, []])
+        delegate?.didAddTerm(data: [
+            "term": termField.text ?? "",
+            "def": defField.text ?? "",
+            "x": 0,
+            "y": 0,
+            "connections": []
+        ])
         dismiss(animated: true, completion: nil)
     }
     

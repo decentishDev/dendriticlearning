@@ -939,6 +939,36 @@ deinit {
         db.collection("sets").document(set).setData(oldSet)
         oldSet.removeValue(forKey: "date")
         defaults.setValue(oldSet, forKey: "set")
+        
+        let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
+        
+        userRef.getDocument { [weak self] (document, error) in
+            guard let self = self else { return }
+            
+            if let document = document, document.exists {
+                var oldUser = document.data()!
+                var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
+                
+                for (i, set) in oldStudied.enumerated() {
+                    if set["setID"] as! String == self.set {
+                        oldStudied[i]["name"] = name
+                        oldStudied[i]["image"] = image
+                        break
+                    }
+                }
+                
+                oldUser["studiedSets"] = oldStudied
+                self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true) { error in
+                    if let error = error {
+                        print("Error updating user data: \(error.localizedDescription)")
+                    } else {
+                        print("User data successfully updated.")
+                    }
+                }
+            } else {
+                print("Document does not exist")
+            }
+        }
     }
     
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
@@ -1107,7 +1137,7 @@ deinit {
                     self.defaults.set(imageData, forKey: self.image!)
                     self.imageButton.setImage(UIImage(systemName: "rectangle.badge.xmark.fill"), for: .normal)
                     
-                    self.updateUserDataWithImagePath(self.image!)
+                    self.save()
                 }
             }
         }
@@ -1115,36 +1145,36 @@ deinit {
         save()
     }
 
-    func updateUserDataWithImagePath(_ imagePath: String) {
-        let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
-        
-        userRef.getDocument { [weak self] (document, error) in
-            guard let self = self else { return }
-            
-            if let document = document, document.exists {
-                var oldUser = document.data()!
-                var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
-                
-                for (i, set) in oldStudied.enumerated() {
-                    if set["setID"] as! String == self.set {
-                        oldStudied[i]["image"] = imagePath
-                        break
-                    }
-                }
-                
-                oldUser["studiedSets"] = oldStudied
-                self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true) { error in
-                    if let error = error {
-                        print("Error updating user data: \(error.localizedDescription)")
-                    } else {
-                        print("User data successfully updated.")
-                    }
-                }
-            } else {
-                print("Document does not exist")
-            }
-        }
-    }
+//    func updateUserDataWithImagePath(_ imagePath: String) {
+//        let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
+//        
+//        userRef.getDocument { [weak self] (document, error) in
+//            guard let self = self else { return }
+//            
+//            if let document = document, document.exists {
+//                var oldUser = document.data()!
+//                var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
+//                
+//                for (i, set) in oldStudied.enumerated() {
+//                    if set["setID"] as! String == self.set {
+//                        oldStudied[i]["image"] = imagePath
+//                        break
+//                    }
+//                }
+//                
+//                oldUser["studiedSets"] = oldStudied
+//                self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true) { error in
+//                    if let error = error {
+//                        print("Error updating user data: \(error.localizedDescription)")
+//                    } else {
+//                        print("User data successfully updated.")
+//                    }
+//                }
+//            } else {
+//                print("Document does not exist")
+//            }
+//        }
+//    }
 
     
     func updateDrawing(_ i: Int, _ term: Bool) {

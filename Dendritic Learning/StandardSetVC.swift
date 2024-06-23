@@ -35,8 +35,23 @@ class StandardSetVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         //print(goToEditor)
-        view.backgroundColor = Colors.background
+        
         if goToEditor {
+            var newSet: [String: Any] = [:]
+            newSet["name"] = "New Set"
+            //newSet["author"] = userData["username"]!
+            newSet["authorID"] = Auth.auth().currentUser?.uid
+            //newSet["date"] = Timestamp(date: Date())
+            newSet["version"] = Colors.version
+            newSet["image"] = ""
+            newSet["type"] = "standard"
+            newSet["set"] = [[
+                "termType": "t",
+                "term": "Example term",
+                "defType": "t",
+                "def": "Example definition"
+            ]]
+            defaults.set(newSet, forKey: "set")
             //UIView.setAnimationsEnabled(false)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
                 self.performSegue(withIdentifier: "standardEditor", sender: self)
@@ -52,6 +67,7 @@ class StandardSetVC: UIViewController {
         //setup()
     }
     override func viewDidAppear(_ animated: Bool) {
+        view.backgroundColor = Colors.background
         setup()
     }
     
