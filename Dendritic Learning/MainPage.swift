@@ -48,62 +48,8 @@ class MainPage: UIViewController, NewSetDelegate {
     func setup(){
         recentSets = []
         mySets = []
-        if let data = defaults.value(forKey: "fingerDrawing") as? Bool{
-            if let uid = Auth.auth().currentUser?.uid{
-                let dataRef = db.collection("users").document(uid)
-                dataRef.getDocument { (document, error) in
-                    if let document = document, document.exists {
-                        self.userData = document.data()!
-                        if let theme = (self.userData["settings"] as? [String: Any])!["theme"]{
-                            for j in Colors.themes {
-                                if j[0] as! String == theme as! String {
-                                    Colors.background = j[1] as! UIColor
-                                    Colors.secondaryBackground = j[2] as! UIColor
-                                    Colors.darkHighlight = j[3] as! UIColor
-                                    Colors.highlight = j[4] as! UIColor
-                                    Colors.lightHighlight = j[5] as! UIColor
-                                    Colors.text = j[6] as! UIColor
-                                }
-                            }
-                        }
-                        
-                         
-                        if let sets = self.userData["studiedSets"]{
-                            print("heyy")
-                            self.recentSets = sets as! [[String: Any]]
-                        }
-                        let mySetIDs = self.userData["createdSets"] as! [String]
-                        for i in self.recentSets {
-                            print("heyy")
-                            if(mySetIDs.firstIndex(of: i["setID"] as! String) != nil){
-                                self.mySets.append(i)
-                            }
-                        }
-                        
-                        if let subscription = self.userData["subscription"] as? [String: Any] {
-                            if subscription["status"] as! String == "inactive" {
-                                self.defaults.set(false, forKey: "isPaid")
-                            }
-                        }
-                    } else {
-                        print("Document does not exist")
-                    }
-                }
-            }else{
-                performSegue(withIdentifier: "newUserVC", sender: nil)
-            }
-//            for (index, i) in data.enumerated() {
-//                sets.append([i["name"] as! String, i["type"] as! String, (defaults.value(forKey: "images") as! [Data?])[index]])
-//            }
-        }else{
-            defaults.setValue(false, forKey: "fingerDrawing")
-            
-            performSegue(withIdentifier: "newUserVC", sender: nil)
-        }
         
-        print(mySets)
-        print(recentSets)
-        
+        // Clear existing views
         for subview in stackView.arrangedSubviews {
             stackView.removeArrangedSubview(subview)
             subview.removeFromSuperview()
@@ -113,6 +59,65 @@ class MainPage: UIViewController, NewSetDelegate {
             subview.removeFromSuperview()
         }
         
+        // Check for user settings and auth status
+        if let data = defaults.value(forKey: "fingerDrawing") as? Bool, let uid = Auth.auth().currentUser?.uid {
+            let dataRef = db.collection("users").document(uid)
+            dataRef.getDocument { (document, error) in
+                if let document = document, document.exists {
+                    self.userData = document.data()!
+                    self.updateColors()
+                    self.updateSets()
+                    
+                    DispatchQueue.main.async {
+                        self.setupUI()
+                    }
+                } else {
+                    print("Document does not exist")
+                    DispatchQueue.main.async {
+                        self.performSegue(withIdentifier: "newUserVC", sender: nil)
+                    }
+                }
+            }
+        } else {
+            defaults.setValue(false, forKey: "fingerDrawing")
+            performSegue(withIdentifier: "newUserVC", sender: nil)
+        }
+    }
+
+    func updateColors() {
+        if let theme = (self.userData["settings"] as? [String: Any])?["theme"] {
+            for j in Colors.themes {
+                if j[0] as! String == theme as! String {
+                    Colors.background = j[1] as! UIColor
+                    Colors.secondaryBackground = j[2] as! UIColor
+                    Colors.darkHighlight = j[3] as! UIColor
+                    Colors.highlight = j[4] as! UIColor
+                    Colors.lightHighlight = j[5] as! UIColor
+                    Colors.text = j[6] as! UIColor
+                }
+            }
+        }
+    }
+
+    func updateSets() {
+        if let sets = self.userData["studiedSets"] {
+            self.recentSets = sets as! [[String: Any]]
+        }
+        if let mySetIDs = self.userData["createdSets"] as? [String] {
+            for set in self.recentSets {
+                if mySetIDs.contains(set["setID"] as! String) {
+                    self.mySets.append(set)
+                }
+            }
+        }
+        if let subscription = self.userData["subscription"] as? [String: Any] {
+            if subscription["status"] as! String == "inactive" {
+                self.defaults.set(false, forKey: "isPaid")
+            }
+        }
+    }
+
+    func setupUI() {
         view.backgroundColor = Colors.background
         
         stackView.axis = .vertical
@@ -131,13 +136,41 @@ class MainPage: UIViewController, NewSetDelegate {
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -60),
             stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 60),
             stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -60),
-//            stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, constant: -100)
         ])
         
-        let topBar = UIView()
-        topBar.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        let topBar = createTopBar()
         stackView.addArrangedSubview(topBar)
-        topBar.widthAnchor.constraint(equalTo: stackView.widthAnchor).isActive = true
+        let breakView0 = UIView()
+        breakView0.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        breakView0.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        stackView.addArrangedSubview(breakView0)
+        
+        let recentLabel = createSectionLabel(text: "Recent sets")
+        stackView.addArrangedSubview(recentLabel)
+        addSets(to: stackView, from: recentSets)
+        let breakView1 = UIView()
+        breakView1.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        breakView1.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        stackView.addArrangedSubview(breakView1)
+        
+        let yourLabel = createSectionLabel(text: "Your sets")
+        let newButton = UIButton()
+        newButton.frame = CGRect(x: 250, y: 5, width: 40, height: 40)
+        yourLabel.addSubview(newButton)
+        newButton.setImage(UIImage(systemName: "plus.app.fill"), for: .normal)
+        newButton.contentHorizontalAlignment = .fill
+        newButton.contentVerticalAlignment = .fill
+        newButton.imageView?.contentMode = .scaleAspectFit
+        newButton.tintColor = Colors.highlight
+        newButton.addTarget(self, action: #selector(newSet(_:)), for: .touchUpInside)
+        stackView.addArrangedSubview(yourLabel)
+        addSets(to: stackView, from: mySets)
+    }
+
+    func createTopBar() -> UIView {
+        let topBar = UIView()
+        con(topBar, view.frame.width - 120, 50)
+        
         let icon = UIImageView(image: UIImage(named: "DendriticLearningIcon-01.svg")?.withRenderingMode(.alwaysTemplate))
         icon.tintColor = Colors.highlight
         icon.contentMode = .scaleAspectFit
@@ -174,180 +207,94 @@ class MainPage: UIViewController, NewSetDelegate {
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
         settingsButton.addTarget(self, action: #selector(settings(_:)), for: .touchUpInside)
         
-        let breakView0 = UIView()
-        breakView0.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        breakView0.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        stackView.addArrangedSubview(breakView0)
-        
-        let recentLabel = UILabel()
-        recentLabel.text = "Recent sets"
-        recentLabel.font = UIFont(name: "LilGrotesk-Black", size: 50)
-        con(recentLabel, 300, 50)
-        recentLabel.textColor = Colors.text
-        recentLabel.isUserInteractionEnabled = true
-        stackView.addArrangedSubview(recentLabel)
-        let newButton = UIButton()
-        newButton.frame = CGRect(x: 250, y: 5, width: 40, height: 40)
-        recentLabel.addSubview(newButton)
-        newButton.setImage(UIImage(systemName: "plus.app.fill"), for: .normal)
-        newButton.contentHorizontalAlignment = .fill
-        newButton.contentVerticalAlignment = .fill
-        newButton.imageView?.contentMode = .scaleAspectFit
-        newButton.tintColor = Colors.highlight
-        newButton.addTarget(self, action: #selector(newSet(_:)), for: .touchUpInside)
-        if(recentSets.count > 0){
-            for i in 0...((recentSets.count - 1)/3) {
-                let row = UIStackView()
-                row.axis = .horizontal
-                row.spacing = 20
-                row.alignment = .leading
-                row.translatesAutoresizingMaskIntoConstraints = false
-                stackView.addArrangedSubview(row)
-                NSLayoutConstraint.activate([
-                    row.widthAnchor.constraint(equalTo: stackView.widthAnchor),
-                    row.heightAnchor.constraint(equalToConstant: 100)
-                ])
-                for j in 3*i...(3*i) + 2 {
-                    if(recentSets.count > j){
-                        let setView = UIView()
-                        row.addArrangedSubview(setView)
-                        var image = UIImageView()
-                        if recentSets[j]["image"] as? Data != nil && recentSets[j]["image"] as? Data != Colors.placeholderI {
-                            image = UIImageView(image: UIImage(data: recentSets[j]["image"] as! Data))
-                            image.layer.cornerRadius = 10
-                            image.contentMode = .scaleAspectFill
-                            image.clipsToBounds = true
-                        }else{
-                            setView.backgroundColor = Colors.secondaryBackground
-                        }
-                        setView.addSubview(image)
-                        let setLabel = UILabel()
-                        setLabel.text = recentSets[j]["name"] as? String
-                        setView.addSubview(setLabel)
-                        image.translatesAutoresizingMaskIntoConstraints = false
-                        setView.translatesAutoresizingMaskIntoConstraints = false
-                        setLabel.translatesAutoresizingMaskIntoConstraints = false
-                        setLabel.textColor = Colors.text
-                        setLabel.textAlignment = .center
-                        setLabel.font = UIFont(name: "LilGrotesk-Regular", size: 25)
-                        setView.layer.cornerRadius = 10
-                        let setButton = UIButton()
-                        setButton.accessibilityIdentifier = "r" + String(j)
-                        setButton.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
-                        setButton.translatesAutoresizingMaskIntoConstraints = false
-                        setView.addSubview(setButton)
-                        NSLayoutConstraint.activate([
-                            setView.widthAnchor.constraint(equalToConstant: (view.frame.width - 160)/3),
-                            setView.heightAnchor.constraint(equalTo: row.heightAnchor),
-                            setLabel.topAnchor.constraint(equalTo: setView.topAnchor),
-                            setLabel.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
-                            setLabel.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
-                            setLabel.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
-                            setButton.topAnchor.constraint(equalTo: setView.topAnchor),
-                            setButton.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
-                            setButton.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
-                            setButton.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
-                            image.topAnchor.constraint(equalTo: setView.topAnchor),
-                            image.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
-                            image.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
-                            image.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
-                        ])
-                    }else{
-                        let setView = UIView()
-                        row.addArrangedSubview(setView)
-                        NSLayoutConstraint.activate([
-                            setView.widthAnchor.constraint(equalToConstant: (view.frame.width - 160)/3),
-                            setView.heightAnchor.constraint(equalTo: row.heightAnchor),
-                        ])
-                    }
-                }
-            }
-        }
-        let yourLabel = UILabel()
-        yourLabel.text = "Your sets"
-        yourLabel.font = UIFont(name: "LilGrotesk-Black", size: 50)
-        con(yourLabel, 300, 50)
-        yourLabel.textColor = Colors.text
-        yourLabel.isUserInteractionEnabled = true
-        stackView.addArrangedSubview(yourLabel)
-//        let newButton = UIButton()
-//        newButton.frame = CGRect(x: 250, y: 5, width: 40, height: 40)
-//        recentLabel.addSubview(newButton)
-//        newButton.setImage(UIImage(systemName: "plus.app.fill"), for: .normal)
-//        newButton.contentHorizontalAlignment = .fill
-//        newButton.contentVerticalAlignment = .fill
-//        newButton.imageView?.contentMode = .scaleAspectFit
-//        newButton.tintColor = Colors.highlight
-//        newButton.addTarget(self, action: #selector(newSet(_:)), for: .touchUpInside)
-        if(mySets.count > 0){
-            for i in 0...((mySets.count - 1)/3) {
-                let row = UIStackView()
-                row.axis = .horizontal
-                row.spacing = 20
-                row.alignment = .leading
-                row.translatesAutoresizingMaskIntoConstraints = false
-                stackView.addArrangedSubview(row)
-                NSLayoutConstraint.activate([
-                    row.widthAnchor.constraint(equalTo: stackView.widthAnchor),
-                    row.heightAnchor.constraint(equalToConstant: 100)
-                ])
-                for j in 3*i...(3*i) + 2 {
-                    if(mySets.count > j){
-                        let setView = UIView()
-                        row.addArrangedSubview(setView)
-                        var image = UIImageView()
-                        if mySets[j]["image"] as? Data != nil && mySets[j]["image"] as? Data != Colors.placeholderI  {
-                            image = UIImageView(image: UIImage(data: mySets[j]["image"] as! Data))
-                            image.layer.cornerRadius = 10
-                            image.contentMode = .scaleAspectFill
-                            image.clipsToBounds = true
-                        }else{
-                            setView.backgroundColor = Colors.secondaryBackground
-                        }
-                        setView.addSubview(image)
-                        let setLabel = UILabel()
-                        setLabel.text = mySets[j]["name"] as? String
-                        setView.addSubview(setLabel)
-                        image.translatesAutoresizingMaskIntoConstraints = false
-                        setView.translatesAutoresizingMaskIntoConstraints = false
-                        setLabel.translatesAutoresizingMaskIntoConstraints = false
-                        setLabel.textColor = Colors.text
-                        setLabel.textAlignment = .center
-                        setLabel.font = UIFont(name: "LilGrotesk-Regular", size: 25)
-                        setView.layer.cornerRadius = 10
-                        let setButton = UIButton()
-                        setButton.accessibilityIdentifier = "m" + String(j)
-                        setButton.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
-                        setButton.translatesAutoresizingMaskIntoConstraints = false
-                        setView.addSubview(setButton)
-                        NSLayoutConstraint.activate([
-                            setView.widthAnchor.constraint(equalToConstant: (view.frame.width - 160)/3),
-                            setView.heightAnchor.constraint(equalTo: row.heightAnchor),
-                            setLabel.topAnchor.constraint(equalTo: setView.topAnchor),
-                            setLabel.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
-                            setLabel.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
-                            setLabel.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
-                            setButton.topAnchor.constraint(equalTo: setView.topAnchor),
-                            setButton.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
-                            setButton.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
-                            setButton.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
-                            image.topAnchor.constraint(equalTo: setView.topAnchor),
-                            image.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
-                            image.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
-                            image.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
-                        ])
-                    }else{
-                        let setView = UIView()
-                        row.addArrangedSubview(setView)
-                        NSLayoutConstraint.activate([
-                            setView.widthAnchor.constraint(equalToConstant: (view.frame.width - 160)/3),
-                            setView.heightAnchor.constraint(equalTo: row.heightAnchor),
-                        ])
-                    }
+        return topBar
+    }
+
+    func createSectionLabel(text: String) -> UILabel {
+        let label = UILabel()
+        label.text = text
+        label.font = UIFont(name: "LilGrotesk-Black", size: 50)
+        con(label, 300, 50)
+        label.textColor = Colors.text
+        label.isUserInteractionEnabled = true
+        return label
+    }
+
+    func addSets(to stackView: UIStackView, from sets: [[String: Any]]) {
+        for i in 0...((sets.count - 1) / 3) {
+            let row = UIStackView()
+            row.axis = .horizontal
+            row.spacing = 20
+            row.alignment = .leading
+            row.translatesAutoresizingMaskIntoConstraints = false
+            stackView.addArrangedSubview(row)
+            con(row, view.frame.width - 120, 100)
+            for j in 3 * i...(3 * i) + 2 {
+                if sets.count > j {
+                    let setView = createSetView(set: sets[j])
+                    row.addArrangedSubview(setView)
+                } else {
+                    let setView = UIView()
+                    row.addArrangedSubview(setView)
+                    NSLayoutConstraint.activate([
+                        //setView.widthAnchor.constraint(equalToConstant: (view.frame.width - 160) / 3),
+                        setView.heightAnchor.constraint(equalTo: row.heightAnchor),
+                    ])
                 }
             }
         }
     }
+
+    func createSetView(set: [String: Any]) -> UIView {
+        let setView = UIView()
+        var image = UIImageView()
+        if set["image"] as! String != "" {
+            loadImage(url: set["image"] as! String, imageView: image)
+            image.layer.cornerRadius = 10
+            image.contentMode = .scaleAspectFill
+            image.clipsToBounds = true
+        } else {
+            setView.backgroundColor = Colors.secondaryBackground
+        }
+        setView.addSubview(image)
+        let setLabel = UILabel()
+        setLabel.text = set["name"] as? String
+        setView.addSubview(setLabel)
+        image.translatesAutoresizingMaskIntoConstraints = false
+        setView.translatesAutoresizingMaskIntoConstraints = false
+        setLabel.translatesAutoresizingMaskIntoConstraints = false
+        setLabel.textColor = Colors.text
+        setLabel.textAlignment = .center
+        setLabel.font = UIFont(name: "LilGrotesk-Regular", size: 25)
+        setView.layer.cornerRadius = 10
+        let setButton = UIButton()
+        setButton.accessibilityIdentifier = "setButton"
+        setButton.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
+        var t = "s"
+        if set["type"] as! String == "web" {
+            t = "w"
+        }
+        setButton.accessibilityIdentifier = t + (set["setID"] as! String)
+        setButton.translatesAutoresizingMaskIntoConstraints = false
+        setView.addSubview(setButton)
+        con(setView, (view.frame.width - 180) / 3, 100)
+        NSLayoutConstraint.activate([
+            setLabel.topAnchor.constraint(equalTo: setView.topAnchor),
+            setLabel.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
+            setLabel.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
+            setLabel.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
+            setButton.topAnchor.constraint(equalTo: setView.topAnchor),
+            setButton.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
+            setButton.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
+            setButton.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
+            image.topAnchor.constraint(equalTo: setView.topAnchor),
+            image.bottomAnchor.constraint(equalTo: setView.bottomAnchor),
+            image.leadingAnchor.constraint(equalTo: setView.leadingAnchor),
+            image.trailingAnchor.constraint(equalTo: setView.trailingAnchor),
+        ])
+        return setView
+    }
+
     
     @objc func newSet(_ sender: UIButton){
         let popupVC = NewSetVC()
@@ -363,25 +310,13 @@ class MainPage: UIViewController, NewSetDelegate {
     }
     
     @objc func buttonTapped(_ sender: UIButton) {
-        
-        if(String(sender.accessibilityIdentifier!.first!) == "r"){
-            destinationSet = recentSets[Int(sender.accessibilityIdentifier!.dropFirst())!]["setID"] as! String
-            if(recentSets[Int(sender.accessibilityIdentifier!.dropFirst())!]["type"] as! String == "standard"){
-                destination = "standard"
-                performSegue(withIdentifier: "viewStandardSet", sender: self)
-            }else{
-                destination = "web"
-                performSegue(withIdentifier: "viewWebSet", sender: self)
-            }
+        destinationSet = String(sender.accessibilityIdentifier!.dropFirst())
+        if(String(sender.accessibilityIdentifier!.first!) == "s"){
+            destination = "standard"
+            performSegue(withIdentifier: "viewStandardSet", sender: self)
         }else{
-            destinationSet = mySets[Int(sender.accessibilityIdentifier!.dropFirst())!]["setID"] as! String
-            if(mySets[Int(sender.accessibilityIdentifier!.dropFirst())!]["type"] as! String == "standard"){
-                destination = "standard"
-                performSegue(withIdentifier: "viewStandardSet", sender: self)
-            }else{
-                destination = "web"
-                performSegue(withIdentifier: "viewWebSet", sender: self)
-            }
+            destination = "web"
+            performSegue(withIdentifier: "viewWebSet", sender: self)
         }
         
         
@@ -420,12 +355,12 @@ class MainPage: UIViewController, NewSetDelegate {
         newSet["name"] = "New Set"
         newSet["author"] = userData["username"]!
         newSet["authorID"] = Auth.auth().currentUser?.uid
-        newSet["date"] = Timestamp()
+        newSet["date"] = Timestamp(date: Date())
         newSet["version"] = Colors.version
-        newSet["image"] = nil
+        newSet["image"] = ""
         var studiedSet: [String: Any] = [:]
         studiedSet["name"] = "New Set"
-        studiedSet["image" ] = nil
+        studiedSet["image"] = ""
         if(type == "Standard"){
             newSet["type"] = "standard"
             newSet["set"] = [[

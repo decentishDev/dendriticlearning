@@ -62,54 +62,77 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         view.backgroundColor = Colors.background
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        let data = defaults.value(forKey: "set") as! [String: Any]
+        
+        // Fetch data and initialize the view after fetching
+        fetchDataAndInitialize()
+    }
+
+    func fetchDataAndInitialize() {
+        guard let data = defaults.value(forKey: "set") as? [String: Any] else { return }
         cards = data["set"] as! [[String: Any]]
+        
         var userData: [String: Any] = [:]
-        let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
-        userRef.getDocument { (document, error) in
+        let userRef = db.collection("users").document(Auth.auth().currentUser!.uid)
+        
+        userRef.getDocument { [weak self] (document, error) in
+            guard let self = self else { return }
+            
             if let document = document, document.exists {
                 userData = document.data()!
+                self.initializeView(userData: userData)
             } else {
                 print("Document does not exist")
+                // Handle the case where the document doesn't exist if necessary
             }
         }
-        for i in userData["studiedSets"] as! [[String: Any]]{
+    }
+
+    func initializeView(userData: [String: Any]) {
+        // Process userData and update the view accordingly
+        for i in userData["studiedSets"] as! [[String: Any]] {
             if i["setID"] as! String == set {
                 known = i["learn"] as! [Int]
                 break
             }
         }
-        if(known.count != cards.count){
+        
+        if known.count != cards.count {
             var c: [Int] = []
-            for i in 0..<cards.count{
+            for _ in 0..<cards.count {
                 c.append(0)
             }
             known = c
             save()
         }
+        
         var t = true
         for i in known {
-            if(i != 2){
+            if i != 2 {
                 t = false
                 break
             }
         }
+        
         if t {
             for i in 0..<known.count {
                 known[i] = 0
             }
         }
-        for i in 0 ..< cards.count{
-            if(known[i] != 2){
+        
+        for i in 0..<cards.count {
+            if known[i] != 2 {
                 cardOrder.append(i)
             }
         }
-        if(random){
+        
+        if random {
             cardOrder.shuffle()
         }
+        
         setup()
         nextTerm()
     }
+
     
     deinit {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -306,27 +329,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
                         if(self.cards[i]["termType"] as! String == "t"){
                             self.CardLabel.text = self.cards[i]["term"] as? String
                         }else{
-                            if let drawingData = self.defaults.value(forKey: self.cards[i]["term"] as! String){
-                                do {
-                                    try self.CardDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
-                                } catch {
-                                    print("Error converting Data to PkDrawing: \(error)")
-                                }
-                            }else {
-                                let storageRef = self.storage.reference().child(self.cards[i]["term"] as! String)
-                                storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
-                                    if let error = error {
-                                        print("Error downloading drawing from Firebase Storage: \(error)")
-                                    }else if let data = data {
-                                        do {
-                                            try self.CardDrawing.drawing = recolor(PKDrawing(data: data ))
-                                        } catch {
-                                            print("Error converting Data to PkDrawing: \(error)")
-                                        }
-                                        self.defaults.set(data, forKey: self.cards[i]["term"] as! String)
-                                    }
-                                }
-                            }
+                            loadDrawing(url: self.cards[i]["term"] as? String, canvas: self.CardDrawing)
                         }
                         UIView.animate(withDuration: 0.2, animations: {
                             self.CardLabel.alpha = 1
@@ -416,28 +419,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
             CardLabel.isHidden = true
             CardImage.isHidden = true
             
-            
-            if let drawingData = self.defaults.value(forKey: cards[cardOrder[index]]["def"] as! String){
-                do {
-                    try self.CardDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
-                } catch {
-                    print("Error converting Data to PkDrawing: \(error)")
-                }
-            }else {
-                let storageRef = self.storage.reference().child(cards[cardOrder[index]]["def"] as! String)
-                storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
-                    if let error = error {
-                        print("Error downloading drawing from Firebase Storage: \(error)")
-                    }else if let data = data {
-                        do {
-                            try self.CardDrawing.drawing = recolor(PKDrawing(data: data ))
-                        } catch {
-                            print("Error converting Data to PkDrawing: \(error)")
-                        }
-                        self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]]["def"] as! String)
-                    }
-                }
-            }
+            loadDrawing(url: cards[cardOrder[index]]["def"] as? String, canvas: self.CardDrawing)
             
             incorrectButton.isHidden = false
             correctButton.isHidden = false
@@ -514,46 +496,14 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
                 CardLabel.text = cards[cardOrder[index]]["term"] as? String
             }else if(cards[cardOrder[index]]["termType"] as! String == "d"){
                 CardDrawing.isHidden = false
-
                 
-                if let drawingData = self.defaults.value(forKey: cards[cardOrder[index]]["term"] as! String){
-                    do {
-                        try self.CardDrawing.drawing = recolor(PKDrawing(data: drawingData as! Data))
-                    } catch {
-                        print("Error converting Data to PkDrawing: \(error)")
-                    }
-                }else {
-                    let storageRef = self.storage.reference().child(cards[cardOrder[index]]["term"] as! String)
-                    storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
-                        if let error = error {
-                            print("Error downloading drawing from Firebase Storage: \(error)")
-                        }else if let data = data {
-                            do {
-                                try self.CardDrawing.drawing = recolor(PKDrawing(data: data ))
-                            } catch {
-                                print("Error converting Data to PkDrawing: \(error)")
-                            }
-                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]]["term"] as! String)
-                        }
-                    }
-                }
+                loadDrawing(url: cards[cardOrder[index]]["term"] as? String, canvas: self.CardDrawing)
                 
             }else{
                 CardImage.isHidden = false
-                if let imageData = self.defaults.value(forKey: self.cards[self.cardOrder[self.index]]["term"] as! String){
-                    self.CardImage.image = UIImage(data: imageData as! Data)
-                }else {
-                    let storageRef = self.storage.reference().child(self.cards[self.cardOrder[self.index]]["term"] as! String)
-                    storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
-                        if let error = error {
-                            print("Error downloading drawing from Firebase Storage: \(error)")
-                        }else if let data = data {
-                            self.CardImage.image = UIImage(data: data )
-                            self.defaults.set(data, forKey: self.cards[self.cardOrder[self.index]]["term"] as! String)
-                        }
-                    }
-                }
+                loadImage(url: self.cards[self.cardOrder[self.index]]["term"] as? String, imageView: self.CardImage)
             }
+            
             currentInput = cards[cardOrder[index]]["defType"] as! String
             if(currentInput == "t"){
                 TextField.isHidden = false
@@ -571,26 +521,37 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         performSegue(withIdentifier: "standardLearnVC_unwind", sender: nil)
     }
     
-    func save(){
-        var oldUser: [String: Any] = [:]
-        let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
+    func save() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let userRef = db.collection("users").document(uid)
+        
         userRef.getDocument { (document, error) in
             if let document = document, document.exists {
-                oldUser = document.data()!
+                var oldUser = document.data()!
+                var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
+                
+                for (i, set) in oldStudied.enumerated() {
+                    if set["setID"] as! String == self.set {
+                        oldStudied[i]["learn"] = self.known
+                        break
+                    }
+                }
+                
+                oldUser["studiedSets"] = oldStudied
+                
+                userRef.setData(oldUser, merge: true) { error in
+                    if let error = error {
+                        print("Error updating document: \(error)")
+                    } else {
+                        print("Document successfully updated")
+                    }
+                }
             } else {
                 print("Document does not exist")
             }
         }
-        var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
-        for (i, set) in oldStudied.enumerated() {
-            if(set["setID"] as! String == self.set){
-                oldStudied[i]["learn"] = known
-                break
-            }
-        }
-        oldUser["studiedSets"] = oldStudied
-        db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true)
     }
+
     
     @objc func SettingsButton(sender: UIButton){
         

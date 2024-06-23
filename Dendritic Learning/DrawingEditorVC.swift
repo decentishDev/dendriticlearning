@@ -49,32 +49,12 @@ class DrawingEditorVC: UIViewController, PKCanvasViewDelegate {
         canvas.overrideUserInterfaceStyle = .light
         canvas.allowsFingerDrawing = defaults.value(forKey: "fingerDrawing") as! Bool
         
-        let card = (UserDefaults.standard.value(forKey: "set") as! [String: Any])["set"] as! [[Any]]
-        var tempI = 3
+        let card = (UserDefaults.standard.value(forKey: "set") as! [String: Any])["set"] as! [[String: Any?]]
+        var tempI = "def"
         if(term){
-            tempI = 1
+            tempI = "term"
         }
-        if let drawingData = self.defaults.value(forKey: card[i][tempI] as! String){
-            do {
-                try self.canvas.drawing = recolor(PKDrawing(data: drawingData as! Data))
-            } catch {
-                print("Error converting Data to PkDrawing: \(error)")
-            }
-        }else {
-            let storageRef = self.storage.reference().child(card[i][tempI] as! String)
-            storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
-                if let error = error {
-                    print("Error downloading drawing from Firebase Storage: \(error)")
-                }else if let data = data {
-                    do {
-                        try self.canvas.drawing = recolor(PKDrawing(data: data ))
-                    } catch {
-                        print("Error converting Data to PkDrawing: \(error)")
-                    }
-                    self.defaults.set(data, forKey: card[self.i][tempI] as! String)
-                }
-            }
-        }
+        loadDrawing(url: card[i][tempI] as? String, canvas: self.canvas)
         
         canvas.delegate = self
         centeredView.addSubview(canvas)

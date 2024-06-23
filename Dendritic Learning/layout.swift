@@ -8,6 +8,8 @@
 import Foundation
 import UIKit
 import PencilKit
+import FirebaseAuth
+import FirebaseStorage
 
 func con(_ sender: UIView, _ x: CGFloat, _ y: CGFloat){
     sender.widthAnchor.constraint(equalToConstant: x).isActive = true
@@ -84,3 +86,76 @@ func daySuffix(from date: Date) -> String {
     default: return "th"
     }
 }
+
+func loadDrawing(url: String?, canvas: PKCanvasView){
+    if url != "" {
+        let storage = Storage.storage()
+        if let drawingData = UserDefaults.standard.value(forKey: url!){
+            do {
+                try canvas.drawing = recolor(PKDrawing(data: drawingData as! Data))
+            } catch {
+                print("Error converting Data to PkDrawing: \(error)")
+            }
+        }else {
+            let storageRef = storage.reference().child(url!)
+            storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                if let error = error {
+                    print("Error downloading drawing from Firebase Storage: \(error)")
+                }else if let data = data {
+                    do {
+                        try canvas.drawing = recolor(PKDrawing(data: data ))
+                    } catch {
+                        print("Error converting Data to PkDrawing: \(error)")
+                    }
+                    UserDefaults.standard.set(data, forKey: url!)
+                }
+            }
+        }
+    }else{
+        canvas.drawing = PKDrawing()
+    }
+}
+
+func loadImage(url: String?, imageView: UIImageView){
+    if url != "" {
+        let storage = Storage.storage()
+        if let imageData = UserDefaults.standard.value(forKey: url!){
+            imageView.image = UIImage(data: imageData as! Data)
+        }else {
+            let storageRef = storage.reference().child(url!)
+            storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                if let error = error {
+                    print("Error downloading drawing from Firebase Storage: \(error)")
+                }else if let data = data {
+                    imageView.image = UIImage(data: data )
+                    UserDefaults.standard.set(data, forKey: url!)
+                }
+            }
+        }
+    }else{
+        imageView.image = UIImage(named: "placeholderimage.png")
+    }
+}
+
+func loadButtonImage(url: String?, imageView: UIButton){
+    if url != "" {
+        let storage = Storage.storage()
+        if let imageData = UserDefaults.standard.value(forKey: url!){
+            imageView.setImage(UIImage(data: imageData as! Data), for: .normal)
+        }else {
+            let storageRef = storage.reference().child(url!)
+            storageRef.getData(maxSize: 10 * 1024 * 1024) { data, error in
+                if let error = error {
+                    print("Error downloading drawing from Firebase Storage: \(error)")
+                }else if let data = data {
+                    imageView.setImage(UIImage(data: data), for: .normal)
+                    UserDefaults.standard.set(data, forKey: url!)
+                }
+            }
+        }
+    }else{
+        imageView.setImage(UIImage(named: "placeholderimage.png"), for: .normal)
+    }
+}
+
+

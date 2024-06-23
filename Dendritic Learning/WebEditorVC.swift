@@ -18,7 +18,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     var name = "Revolutionary War"
     var rectangles: [UIView] = []
     var scrollView: UIScrollView!
-    var image: String? = nil
+    var image: String = ""
     var web: [[Any]] = []
     var currentEdit: Int = -1
     var selectedButton: UIButton? = nil
@@ -45,7 +45,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         //print(data)
         name = data["name"] as! String
         web = data["set"] as! [[Any]]
-        image = data["image"] as! String?
+        image = (data["image"] as! String?)!
         
         scrollView = UIScrollView(frame: view.bounds)
         scrollView.contentSize = CGSize(width: view.bounds.width, height: view.bounds.height)
@@ -107,7 +107,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
 //        
 //        view.addSubview(themesButton)
         if(defaults.value(forKey: "isPaid") as! Bool == true){
-            if(data["image"] == nil){
+            if(data["image"] as! String == ""){
                 imageButton.setImage(UIImage(systemName: "photo"), for: .normal)
             }else{
                 imageButton.setImage(UIImage(systemName: "rectangle.badge.xmark.fill"), for: .normal)
@@ -255,7 +255,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             })
         }
         
-        if defaults.value(forKey: "beenInWebEditor") == nil{
+        if defaults.value(forKey: "beenInWebEditor") as! String == ""{
             defaults.setValue(true, forKey: "beenInWebEditor")
             
             let introView = UIView(frame: CGRect(x: view.frame.width - 380, y: view.frame.height - 440, width: 350, height: 410))
@@ -732,17 +732,17 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     }
     
     @objc func changeImage(_ sender: UIButton) {
-        if image == nil {
+        if image == "" {
             present(imagePicker, animated: true, completion: nil)
         }else{
-            defaults.removeObject(forKey: image!)
-            let imageRef = storage.reference().child(image!)
+            defaults.removeObject(forKey: image)
+            let imageRef = storage.reference().child(image)
             imageRef.delete(){ error in
                 if let error = error{
                     print("Error deleting image: \(error.localizedDescription)")
                 }
             }
-            image = nil
+            image = ""
             imageButton.setImage(UIImage(systemName: "photo"), for: .normal)
         }
     }
@@ -765,7 +765,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
                 }
                 
                 image = imageRef.fullPath
-                defaults.set(imageData, forKey: image!)
+                defaults.set(imageData, forKey: image)
                 imageButton.setImage(UIImage(systemName: "rectangle.badge.xmark.fill"), for: .normal)
                 
                 var oldUser: [String: Any] = [:]

@@ -23,7 +23,7 @@ class WebSetVC: UIViewController {
     var name: String = ""
     var date: String = ""
     
-    var image: String? = nil
+    var image: String? = ""
     
     var setData: [String: Any] = [:]
     
@@ -84,7 +84,7 @@ class WebSetVC: UIViewController {
             for subview in view.subviews {
                 subview.removeFromSuperview()
             }
-        if(image == nil){
+        if(image == ""){
             view.backgroundColor = Colors.background
         }else{
             var actualImage = UIImage()
@@ -221,7 +221,7 @@ class WebSetVC: UIViewController {
         conW(button, (title as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont(name: "LilGrotesk-Bold", size: 30)!]).width + 40)
         button.layer.masksToBounds = true
 
-        if(image == nil){
+        if(image == ""){
             button.backgroundColor = Colors.secondaryBackground
         }else{
             var blurEffect = UIBlurEffect(style: .systemThinMaterial)
