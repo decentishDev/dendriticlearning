@@ -34,6 +34,16 @@ class WebSetVC: UIViewController {
         super.viewDidLoad()
         
         if goToEditor {
+            var newSet: [String: Any] = [:]
+            newSet["name"] = "New Set"
+            //newSet["author"] = userData["username"]!
+            newSet["authorID"] = Auth.auth().currentUser?.uid
+            //newSet["date"] = Timestamp(date: Date())
+            newSet["version"] = Colors.version
+            newSet["image"] = ""
+            newSet["type"] = "web"
+            newSet["set"] = [] as [[String: Any]]
+            defaults.set(newSet, forKey: "set")
             //UIView.setAnimationsEnabled(false)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
                 self.performSegue(withIdentifier: "editWebSet", sender: self)
@@ -47,6 +57,7 @@ class WebSetVC: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        view.backgroundColor = Colors.background
         let dataRef = db.collection("sets").document(set)
         dataRef.getDocument { (document, error) in
             if let document = document, document.exists {
@@ -89,21 +100,8 @@ class WebSetVC: UIViewController {
         if(image == ""){
             view.backgroundColor = Colors.background
         }else{
-            var actualImage = UIImage()
-            if let imageData = defaults.object(forKey: image!) {
-                actualImage = UIImage(data: imageData as! Data)!
-            }else{
-                let imageRef = storageRef.child(image!)
-                imageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
-                    if let error = error {
-                        print("error retrieving image: \(error)")
-                    } else {
-                        let actualImage = UIImage(data: data!)
-                        self.defaults.set(data!, forKey: self.image!)
-                    }
-                }
-            }
-            let backgroundImage = UIImageView(image: actualImage)
+            let backgroundImage = UIImageView()
+            loadImage(url: image!, imageView: backgroundImage)
             backgroundImage.contentMode = .scaleAspectFill
             view.addSubview(backgroundImage)
             backgroundImage.translatesAutoresizingMaskIntoConstraints = false

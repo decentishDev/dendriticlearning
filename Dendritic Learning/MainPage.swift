@@ -375,7 +375,7 @@ class MainPage: UIViewController, NewSetDelegate {
             destination = "standard"
         }else if(type == "Web"){
             newSet["type"] = "web"
-            newSet["set"] = []
+            newSet["set"] = [] as [[String: Any]]
             studiedSet["type"] = "web"
             destination = "web"
         }

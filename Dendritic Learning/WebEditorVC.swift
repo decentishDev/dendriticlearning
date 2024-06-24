@@ -140,7 +140,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             let rectWidth: CGFloat = 180
             let rectHeight: CGFloat = 180
             
-            let centerX = term["x"] as! CGFloat
+            let centerX = term["x"] as! CGFloat //Thread 1: Fatal error: Unexpectedly found nil while unwrapping an Optional value
             let centerY = term["y"] as! CGFloat
             
             let newX = centerX - rectWidth / 2
@@ -255,7 +255,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             })
         }
         
-        if defaults.value(forKey: "beenInWebEditor") as! String == ""{
+        if defaults.value(forKey: "beenInWebEditor") as? Bool == nil{
             defaults.setValue(true, forKey: "beenInWebEditor")
             
             let introView = UIView(frame: CGRect(x: view.frame.width - 380, y: view.frame.height - 440, width: 350, height: 410))
@@ -380,7 +380,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         web[rectI!]["x"] = movedView.center.x
         web[rectI!]["y"] = movedView.center.y
         
-        save()
+        //save()
         
         updateLines()
     }
@@ -400,6 +400,36 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         oldSet["set"] = web
         oldSet["image"] = image
         db.collection("sets").document(set).setData(oldSet)
+        
+        let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
+        
+        userRef.getDocument { [weak self] (document, error) in
+            guard let self = self else { return }
+            
+            if let document = document, document.exists {
+                var oldUser = document.data()!
+                var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
+                
+                for (i, set) in oldStudied.enumerated() {
+                    if set["setID"] as! String == self.set {
+                        oldStudied[i]["name"] = name
+                        oldStudied[i]["image"] = image
+                        break
+                    }
+                }
+                
+                oldUser["studiedSets"] = oldStudied
+                self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true) { error in
+                    if let error = error {
+                        print("Error updating user data: \(error.localizedDescription)")
+                    } else {
+                        print("User data successfully updated.")
+                    }
+                }
+            } else {
+                print("Document does not exist")
+            }
+        }
     }
     
     func updateLines(){
@@ -528,7 +558,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             let termLabel = UILabel(frame: CGRect(x: 5, y: 0, width: 170, height: 120))
             termLabel.text = data["term"] as? String
             termLabel.textColor = Colors.text
-            termLabel.font = UIFont(name: "LilGrotesk-Regular", size: 15)
+            termLabel.font = UIFont(name: "LilGrotesk-Regular", size: 18)
             termLabel.textAlignment = .center
             termLabel.numberOfLines = 0
             visible.addSubview(termLabel)
@@ -553,7 +583,12 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             
             save()
         }else{
-            web[currentEdit] = [data["term"], data["def"], web[currentEdit]["x"], web[currentEdit]["y"], web[currentEdit]["connections"]]
+            let a = data["term"]
+            let b = data["def"]
+            let c = web[currentEdit]["x"]
+            let d = web[currentEdit]["y"]
+            let e =  web[currentEdit]["connections"]
+            web[currentEdit] = ["term": a, "def": b, "x": c, "y": d, "connections": e]
             (rectangles[currentEdit].subviews[0].subviews[0] as! UILabel).text = data["term"] as? String
             save()
         }

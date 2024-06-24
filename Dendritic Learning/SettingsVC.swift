@@ -206,6 +206,6 @@ class SettingsVC: UIViewController {
     }
     
     func save(){
-        db.document(Auth.auth().currentUser!.uid).setData(userData, merge: true)
+        db.collection("users").document(Auth.auth().currentUser!.uid).setData(userData, merge: true)
     }
 }

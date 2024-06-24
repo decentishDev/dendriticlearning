@@ -12,7 +12,7 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
     let defaults = UserDefaults.standard
 
     var set = ""
-    var web: [[Any]] = []
+    var web: [[String: Any]] = []
     var round: [Int] = []
     var termCounter = UILabel()
     var index = 0
@@ -49,7 +49,7 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         view.backgroundColor = Colors.background
         let data = defaults.value(forKey: "set") as! [String: Any]
-        web = data["set"] as! [[Any]]
+        web = data["set"] as! [[String: Any]]
         
         if(web.count > 0){
             
@@ -222,19 +222,19 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
         
         var incoming: [String] = []
         for term in web {
-            if((term[4] as! [Int]).firstIndex(of: round[index]) != nil){
-                incoming.append(term[0] as! String)
+            if((term["connections"] as! [Int]).firstIndex(of: round[index]) != nil){
+                incoming.append(term["term"] as! String)
             }
         }
         if(incoming.count > 0){
             options.append(0)
         }
         
-        if((web[round[index]][4] as! [Int]).count > 0){
+        if((web[round[index]]["connections"] as! [Int]).count > 0){
             options.append(2)
         }
         
-        if((web[round[index]][1] as! String) != ""){
+        if((web[round[index]]["def"] as! String) != ""){
             options.append(4)
         }
         
@@ -265,7 +265,7 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
             if(questionType == 0){ //INCOMING TERMS
 //                if(otherType){
 //                    questionType+=1
-                    mainLabel.text = "What leads to " + (web[round[index]][0] as! String) + "?"
+                    mainLabel.text = "What leads to " + (web[round[index]]["term"] as! String) + "?"
                     for i in incoming {
                         var response = ""
                         var thing = i
@@ -323,11 +323,11 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
 //                    mainLabel.text = "What leads to " + t + "?"
 //                    answer = [(web[round[index]][0] as! String)]
 //                }else{
-                    mainLabel.text = "What does " + (web[round[index]][0] as! String) + " lead to?"
-                    let outgoing = web[round[index]][4] as! [Int]
+                    mainLabel.text = "What does " + (web[round[index]]["term"] as! String) + " lead to?"
+                    let outgoing = web[round[index]]["connections"] as! [Int]
                     for term in outgoing {
                         var response = ""
-                        var thing = (web[term][0] as! String)
+                        var thing = (web[term]["term"] as! String)
                         if(thing.count > 0){
                             for _ in 0..<thing.count {
                                 if(String(thing.first!) != " "){
@@ -336,7 +336,7 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
                                 thing.removeFirst()
                             }
                         }
-                        originalAnswers.append(web[term][0] as! String)
+                        originalAnswers.append(web[term]["term"] as! String)
                         answer.append(response)
                     }
 //                }
@@ -344,9 +344,9 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
             }else{ //TERM / DEFINITION
 //                if(otherType){
 //                    questionType+=1
-                    mainLabel.text = "What is " + (web[round[index]][1] as! String) + "?"
+                    mainLabel.text = "What is " + (web[round[index]]["def"] as! String) + "?"
                 var response = ""
-                var thing = (web[round[index]][0] as! String)
+                var thing = (web[round[index]]["term"] as! String)
                 if(thing.count > 0){
                     for _ in 0..<thing.count {
                         if(String(thing.first!) != " "){
@@ -356,7 +356,7 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
                     }
                 }
                     answer = [response]
-                originalAnswers = [web[round[index]][0] as! String]
+                originalAnswers = [web[round[index]]["term"] as! String]
 //                }else{
 //                    mainLabel.text = "What is " + (web[round[index]][0] as! String) + "?"
 //                    answer = [(web[round[index]][1] as! String)]
