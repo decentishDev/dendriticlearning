@@ -293,8 +293,8 @@ class NewUserVC: UIViewController {
                 }
             }
         case 4:
-            let email = signUpEmail.text
-            let password = signUpPassword.text
+            let email = signInEmail.text
+            let password = signInPassword.text
             if(email != nil && isValidEmail(email!)){
                 if(password != nil && isValidPassword(password!)){
                     backButton.isEnabled = false

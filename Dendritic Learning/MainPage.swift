@@ -31,6 +31,8 @@ class MainPage: UIViewController, NewSetDelegate {
     
     var userData: [String: Any] = [:]
     
+    var loadingImage = UIImageView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 //        for family in UIFont.familyNames {
@@ -39,10 +41,42 @@ class MainPage: UIViewController, NewSetDelegate {
 //                print("        Font: \(name)~")
 //            }
 //        }
+        view.backgroundColor = Colors.background
+        
+        stackView.axis = .vertical
+        stackView.spacing = 20
+        stackView.alignment = .leading
+        scrollView.addSubview(stackView)
+        view.addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 60),
+            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -60),
+            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 60),
+            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -60),
+        ])
+        
+        
+        let topBar = createTopBar()
+        stackView.addArrangedSubview(topBar)
+        let breakView0 = UIView()
+        breakView0.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        breakView0.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        stackView.addArrangedSubview(breakView0)
+        
+        loadingImage = createLoadingIcon()
+        loadingImage.center = view.center
+        view.addSubview(loadingImage)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         setup()
+        
     }
     
     func setup(){
@@ -50,14 +84,8 @@ class MainPage: UIViewController, NewSetDelegate {
         mySets = []
         
         // Clear existing views
-        for subview in stackView.arrangedSubviews {
-            stackView.removeArrangedSubview(subview)
-            subview.removeFromSuperview()
-        }
-        stackView.removeFromSuperview()
-        for subview in view.subviews {
-            subview.removeFromSuperview()
-        }
+        
+        
         
         // Check for user settings and auth status
         if let fingerDrawing = defaults.value(forKey: "fingerDrawing") as? Bool, let uid = Auth.auth().currentUser?.uid {
@@ -70,16 +98,19 @@ class MainPage: UIViewController, NewSetDelegate {
                     
                     DispatchQueue.main.async {
                         self.setupUI()
+                        self.loadingImage.removeFromSuperview()
                     }
                 } else {
                     print("Document does not exist")
                     DispatchQueue.main.async {
                         self.performSegue(withIdentifier: "newUserVC", sender: nil)
+                        self.loadingImage.removeFromSuperview()
                     }
                 }
             }
         } else {
             defaults.setValue(false, forKey: "fingerDrawing")
+            defaults.setValue("dark", forKey: "theme")
             performSegue(withIdentifier: "newUserVC", sender: nil)
         }
     }
@@ -118,6 +149,15 @@ class MainPage: UIViewController, NewSetDelegate {
     }
 
     func setupUI() {
+        for subview in stackView.arrangedSubviews {
+            stackView.removeArrangedSubview(subview)
+            subview.removeFromSuperview()
+        }
+        stackView.removeFromSuperview()
+        for subview in view.subviews {
+            subview.removeFromSuperview()
+        }
+        
         view.backgroundColor = Colors.background
         
         stackView.axis = .vertical
@@ -138,12 +178,17 @@ class MainPage: UIViewController, NewSetDelegate {
             stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -60),
         ])
         
+        
         let topBar = createTopBar()
         stackView.addArrangedSubview(topBar)
         let breakView0 = UIView()
         breakView0.widthAnchor.constraint(equalToConstant: 30).isActive = true
         breakView0.heightAnchor.constraint(equalToConstant: 30).isActive = true
         stackView.addArrangedSubview(breakView0)
+        
+        loadingImage = createLoadingIcon()
+        loadingImage.center = view.center
+        view.addSubview(loadingImage)
         
         let recentLabel = createSectionLabel(text: "Recent sets")
         stackView.addArrangedSubview(recentLabel)
@@ -206,6 +251,24 @@ class MainPage: UIViewController, NewSetDelegate {
         settingsButton.trailingAnchor.constraint(equalTo: topBar.trailingAnchor).isActive = true
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
         settingsButton.addTarget(self, action: #selector(settings(_:)), for: .touchUpInside)
+        
+        let searchIcon = UIImageView()
+        searchIcon.image = UIImage(systemName: "magnifyingglass")
+        searchIcon.contentMode = .scaleAspectFit
+        searchIcon.tintColor = Colors.highlight
+        searchIcon.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        searchIcon.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        topBar.addSubview(searchIcon)
+        searchIcon.trailingAnchor.constraint(equalTo: settingsIcon.leadingAnchor, constant: -15).isActive = true
+        searchIcon.translatesAutoresizingMaskIntoConstraints = false
+        
+        let searchButton = UIButton()
+        searchButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        searchButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        topBar.addSubview(searchButton)
+        searchButton.trailingAnchor.constraint(equalTo: settingsIcon.leadingAnchor, constant: -15).isActive = true
+        searchButton.translatesAutoresizingMaskIntoConstraints = false
+        searchButton.addTarget(self, action: #selector(search(_:)), for: .touchUpInside)
         
         return topBar
     }
@@ -305,6 +368,11 @@ class MainPage: UIViewController, NewSetDelegate {
     }
     
     @objc func settings(_ sender: UIButton){
+        destination = "settings"
+        performSegue(withIdentifier: "settingsVC", sender: nil)
+    }
+    
+    @objc func search(_ sender: UIButton){
         destination = "settings"
         performSegue(withIdentifier: "settingsVC", sender: nil)
     }

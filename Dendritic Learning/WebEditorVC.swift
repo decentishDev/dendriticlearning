@@ -359,6 +359,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     
     @objc func back(_ sender: UIButton) {
         performSegue(withIdentifier: "webEditorVC_unwind", sender: nil)
+        save()
     }
     
     @objc func handleBackTap(_ gestureRecognizer: UITapGestureRecognizer) {
@@ -684,11 +685,11 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         }
         save()
     }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+    }
+    func textFieldDidEndEditing(_ textField: UITextField){
         name = textField.text!
-        
         save()
     }
     

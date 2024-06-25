@@ -29,10 +29,12 @@ class WebSetVC: UIViewController {
     
     let db = Firestore.firestore()
     let storage = Storage.storage()
+    
+    var loadingImage = UIImageView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.backgroundColor = Colors.background
         if goToEditor {
             var newSet: [String: Any] = [:]
             newSet["name"] = "New Set"
@@ -54,10 +56,13 @@ class WebSetVC: UIViewController {
         //cards = data["set"] as! [[Any]]
         
         //setup()
+        loadingImage = createLoadingIcon()
+        loadingImage.center = view.center
+        view.addSubview(loadingImage)
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        view.backgroundColor = Colors.background
+
         let dataRef = db.collection("sets").document(set)
         dataRef.getDocument { (document, error) in
             if let document = document, document.exists {
@@ -76,6 +81,7 @@ class WebSetVC: UIViewController {
                 self.setup()
                 self.setData.removeValue(forKey: "date")
                 self.defaults.set(self.setData, forKey: "set")
+                self.loadingImage.removeFromSuperview()
             } else {
                 print("Document does not exist")
             }

@@ -159,3 +159,22 @@ func loadButtonImage(url: String?, imageView: UIButton){
 }
 
 
+func createLoadingIcon() -> UIImageView {
+    let loadingImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+    loadingImageView.contentMode = .scaleAspectFit
+
+    var animationImages: [UIImage] = []
+    for i in 1...49 {
+        if let image = UIImage(named: "d\(i)") {
+            animationImages.append(image)
+        }
+    }
+
+    loadingImageView.animationImages = animationImages
+    loadingImageView.animationDuration = 1.5
+    loadingImageView.animationRepeatCount = 0
+    
+    loadingImageView.startAnimating()
+    
+    return loadingImageView
+}

@@ -18,7 +18,6 @@
 		8D9080B42C1FEA7800DB36AB /* SetsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080B32C1FEA7800DB36AB /* SetsVC.swift */; };
 		8D9080B62C1FEA8000DB36AB /* StandardLearnVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080B52C1FEA8000DB36AB /* StandardLearnVC.swift */; };
 		8D9080B82C1FEA8400DB36AB /* StandardSetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080B72C1FEA8400DB36AB /* StandardSetVC.swift */; };
-		8D9080BA2C1FEA8700DB36AB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080B92C1FEA8700DB36AB /* ViewController.swift */; };
 		8D9080BC2C1FEA9E00DB36AB /* WebEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080BB2C1FEA9D00DB36AB /* WebEditorVC.swift */; };
 		8D9080BE2C1FEAA100DB36AB /* WebSetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080BD2C1FEAA100DB36AB /* WebSetVC.swift */; };
 		8D9080C02C1FEAA600DB36AB /* DrawingEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080BF2C1FEAA600DB36AB /* DrawingEditorVC.swift */; };
@@ -52,7 +51,6 @@
 		8D9080B32C1FEA7800DB36AB /* SetsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetsVC.swift; sourceTree = "<group>"; };
 		8D9080B52C1FEA8000DB36AB /* StandardLearnVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StandardLearnVC.swift; sourceTree = "<group>"; };
 		8D9080B72C1FEA8400DB36AB /* StandardSetVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StandardSetVC.swift; sourceTree = "<group>"; };
-		8D9080B92C1FEA8700DB36AB /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = ../../StudyApp/StudyApp/ViewController.swift; sourceTree = "<group>"; };
 		8D9080BB2C1FEA9D00DB36AB /* WebEditorVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebEditorVC.swift; sourceTree = "<group>"; };
 		8D9080BD2C1FEAA100DB36AB /* WebSetVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSetVC.swift; sourceTree = "<group>"; };
 		8D9080BF2C1FEAA600DB36AB /* DrawingEditorVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawingEditorVC.swift; sourceTree = "<group>"; };
@@ -116,7 +114,6 @@
 				8D9080B32C1FEA7800DB36AB /* SetsVC.swift */,
 				8D9080B52C1FEA8000DB36AB /* StandardLearnVC.swift */,
 				8D9080B72C1FEA8400DB36AB /* StandardSetVC.swift */,
-				8D9080B92C1FEA8700DB36AB /* ViewController.swift */,
 				8D9080BB2C1FEA9D00DB36AB /* WebEditorVC.swift */,
 				8D9080BD2C1FEAA100DB36AB /* WebSetVC.swift */,
 				8D9080BF2C1FEAA600DB36AB /* DrawingEditorVC.swift */,
@@ -220,7 +217,6 @@
 				8D9080C02C1FEAA600DB36AB /* DrawingEditorVC.swift in Sources */,
 				8D9080C82C1FEAB700DB36AB /* StandardEditorVC.swift in Sources */,
 				8D9080BC2C1FEA9E00DB36AB /* WebEditorVC.swift in Sources */,
-				8D9080BA2C1FEA8700DB36AB /* ViewController.swift in Sources */,
 				8D9080BE2C1FEAA100DB36AB /* WebSetVC.swift in Sources */,
 				8D9080AE2C1FEA5700DB36AB /* Colors.swift in Sources */,
 				8D9080C22C1FEAAB00DB36AB /* layout.swift in Sources */,

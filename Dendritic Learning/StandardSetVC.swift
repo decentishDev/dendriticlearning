@@ -32,10 +32,12 @@ class StandardSetVC: UIViewController {
     let db = Firestore.firestore()
     let storage = Storage.storage()
     
+    var loadingImage = UIImageView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         //print(goToEditor)
-        
+        view.backgroundColor = Colors.background
         if goToEditor {
             var newSet: [String: Any] = [:]
             newSet["name"] = "New Set"
@@ -60,6 +62,10 @@ class StandardSetVC: UIViewController {
             editSet()
             //UIView.setAnimationsEnabled(true)
         }
+        
+        loadingImage = createLoadingIcon()
+        loadingImage.center = view.center
+        view.addSubview(loadingImage)
 //        print(data)
 //        print("//////////////////////////////////////////////")
 //        print(cards)
@@ -92,7 +98,7 @@ class StandardSetVC: UIViewController {
                 }
                 self.setData.removeValue(forKey: "date")
                 self.defaults.set(self.setData, forKey: "set")
-                
+                self.loadingImage.removeFromSuperview()
                 completion()
             } else {
                 print("Document does not exist")
@@ -210,7 +216,6 @@ class StandardSetVC: UIViewController {
         ])
         
         for card in cards {
-            print("heyy")
             let termDefinitionStackView = createTermDefinitionStackView(for: card)
             allTermsStackView.addArrangedSubview(termDefinitionStackView)
         }
@@ -446,14 +451,14 @@ class StandardSetVC: UIViewController {
 //            print("Failed to archive data.")
 //            return
 //        }
-//        
+//
 //        let temporaryDirectoryURL = FileManager.default.temporaryDirectory
 //        let timeString = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
 //        let fileURL = temporaryDirectoryURL.appendingPathComponent(name).appendingPathExtension("dlset")
-//        
+//
 //        do {
 //            try data.write(to: fileURL)
-//            
+//
 //            let documentPicker = UIDocumentPickerViewController(url: fileURL, in: .exportToService)
 //            documentPicker.shouldShowFileExtensions = true
 //            self.present(documentPicker, animated: true, completion: nil)
