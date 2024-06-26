@@ -144,6 +144,8 @@ class MainPage: UIViewController, NewSetDelegate {
         if let subscription = self.userData["subscription"] as? [String: Any] {
             if subscription["status"] as! String == "inactive" {
                 self.defaults.set(false, forKey: "isPaid")
+            }else{
+                self.defaults.set(true, forKey: "isPaid")
             }
         }
     }

@@ -10,8 +10,9 @@ import PencilKit
 import FirebaseAuth
 import FirebaseFirestore
 import FirebaseStorage
+import GoogleMobileAds
 
-class FlashcardsVC: UIViewController {
+class FlashcardsVC: UIViewController, GADBannerViewDelegate {
     
     var set = ""
     
@@ -49,6 +50,8 @@ class FlashcardsVC: UIViewController {
     
     let db = Firestore.firestore()
     let storage = Storage.storage()
+    
+    var bottomSpace: CGFloat = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -120,6 +123,24 @@ class FlashcardsVC: UIViewController {
             i.removeFromSuperview()
         }
         
+        if(defaults.value(forKey: "isPaid") as! Bool != true){
+            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(view.frame.height, view.frame.width) - 50, height: 100)))
+            view.addSubview(bannerView)
+            bannerView.delegate = self
+            bannerView.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+            bannerView.rootViewController = self
+            bannerView.load(GADRequest())
+            
+            bannerView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+                bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            ])
+            
+            //bottomSpace = GADCurrentOrientationInlineAdaptiveBannerAdSizeWithWidth(min(view.frame.height, view.frame.width) - 300).size.height + 10
+            bottomSpace = 120
+        }
+        print(bottomSpace)
         IncorrectView.backgroundColor = Colors.secondaryBackground
         IncorrectView.layer.cornerRadius = 10
         CardView.backgroundColor = Colors.secondaryBackground
@@ -133,12 +154,12 @@ class FlashcardsVC: UIViewController {
         view.addSubview(CardView)
         
         if(view.layer.frame.width > view.layer.frame.height){
-            IncorrectView.frame = CGRect(x: 20, y: 60, width: (view.layer.frame.width - 80) * 0.15, height: view.frame.height - 80)
-            CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80)
-            CorrectView.frame = CGRect(x: 60 + IncorrectView.frame.width + CardView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.15, height: view.frame.height - 80)
+            IncorrectView.frame = CGRect(x: 20, y: 60, width: (view.layer.frame.width - 80) * 0.15, height: view.frame.height - 80 - bottomSpace)
+            CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80 - bottomSpace)
+            CorrectView.frame = CGRect(x: 60 + IncorrectView.frame.width + CardView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.15, height: view.frame.height - 80 - bottomSpace)
         }else{
-            let optionsHeight: CGFloat = (view.layer.frame.height - 100) * 0.3
-            let topHeight: CGFloat = (view.layer.frame.height - 100) * 0.7
+            let optionsHeight: CGFloat = (view.layer.frame.height - 100 - bottomSpace) * 0.3
+            let topHeight: CGFloat = (view.layer.frame.height - 100 - bottomSpace) * 0.7
             
             IncorrectView.frame = CGRect(x: 20, y: 80 + topHeight, width: (view.layer.frame.width - 60) * 0.5, height: optionsHeight)
             CardView.frame = CGRect(x: 20, y: 60, width: view.layer.frame.width - 40, height: topHeight)
@@ -152,7 +173,7 @@ class FlashcardsVC: UIViewController {
         CardLabel.numberOfLines = 0
         CardLabel.textColor = Colors.text
         CardView.addSubview(CardLabel)
-        CardDrawing.frame = CGRect(x: 0, y: 0, width: (view.frame.width - 161), height: 2*(view.frame.width - 161)/3)
+        CardDrawing.frame = CGRect(x: 0, y: 0, width: (view.frame.width - 161), height: 2*(view.frame.width - 161)/3 - bottomSpace)
         CardDrawing.isUserInteractionEnabled = false
         CardDrawing.layer.cornerRadius = 10
         CardDrawing.backgroundColor = .clear
@@ -249,7 +270,7 @@ class FlashcardsVC: UIViewController {
         OverlayLabel.numberOfLines = 0
         OverlayLabel.textColor = Colors.text
         OverlayCard.addSubview(OverlayLabel)
-        OverlayDrawing.frame = CGRect(x: 0, y: 0, width: (view.frame.width - 161), height: 2*(view.frame.width - 161)/3)
+        OverlayDrawing.frame = CGRect(x: 0, y: 0, width: (view.frame.width - 161), height: 2*(view.frame.width - 161)/3 - bottomSpace)
         OverlayDrawing.isUserInteractionEnabled = false
         OverlayDrawing.layer.cornerRadius = 10
         OverlayDrawing.backgroundColor = .clear
@@ -289,7 +310,7 @@ class FlashcardsVC: UIViewController {
         
         view.bringSubviewToFront(OverlayCard)
         
-        CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80)
+        CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80 - bottomSpace)
     }
     
     @objc func nextRound(sender: UIButton){
@@ -366,7 +387,7 @@ class FlashcardsVC: UIViewController {
     
     func nextCard(_ correct: Bool){
         let overlayI = index
-        CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80)
+        CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80 - bottomSpace)
         view.bringSubviewToFront(OverlayCard)
         CardView.sendSubviewToBack(endScreen)
         if(correct){
@@ -591,5 +612,6 @@ class FlashcardsVC: UIViewController {
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
         
     }
+    
 
 }

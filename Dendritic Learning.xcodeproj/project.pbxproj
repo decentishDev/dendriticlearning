@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8D873A702C2B60480036A928 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 8D873A6F2C2B60480036A928 /* GoogleMobileAds */; };
+		8D873A732C2B66D40036A928 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D873A722C2B66D40036A928 /* WebKit.framework */; };
 		8D90809A2C1FE88500DB36AB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080992C1FE88500DB36AB /* AppDelegate.swift */; };
 		8D90809C2C1FE88500DB36AB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D90809B2C1FE88500DB36AB /* SceneDelegate.swift */; };
 		8D9080A12C1FE88500DB36AB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D90809F2C1FE88500DB36AB /* Main.storyboard */; };
@@ -37,7 +39,21 @@
 		8DE6FA2F2C21DA93004E0C58 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8DE6FA2E2C21DA93004E0C58 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		8DCD3DB82C2B3AA500F041BE /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		8D873A722C2B66D40036A928 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		8D9080962C1FE88500DB36AB /* Dendritic Learning.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Dendritic Learning.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D9080992C1FE88500DB36AB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8D90809B2C1FE88500DB36AB /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -71,8 +87,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D873A732C2B66D40036A928 /* WebKit.framework in Frameworks */,
 				8DCF23DB2C2081B200B0DFA6 /* FirebaseAuth in Frameworks */,
 				8DCF23E12C2081B200B0DFA6 /* FirebaseStorage in Frameworks */,
+				8D873A702C2B60480036A928 /* GoogleMobileAds in Frameworks */,
 				8DCF23DD2C2081B200B0DFA6 /* FirebaseFirestore in Frameworks */,
 				8DCF23DF2C2081B200B0DFA6 /* FirebaseFirestoreSwift in Frameworks */,
 			);
@@ -81,11 +99,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8D873A712C2B66D40036A928 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8D873A722C2B66D40036A928 /* WebKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		8D90808D2C1FE88500DB36AB = {
 			isa = PBXGroup;
 			children = (
 				8D9080982C1FE88500DB36AB /* Dendritic Learning */,
 				8D9080972C1FE88500DB36AB /* Products */,
+				8D873A712C2B66D40036A928 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -139,6 +166,7 @@
 				8D9080922C1FE88500DB36AB /* Sources */,
 				8D9080932C1FE88500DB36AB /* Frameworks */,
 				8D9080942C1FE88500DB36AB /* Resources */,
+				8DCD3DB82C2B3AA500F041BE /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -150,6 +178,7 @@
 				8DCF23DC2C2081B200B0DFA6 /* FirebaseFirestore */,
 				8DCF23DE2C2081B200B0DFA6 /* FirebaseFirestoreSwift */,
 				8DCF23E02C2081B200B0DFA6 /* FirebaseStorage */,
+				8D873A6F2C2B60480036A928 /* GoogleMobileAds */,
 			);
 			productName = "Dendritic Learning";
 			productReference = 8D9080962C1FE88500DB36AB /* Dendritic Learning.app */;
@@ -181,6 +210,7 @@
 			mainGroup = 8D90808D2C1FE88500DB36AB;
 			packageReferences = (
 				8DCF23D92C2081B200B0DFA6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				8D873A6E2C2B60480036A928 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 			);
 			productRefGroup = 8D9080972C1FE88500DB36AB /* Products */;
 			projectDirPath = "";
@@ -382,9 +412,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 366XTZF564;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Dendritic Learning/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Dendritic Learning";
+				INFOPLIST_KEY_CFBundleDisplayName = Dendritic;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -398,6 +429,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.dendritic-learning.Dendritic-Learning";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -414,9 +446,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 366XTZF564;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Dendritic Learning/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Dendritic Learning";
+				INFOPLIST_KEY_CFBundleDisplayName = Dendritic;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -430,6 +463,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.dendritic-learning.Dendritic-Learning";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -462,6 +496,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8D873A6E2C2B60480036A928 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = exactVersion;
+				version = 11.0.0;
+			};
+		};
 		8DCF23D92C2081B200B0DFA6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -473,6 +515,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8D873A6F2C2B60480036A928 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D873A6E2C2B60480036A928 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
 		8DCF23DA2C2081B200B0DFA6 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8DCF23D92C2081B200B0DFA6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

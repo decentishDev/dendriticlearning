@@ -9,6 +9,7 @@ import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 import FirebaseStorage
+import GoogleMobileAds
 
 class WebSetVC: UIViewController {
 
@@ -31,6 +32,8 @@ class WebSetVC: UIViewController {
     let storage = Storage.storage()
     
     var loadingImage = UIImageView()
+    
+    var bannerView: GADBannerView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,6 +62,8 @@ class WebSetVC: UIViewController {
         loadingImage = createLoadingIcon()
         loadingImage.center = view.center
         view.addSubview(loadingImage)
+        
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -214,6 +219,14 @@ class WebSetVC: UIViewController {
 //        view.addSubview(icon)
 //        icon.frame = CGRect(x: view.frame.width / 2.5, y: view.frame.height / 2.5, width: max(view.frame.width, view.frame.height), height: max(view.frame.width, view.frame.height))
 //        icon.transform = icon.transform.rotated(by: -(.pi / 8))
+        
+        
+        
+        
+        bannerView = GADBannerView(adSize: GADCurrentOrientationInlineAdaptiveBannerAdSizeWithWidth(min(view.frame.height, view.frame.width) - 100))
+        view.addSubview(bannerView)
+        bannerView.delegate = self
+        configureBannerView()
     }
     
     func createButton(withTitle title: String) -> UIButton {
@@ -314,4 +327,22 @@ class WebSetVC: UIViewController {
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
         
     }
+    
+    func configureBannerView(){
+        bannerView.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+        bannerView.rootViewController = self
+        bannerView.load(GADRequest())
+        
+        bannerView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -50),
+            bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
+        //bannerView.backgroundColor = .white
+    }
+}
+
+extension WebSetVC: GADBannerViewDelegate {
+    
 }

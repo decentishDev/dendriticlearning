@@ -7,7 +7,7 @@
 
 import UIKit
 import FirebaseCore
-//import FirebaseFirestore
+import GoogleMobileAds
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -15,6 +15,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
+        //GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = [ "0cf650f7338714ffebcf31a16c878a90"]
         FirebaseApp.configure()
         
         //let db = Firestore.firestore()
