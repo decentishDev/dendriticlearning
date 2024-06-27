@@ -11,8 +11,9 @@ import Vision
 import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
+import GoogleMobileAds
 
-class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelegate {
+class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelegate, GADBannerViewDelegate {
     let defaults = UserDefaults.standard
     var set = ""
     var topHeight: CGFloat = 200
@@ -226,7 +227,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         
         EndScreen.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
         view.addSubview(EndScreen)
-        EndLabel.frame = CGRect(x: 100, y: 100, width: view.frame.width - 200, height: view.frame.height - 275)
+        EndLabel.frame = CGRect(x: 100, y: 100, width: view.frame.width - 200, height: view.frame.height - 315)
         EndLabel.text = ""
         EndLabel.font = UIFont(name: "LilGrotesk-Regular", size: 40)
         EndLabel.textColor = Colors.text
@@ -234,7 +235,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         EndLabel.numberOfLines = 0
         EndScreen.addSubview(EndLabel)
         let EndButton = UIButton()
-        EndButton.frame = CGRect(x: (view.frame.width / 2) - 125, y: view.frame.height - 175, width: 250, height: 75)
+        EndButton.frame = CGRect(x: (view.frame.width / 2) - 125, y: view.frame.height - 215, width: 250, height: 75)
         EndButton.backgroundColor = Colors.highlight
         EndButton.layer.cornerRadius = 15
         EndButton.setTitle("Next round", for: .normal)
@@ -242,6 +243,20 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         EndButton.titleLabel!.font = UIFont(name: "LilGrotesk-Bold", size: 30)
         EndButton.addTarget(self, action: #selector(nextRound(sender:)), for: .touchUpInside)
         EndScreen.addSubview(EndButton)
+        
+        if(defaults.value(forKey: "isPaid") as! Bool != true){
+            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(view.frame.height, view.frame.width) - 50, height: 100)))
+            EndScreen.addSubview(bannerView)
+            bannerView.delegate = self
+            bannerView.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+            bannerView.rootViewController = self
+            bannerView.load(GADRequest())
+            bannerView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                bannerView.bottomAnchor.constraint(equalTo: EndScreen.bottomAnchor, constant: -20),
+                bannerView.centerXAnchor.constraint(equalTo: EndScreen.centerXAnchor)
+            ])
+        }
         EndScreen.isHidden = true
         
         incorrectButton.frame = CGRect(x: (view.frame.width / 2) - 60, y: topHeight - keyboard + 20 - 70, width: 50, height: 50)

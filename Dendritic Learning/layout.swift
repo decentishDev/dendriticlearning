@@ -178,3 +178,22 @@ func createLoadingIcon() -> UIImageView {
     
     return loadingImageView
 }
+
+func getKeyWords(_ input: String) -> [String] {
+
+    let words = input.lowercased().split(separator: " ").map { String($0) }
+
+    var combinations: [String] = []
+    
+    func combinationsHelper(_ current: [String], _ start: Int) {
+        for i in start..<words.count {
+            let newCombination = current + [words[i]]
+            combinations.append(newCombination.joined(separator: " "))
+            combinationsHelper(newCombination, i + 1)
+        }
+    }
+    
+    combinationsHelper([], 0)
+    
+    return combinations
+}

@@ -375,8 +375,8 @@ class MainPage: UIViewController, NewSetDelegate {
     }
     
     @objc func search(_ sender: UIButton){
-        destination = "settings"
-        performSegue(withIdentifier: "settingsVC", sender: nil)
+        destination = "search"
+        performSegue(withIdentifier: "searchVC", sender: nil)
     }
     
     @objc func buttonTapped(_ sender: UIButton) {
@@ -423,6 +423,7 @@ class MainPage: UIViewController, NewSetDelegate {
         goToEditor = true
         var newSet: [String: Any] = [:]
         newSet["name"] = "New Set"
+        newSet["keyWords"] = ["new", "set"]
         newSet["author"] = userData["username"]!
         newSet["authorID"] = Auth.auth().currentUser?.uid
         newSet["date"] = Timestamp(date: Date())

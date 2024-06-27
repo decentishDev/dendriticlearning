@@ -11,12 +11,12 @@ import FirebaseFirestore
 
 class NewUserVC: UIViewController {
     
-    let welcomeView = UIView()
-    let infoView = UIView()
-    let signUpOrIn = UIView()
-    let signUp = UIView()
-    let signIn = UIView()
-    let success = UIView()
+    let welcomeView = UIScrollView()
+    let infoView = UIScrollView()
+    let signUpOrIn = UIScrollView()
+    let signUp = UIScrollView()
+    let signIn = UIScrollView()
+    let success = UIScrollView()
     
     var signUpName = UITextField()
     var signUpEmail = UITextField()
@@ -33,15 +33,22 @@ class NewUserVC: UIViewController {
     var page = 0
     
     let db = Firestore.firestore()
+    
+    var keyboard: CGFloat = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         setup()
         
         let gesture = UITapGestureRecognizer(target: self, action: #selector(dismissIt(_:)))
         view.addGestureRecognizer(gesture)
     }
-    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
     func setup(){
         let midX = view.frame.width / 2
         let midY = view.frame.height / 2
@@ -49,24 +56,25 @@ class NewUserVC: UIViewController {
         let fullY = view.frame.height
         
         view.backgroundColor = Colors.background
+
         welcomeView.frame = view.frame
         view.addSubview(welcomeView)
-
+        welcomeView.contentSize = view.frame.size
         infoView.frame = CGRect(x: fullX, y: 0, width: fullX, height: fullY)
         view.addSubview(infoView)
-
+        infoView.contentSize = view.frame.size
         signUpOrIn.frame = CGRect(x: fullX, y: 0, width: fullX, height: fullY)
         view.addSubview(signUpOrIn)
-
+        signUpOrIn.contentSize = view.frame.size
         signUp.frame = CGRect(x: fullX, y: 0, width: fullX, height: fullY)
         view.addSubview(signUp)
-
+        signUp.contentSize = view.frame.size
         signIn.frame = CGRect(x: fullX, y: 0, width: fullX, height: fullY)
         view.addSubview(signIn)
-
+        signIn.contentSize = view.frame.size
         success.frame = CGRect(x: fullX, y: 0, width: fullX, height: fullY)
         view.addSubview(success)
-
+        success.contentSize = view.frame.size
         
         let welcomeText = UILabel(frame: CGRect(x: 0, y: 0, width: fullX, height: fullY - 200))
         welcomeText.font = UIFont(name: "LilGrotesk-Black", size: 40)
@@ -108,18 +116,23 @@ class NewUserVC: UIViewController {
         signUpLabel.textAlignment = .center
         signUp.addSubview(signUpLabel)
         signUpName = UITextField(frame: CGRect(x: midX - 200, y: midY - 160, width: 400, height: 30))
+        signUpName.textContentType = .name
         let signUpNameLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 190, width: 400, height: 30))
         signUpNameLabel.text = "Name"
         signUpEmail = UITextField(frame: CGRect(x: midX - 200, y: midY - 90, width: 400, height: 30))
+        signUpEmail.textContentType = .emailAddress
         let signUpEmailLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 120, width: 400, height: 30))
         signUpEmailLabel.text = "Email"
         signUpUsername = UITextField(frame: CGRect(x: midX - 200, y: midY - 20, width: 400, height: 30))
+        signUpUsername.textContentType = .username
         let signUpUsernameLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 50, width: 400, height: 30))
         signUpUsernameLabel.text = "Username"
         signUpPassword = UITextField(frame: CGRect(x: midX - 200, y: midY + 50, width: 400, height: 30))
+        signUpPassword.textContentType = .password
         let signUpPasswordLabel = UILabel(frame: CGRect(x: midX - 200, y: midY + 20, width: 400, height: 30))
         signUpPasswordLabel.text = "Password"
         signUpPassword2 = UITextField(frame: CGRect(x: midX - 200, y: midY + 120, width: 400, height: 30))
+        signUpPassword2.textContentType = .password
         let signUpPassword2Label = UILabel(frame: CGRect(x: midX - 200, y: midY + 90, width: 400, height: 30))
         signUpPassword2Label.text = "Repeat password"
         
@@ -144,9 +157,11 @@ class NewUserVC: UIViewController {
         signInLabel.textAlignment = .center
         signIn.addSubview(signInLabel)
         signInEmail = UITextField(frame: CGRect(x: midX - 200, y: midY - 70, width: 400, height: 30))
+        signInEmail.textContentType = .emailAddress
         let signInEmailLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 100, width: 400, height: 30))
         signInEmailLabel.text = "Email"
         signInPassword = UITextField(frame: CGRect(x: midX - 200, y: midY + 30, width: 400, height: 30))
+        signInPassword.textContentType = .password
         let signInPasswordLabel = UILabel(frame: CGRect(x: midX - 200, y: midY, width: 400, height: 30))
         signInPasswordLabel.text = "Password"
         
@@ -179,7 +194,7 @@ class NewUserVC: UIViewController {
         nextButton.setTitleColor(Colors.text, for: .normal)
         nextButton.layer.cornerRadius = 10
         nextButton.titleLabel!.font = UIFont(name: "LilGrotesk-Regular", size: 20)
-        nextButton.addTarget(self, action: #selector(nextButtonPressed(_:)), for: .touchUpInside)
+        nextButton.addTarget(self, action: #selector(nextButtonPressed(_:)) , for: .touchUpInside)
         view.addSubview(nextButton)
         backButton = UIButton(frame: CGRect(x: midX - 160, y: fullY - 200, width: 150, height: 50))
         backButton.backgroundColor = Colors.secondaryBackground
@@ -293,10 +308,13 @@ class NewUserVC: UIViewController {
                 }
             }
         case 4:
+            print("ok")
             let email = signInEmail.text
             let password = signInPassword.text
             if(email != nil && isValidEmail(email!)){
+                print("ok")
                 if(password != nil && isValidPassword(password!)){
+                    print("ok")
                     backButton.isEnabled = false
                     nextButton.isEnabled = false
                     Auth.auth().signIn(withEmail: signInEmail.text!, password: signInPassword.text!) { authResult, error in
@@ -387,5 +405,33 @@ class NewUserVC: UIViewController {
     }
     
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
+    }
+    func reformat(){
+        let fullX = view.frame.width
+        let fullY = view.frame.width
+        welcomeView.frame = CGRect(x: welcomeView.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+        infoView.frame = CGRect(x: infoView.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+        signUpOrIn.frame = CGRect(x: signUpOrIn.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+        signUp.frame = CGRect(x: signUp.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+        signIn.frame = CGRect(x: signIn.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+        success.frame = CGRect(x: success.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+    }
+}
+extension NewUserVC {
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+        guard let userInfo = notification.userInfo,
+              let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+            return
+        }
+        
+        let keyboardHeight = keyboardFrame.height
+        keyboard = keyboardHeight
+        reformat()
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        keyboard = 0
+        reformat()
     }
 }

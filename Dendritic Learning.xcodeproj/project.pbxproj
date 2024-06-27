@@ -36,6 +36,7 @@
 		8DCF23DF2C2081B200B0DFA6 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8DCF23DE2C2081B200B0DFA6 /* FirebaseFirestoreSwift */; };
 		8DCF23E12C2081B200B0DFA6 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 8DCF23E02C2081B200B0DFA6 /* FirebaseStorage */; };
 		8DCF23E32C2082BB00B0DFA6 /* NewUserVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCF23E22C2082BB00B0DFA6 /* NewUserVC.swift */; };
+		8DDBE08E2C2C96470050D7DB /* SearchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDBE08D2C2C96470050D7DB /* SearchVC.swift */; };
 		8DE6FA2F2C21DA93004E0C58 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8DE6FA2E2C21DA93004E0C58 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -79,6 +80,7 @@
 		8D9080CD2C1FEAC200DB36AB /* WebViewerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewerVC.swift; sourceTree = "<group>"; };
 		8DCF23D72C207D2200B0DFA6 /* LilGrotesk[wght].ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "LilGrotesk[wght].ttf"; path = "../../../Downloads/LilGrotesk[wght].ttf"; sourceTree = "<group>"; };
 		8DCF23E22C2082BB00B0DFA6 /* NewUserVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewUserVC.swift; sourceTree = "<group>"; };
+		8DDBE08D2C2C96470050D7DB /* SearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVC.swift; sourceTree = "<group>"; };
 		8DE6FA2E2C21DA93004E0C58 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -152,6 +154,7 @@
 				8D9080CB2C1FEABF00DB36AB /* WebTermEditorVC.swift */,
 				8D9080CD2C1FEAC200DB36AB /* WebViewerVC.swift */,
 				8DCF23E22C2082BB00B0DFA6 /* NewUserVC.swift */,
+				8DDBE08D2C2C96470050D7DB /* SearchVC.swift */,
 			);
 			path = "Dendritic Learning";
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 				8D9080B62C1FEA8000DB36AB /* StandardLearnVC.swift in Sources */,
 				8D90809A2C1FE88500DB36AB /* AppDelegate.swift in Sources */,
 				8D9080CA2C1FEABB00DB36AB /* WebStudyVC.swift in Sources */,
+				8DDBE08E2C2C96470050D7DB /* SearchVC.swift in Sources */,
 				8D90809C2C1FE88500DB36AB /* SceneDelegate.swift in Sources */,
 				8D9080B22C1FEA6600DB36AB /* MainPage.swift in Sources */,
 				8D9080C62C1FEAB400DB36AB /* SettingsVC.swift in Sources */,

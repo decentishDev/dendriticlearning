@@ -936,7 +936,7 @@ deinit {
         oldSet["date"] = Timestamp(date: Date())
         oldSet["set"] = cards
         oldSet["image"] = image
-        db.collection("sets").document(set).setData(oldSet)
+        db.collection("sets").document(set).setData(oldSet, merge: true)
         oldSet.removeValue(forKey: "date")
         defaults.setValue(oldSet, forKey: "set")
         

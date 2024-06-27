@@ -26,7 +26,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="T9g-Li-PsI" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <exit id="c2A-3D-Ktm" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="-19" y="-1765"/>
+            <point key="canvasLocation" x="651" y="-2544"/>
         </scene>
         <!--Standard SetVC-->
         <scene sceneID="Guk-E4-4ck">
@@ -169,6 +169,7 @@
                         <segue destination="o57-tv-PwE" kind="show" identifier="viewWebSet" id="s1d-gY-Yty"/>
                         <segue destination="Xpx-KQ-zv9" kind="show" identifier="settingsVC" id="mdz-NW-Lqh"/>
                         <segue destination="Ga0-Av-FmX" kind="show" identifier="newUserVC" animates="NO" id="rdL-81-wd4"/>
+                        <segue destination="vBn-Dh-7Wy" kind="show" identifier="searchVC" id="737-9o-Gji"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QPn-Te-KUs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -233,7 +234,27 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rfe-b9-nNQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <exit id="SRQ-us-emV" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="1415" y="-2005"/>
+            <point key="canvasLocation" x="1408" y="-2544"/>
+        </scene>
+        <!--SearchVC-->
+        <scene sceneID="K4d-BP-EcK">
+            <objects>
+                <viewController id="vBn-Dh-7Wy" customClass="SearchVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Xti-BC-YkQ">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="8TK-Kl-H5g"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="35m-a9-xKj"/>
+                    <connections>
+                        <segue destination="o2m-VU-Qpd" kind="unwind" identifier="searchVC_unwind" unwindAction="cancel:" id="xOh-wu-1nA"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="LEH-9V-xZs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="o2m-VU-Qpd" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="-119" y="-1765"/>
         </scene>
     </scenes>
     <resources>
