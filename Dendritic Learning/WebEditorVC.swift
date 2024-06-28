@@ -9,8 +9,9 @@ import UIKit
 import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
+import GoogleMobileAds
 
-class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, GADBannerViewDelegate {
     
     let defaults = UserDefaults.standard
 
@@ -285,6 +286,22 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             introTips.font = UIFont(name: "LilGrotesk-Regular", size: 23)
             introTips.textColor = Colors.text
             introTips.text = " - Visualize processes by connecting terms downward\n\n - After adding multiple terms, connect them using the plus icons\n\n - You can tap on terms to edit them\n\n - You can tap on connections to remove them"
+        }
+        
+        
+        if(defaults.value(forKey: "isPaid") as! Bool != true){
+            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(view.frame.height, view.frame.width) - 50, height: 100)))
+            view.addSubview(bannerView)
+            bannerView.delegate = self
+            bannerView.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+            bannerView.rootViewController = self
+            bannerView.load(GADRequest())
+            
+            bannerView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+                bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            ])
         }
     }
     @objc func exitIntro(_ sender: UIButton) {

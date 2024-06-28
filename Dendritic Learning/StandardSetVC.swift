@@ -19,10 +19,12 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     let scrollView = UIScrollView()
     let stackView = UIStackView()
     
+    var fromSearch = false
     var set = "" // passed through mainpage
     var cards: [[String: Any?]] = [] //t: text, d: drawing, s: speech - maybe
     var name: String = ""
     var date: String = ""
+    var author: String = ""
     
     var setData: [String: Any] = [:]
     
@@ -81,30 +83,42 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     }
     
     func setup() {
-        let storageRef = storage.reference()
         fetchSetData { [weak self] in
             self?.setupUI()
         }
     }
 
     private func fetchSetData(completion: @escaping () -> Void) {
-        let dataRef = db.collection("sets").document(set)
-        dataRef.getDocument { (document, error) in
-            if let document = document, document.exists {
-                self.setData = document.data()!
-                self.cards = self.setData["set"] as! [[String: Any?]]
-                self.name = self.setData["name"] as? String ?? ""
-                self.image = (self.setData["image"] as? String)!
-                if let timestamp = self.setData["date"] as? Timestamp {
-                    let date = timestamp.dateValue()
-                    self.date = formatDate(date)
+        if fromSearch {
+            fromSearch = false
+            setData = defaults.value(forKey: "set") as! [String : Any]
+            cards = setData["set"] as! [[String: Any?]]
+            name = setData["name"] as? String ?? ""
+            author = setData["author"] as! String
+            image = (setData["image"] as? String)!
+            self.date = defaults.value(forKey: "searchDate") as! String
+            loadingImage.removeFromSuperview()
+            completion()
+        }else{
+            let dataRef = db.collection("sets").document(set)
+            dataRef.getDocument { (document, error) in
+                if let document = document, document.exists {
+                    self.setData = document.data()!
+                    self.cards = self.setData["set"] as! [[String: Any?]]
+                    self.name = self.setData["name"] as? String ?? ""
+                    self.image = (self.setData["image"] as? String)!
+                    self.author = self.setData["author"] as! String
+                    if let timestamp = self.setData["date"] as? Timestamp {
+                        let date = timestamp.dateValue()
+                        self.date = formatDate(date)
+                    }
+                    self.setData.removeValue(forKey: "date")
+                    self.defaults.set(self.setData, forKey: "set")
+                    self.loadingImage.removeFromSuperview()
+                    completion()
+                } else {
+                    print("Document does not exist")
                 }
-                self.setData.removeValue(forKey: "date")
-                self.defaults.set(self.setData, forKey: "set")
-                self.loadingImage.removeFromSuperview()
-                completion()
-            } else {
-                print("Document does not exist")
             }
         }
     }
@@ -173,24 +187,28 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         let backButton = createButton(title: "< Back", font: UIFont(name: "LilGrotesk-Bold", size: 20), action: #selector(self.backButton(sender:)))
         stackView.addArrangedSubview(backButton)
         
-        addBreakView(to: stackView, size: 15)
+        addBreakView(stackView, 15)
         
         let titleLabel = createLabel(text: name, font: UIFont(name: "LilGrotesk-Black", size: 50))
         stackView.addArrangedSubview(titleLabel)
         
+        let authorLabel = createLabel(text: author, font: UIFont(name: "LilGrotesk-Bold", size: 25))
+        stackView.addArrangedSubview(authorLabel)
+        
         let dateLabel = createLabel(text: "Last edited " + date, font: UIFont(name: "LilGrotesk-Light", size: 20))
         stackView.addArrangedSubview(dateLabel)
         
-        addBreakView(to: stackView, size: 30)
+        addBreakView(stackView, 30)
     }
 
     private func setupButtons() {
-        let learnButton = createButton(withTitle: "Learn")
-        let flashcardsButton = createButton(withTitle: "Flashcards")
-        let editButton = createButton(withTitle: "Edit")
-        let spacer = UIView()
-        
-        let buttonsStackView = UIStackView(arrangedSubviews: [learnButton, flashcardsButton, editButton, spacer])
+        let buttonsStackView = UIStackView()
+        buttonsStackView.addArrangedSubview(createButton(withTitle: "Learn"))
+        buttonsStackView.addArrangedSubview(createButton(withTitle: "Flashcards"))
+        if setData["authorID"] as! String == Auth.auth().currentUser!.uid {
+            buttonsStackView.addArrangedSubview(createButton(withTitle: "Edit"))
+        }
+        buttonsStackView.addArrangedSubview(UIView())
         buttonsStackView.axis = .horizontal
         buttonsStackView.spacing = 20
         buttonsStackView.distribution = .fill
@@ -198,14 +216,14 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         buttonsStackView.widthAnchor.constraint(equalToConstant: 600).isActive = true
         stackView.addArrangedSubview(buttonsStackView)
         
-        addBreakView(to: stackView, size: 100)
+        addBreakView(stackView, 100)
     }
 
     private func setupTermsSection() {
         let termsLabel = createLabel(text: "Terms", font: UIFont(name: "LilGrotesk-Bold", size: 30))
         stackView.addArrangedSubview(termsLabel)
         
-        addBreakView(to: stackView, size: 10)
+        addBreakView(stackView, 10)
         
         let allTermsStackView = UIStackView()
         allTermsStackView.axis = .vertical
@@ -390,14 +408,6 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
             //centerDrawing(definitionDrawing)
         }
     }
-
-    private func addBreakView(to stackView: UIStackView, size: CGFloat) {
-        let breakView = UIView()
-        breakView.widthAnchor.constraint(equalToConstant: size).isActive = true
-        breakView.heightAnchor.constraint(equalToConstant: size).isActive = true
-        stackView.addArrangedSubview(breakView)
-    }
-
     
     func createButton(withTitle title: String) -> UIButton {
         let button = UIButton()

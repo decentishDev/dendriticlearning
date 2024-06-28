@@ -197,3 +197,9 @@ func getKeyWords(_ input: String) -> [String] {
     
     return combinations
 }
+
+func addBreakView(_ to: UIStackView, _ size: CGFloat){
+    let breakView = UIView()
+    con(breakView, size, size)
+    to.addArrangedSubview(breakView)
+}

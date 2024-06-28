@@ -160,10 +160,7 @@ deinit {
             
             topBar.addSubview(deleteButton)
             
-            let breakView0 = UIView()
-            breakView0.widthAnchor.constraint(equalToConstant: 30).isActive = true
-            breakView0.heightAnchor.constraint(equalToConstant: 30).isActive = true
-            stackView.addArrangedSubview(breakView0)
+        addBreakView(stackView, 30)
             
             allTermsStackView.axis = .vertical
             allTermsStackView.spacing = 10

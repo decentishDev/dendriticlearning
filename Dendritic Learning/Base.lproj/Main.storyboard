@@ -249,6 +249,8 @@
                     <navigationItem key="navigationItem" id="35m-a9-xKj"/>
                     <connections>
                         <segue destination="o2m-VU-Qpd" kind="unwind" identifier="searchVC_unwind" unwindAction="cancel:" id="xOh-wu-1nA"/>
+                        <segue destination="o57-tv-PwE" kind="show" identifier="searchToWeb" id="B2E-Ks-hAU"/>
+                        <segue destination="FIP-K8-yah" kind="show" id="6e6-8N-F7B"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LEH-9V-xZs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -257,6 +259,10 @@
             <point key="canvasLocation" x="-119" y="-1765"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="B2E-Ks-hAU"/>
+        <segue reference="6e6-8N-F7B"/>
+    </inferredMetricsTieBreakers>
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

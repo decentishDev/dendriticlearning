@@ -92,10 +92,7 @@ class SettingsVC: UIViewController {
         backButton.setTitleColor(Colors.highlight, for: .normal)
         stackView.addArrangedSubview(backButton)
         
-        let breakView0 = UIView()
-        breakView0.widthAnchor.constraint(equalToConstant: 15).isActive = true
-        breakView0.heightAnchor.constraint(equalToConstant: 15).isActive = true
-        stackView.addArrangedSubview(breakView0)
+        addBreakView(stackView, 15)
         
         let titleLabel = UILabel()
         titleLabel.text = "Settings"
@@ -104,10 +101,7 @@ class SettingsVC: UIViewController {
         titleLabel.textColor = Colors.text
         stackView.addArrangedSubview(titleLabel)
         
-        let breakView01 = UIView()
-        breakView01.widthAnchor.constraint(equalToConstant: 15).isActive = true
-        breakView01.heightAnchor.constraint(equalToConstant: 15).isActive = true
-        stackView.addArrangedSubview(breakView01)
+        addBreakView(stackView, 15)
         
         let colorLabel = UILabel()
         colorLabel.text = "Color theme"
@@ -153,10 +147,7 @@ class SettingsVC: UIViewController {
             button.addTarget(self, action: #selector(self.themeButton(sender:)), for: .touchUpInside)
         }
         
-        let breakView02 = UIView()
-        breakView02.widthAnchor.constraint(equalToConstant: 15).isActive = true
-        breakView02.heightAnchor.constraint(equalToConstant: 15).isActive = true
-        stackView.addArrangedSubview(breakView02)
+        addBreakView(stackView, 15)
         
         let pencilLabel = UILabel()
         pencilLabel.text = "Allows drawing with fingers"

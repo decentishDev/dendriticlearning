@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import GoogleMobileAds
 
-class WebViewerVC: UIViewController, UIScrollViewDelegate {
+class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate {
     let defaults = UserDefaults.standard
 
     var set = ""
@@ -225,6 +226,22 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate {
             }, completion: {_ in
                 self.loadingView.removeFromSuperview()
             })
+        }
+        
+        
+        if(defaults.value(forKey: "isPaid") as! Bool != true){
+            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(view.frame.height, view.frame.width) - 50, height: 100)))
+            view.addSubview(bannerView)
+            bannerView.delegate = self
+            bannerView.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+            bannerView.rootViewController = self
+            bannerView.load(GADRequest())
+            
+            bannerView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+                bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            ])
         }
     }
     

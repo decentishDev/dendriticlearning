@@ -12,11 +12,14 @@ import FirebaseFirestore
 class SearchVC: UIViewController, UITextFieldDelegate {
     
     let db = Firestore.firestore()
-    
+    let defaults = UserDefaults.standard
     var resultsScroll = UIScrollView()
     var resultsStack = UIStackView()
     
     var searchBar = UITextField()
+    
+    var destinationSet = ""
+    var destinationType = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,7 +52,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         let idButton = UIButton(frame: CGRect(x: view.frame.width - 200, y: 50, width: 150, height: 50))
         idButton.setTitle("Enter set ID", for: .normal)
         idButton.titleLabel!.font = UIFont(name: "LilGrotesk-Bold", size: 20)
-        idButton.addTarget(self, action: #selector(self.backButton(sender:)), for: .touchUpInside)
+        idButton.addTarget(self, action: #selector(self.idButton(sender:)), for: .touchUpInside)
         idButton.setTitleColor(Colors.highlight, for: .normal)
         idButton.backgroundColor = Colors.secondaryBackground
         idButton.layer.cornerRadius = 10
@@ -94,7 +97,43 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     }
     
     @objc func idButton(sender: UIButton){
-        
+        let alertController = UIAlertController(title: "Enter the ID of a set", message: nil, preferredStyle: .alert)
+        alertController.addTextField { (textField) in
+            textField.placeholder = "Set ID"
+        }
+        let confirmAction = UIAlertAction(title: "Confirm", style: .default) { [weak alertController] _ in
+            if let textField = alertController?.textFields?.first, let text = textField.text {
+                let loadingImage = createLoadingIcon()
+                loadingImage.center = self.view.center
+                self.view.addSubview(loadingImage)
+                let dataRef = self.db.collection("sets").document(text)
+                dataRef.getDocument { (document, error) in
+                    if let document = document, document.exists {
+                        var setData = document.data()!
+                        if let timestamp = setData["date"] as? Timestamp {
+                            let date = timestamp.dateValue()
+                            self.defaults.setValue(formatDate(date), forKey: "searchDate")
+                        }
+                        setData.removeValue(forKey: "date")
+                        self.defaults.set(setData, forKey: "set")
+                        
+                        if setData["type"] as! String == "standard" {
+                            self.performSegue(withIdentifier: "searchToStandard", sender: nil)
+                        }else{
+                            self.performSegue(withIdentifier: "searchToWeb", sender: nil)
+                        }
+                    } else {
+                        print("Document does not exist")
+                    }
+                    loadingImage.removeFromSuperview()
+                }
+                
+            }
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
     }
     
     @objc func backButton(sender: UIButton){
@@ -180,5 +219,18 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         textField.resignFirstResponder()
         searchButton(sender: UIButton())
         return true
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        segue.destination.modalPresentationStyle = .fullScreen
+        if(destinationType == "standard"){
+            guard let vc = segue.destination as? StandardSetVC else {return}
+            vc.set = destinationSet
+            vc.fromSearch = true
+        }else{
+            guard let vc = segue.destination as? WebSetVC else {return}
+            vc.set = destinationSet
+            vc.fromSearch = true
+        }
     }
 }

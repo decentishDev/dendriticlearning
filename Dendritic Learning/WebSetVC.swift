@@ -18,11 +18,13 @@ class WebSetVC: UIViewController {
     let scrollView = UIScrollView()
     let stackView = UIStackView()
     
+    var fromSearch = false
     var set = ""
     var goToEditor = false
     
     var name: String = ""
     var date: String = ""
+    var author: String = ""
     
     var image: String? = ""
     
@@ -67,31 +69,45 @@ class WebSetVC: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-
-        let dataRef = db.collection("sets").document(set)
-        dataRef.getDocument { (document, error) in
-            if let document = document, document.exists {
-                self.setData = document.data()!
-                
-                if let name = self.setData["name"] as? String{
-                    self.name = name
+        if fromSearch {
+            fromSearch = false
+            setData = defaults.value(forKey: "set") as! [String : Any]
+            if let name = self.setData["name"] as? String{
+                self.name = name
+            }
+            if let image = self.setData["image"] as? String?{
+                self.image = image
+            }
+            self.date = defaults.value(forKey: "searchDate") as! String
+            author = setData["author"] as! String
+            self.setup()
+            self.loadingImage.removeFromSuperview()
+        }else{
+            let dataRef = db.collection("sets").document(set)
+            dataRef.getDocument { (document, error) in
+                if let document = document, document.exists {
+                    self.setData = document.data()!
+                    
+                    if let name = self.setData["name"] as? String{
+                        self.name = name
+                    }
+                    if let image = self.setData["image"] as? String?{
+                        self.image = image
+                    }
+                    if let timestamp = self.setData["date"] as? Timestamp {
+                        let date = timestamp.dateValue()
+                        self.date = formatDate(date)
+                    }
+                    self.author = self.setData["author"] as! String
+                    self.setup()
+                    self.setData.removeValue(forKey: "date")
+                    self.defaults.set(self.setData, forKey: "set")
+                    self.loadingImage.removeFromSuperview()
+                } else {
+                    print("Document does not exist")
                 }
-                if let image = self.setData["image"] as? String?{
-                    self.image = image
-                }
-                if let timestamp = self.setData["date"] as? Timestamp {
-                    let date = timestamp.dateValue()
-                    self.date = formatDate(date)
-                }
-                self.setup()
-                self.setData.removeValue(forKey: "date")
-                self.defaults.set(self.setData, forKey: "set")
-                self.loadingImage.removeFromSuperview()
-            } else {
-                print("Document does not exist")
             }
         }
-        
     }
     
     func setup(){
@@ -149,10 +165,7 @@ class WebSetVC: UIViewController {
             backButton.setTitleColor(Colors.highlight, for: .normal)
             stackView.addArrangedSubview(backButton)
             
-            let breakView0 = UIView()
-            breakView0.widthAnchor.constraint(equalToConstant: 15).isActive = true
-            breakView0.heightAnchor.constraint(equalToConstant: 15).isActive = true
-            stackView.addArrangedSubview(breakView0)
+        addBreakView(stackView, 15)
             
             let titleLabel = UILabel()
             titleLabel.text = name
@@ -161,6 +174,15 @@ class WebSetVC: UIViewController {
             titleLabel.sizeToFit()
             stackView.addArrangedSubview(titleLabel)
             
+        let authorLabel = UILabel()
+        authorLabel.text = author
+        authorLabel.font = UIFont(name: "LilGrotesk-Bold", size: 25)
+        authorLabel.textColor = Colors.text
+        authorLabel.sizeToFit()
+        stackView.addArrangedSubview(authorLabel)
+        
+        
+        
             let dateLabel = UILabel()
             dateLabel.text = date
             dateLabel.font = UIFont(name: "LilGrotesk-Light", size: 20)
@@ -196,17 +218,15 @@ class WebSetVC: UIViewController {
 //            shareText.font = UIFont(name: "LilGrotesk-Regular", size: 20)
 //            shareText.textColor = Colors.highlight
             
-            let breakView1 = UIView()
-            breakView1.widthAnchor.constraint(equalToConstant: 30).isActive = true
-            breakView1.heightAnchor.constraint(equalToConstant: 30).isActive = true
-            stackView.addArrangedSubview(breakView1)
+        addBreakView(stackView, 30)
             
-            let viewButton = createButton(withTitle: "View")
-            let studyButton = createButton(withTitle: "Study")
-            let editButton = createButton(withTitle: "Edit")
-            let spacer = UIView()
-            
-            let buttonsStackView = UIStackView(arrangedSubviews: [viewButton, studyButton, editButton, spacer])
+            let buttonsStackView = UIStackView()
+        buttonsStackView.addArrangedSubview(createButton(withTitle: "View"))
+        buttonsStackView.addArrangedSubview(createButton(withTitle: "Study"))
+        if setData["authorID"] as! String == Auth.auth().currentUser!.uid {
+            buttonsStackView.addArrangedSubview(createButton(withTitle: "Edit"))
+        }
+        buttonsStackView.addArrangedSubview(UIView())
             buttonsStackView.axis = .horizontal
             buttonsStackView.widthAnchor.constraint(equalToConstant: 400).isActive = true
             buttonsStackView.spacing = 20
@@ -223,10 +243,20 @@ class WebSetVC: UIViewController {
         
         
         
-        bannerView = GADBannerView(adSize: GADCurrentOrientationInlineAdaptiveBannerAdSizeWithWidth(min(view.frame.height, view.frame.width) - 100))
-        view.addSubview(bannerView)
-        bannerView.delegate = self
-        configureBannerView()
+        if(defaults.value(forKey: "isPaid") as! Bool != true){
+            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(view.frame.height, view.frame.width) - 50, height: 100)))
+            view.addSubview(bannerView)
+            bannerView.delegate = self
+            bannerView.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+            bannerView.rootViewController = self
+            bannerView.load(GADRequest())
+            
+            bannerView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+                bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            ])
+        }
     }
     
     func createButton(withTitle title: String) -> UIButton {
@@ -326,20 +356,6 @@ class WebSetVC: UIViewController {
     
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
         
-    }
-    
-    func configureBannerView(){
-        bannerView.adUnitID = "ca-app-pub-3940256099942544/2435281174"
-        bannerView.rootViewController = self
-        bannerView.load(GADRequest())
-        
-        bannerView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -50),
-            bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-        ])
-        
-        //bannerView.backgroundColor = .white
     }
 }
 

@@ -64,10 +64,7 @@ class MainPage: UIViewController, NewSetDelegate {
         
         let topBar = createTopBar()
         stackView.addArrangedSubview(topBar)
-        let breakView0 = UIView()
-        breakView0.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        breakView0.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        stackView.addArrangedSubview(breakView0)
+        addBreakView(stackView, 30)
         
         loadingImage = createLoadingIcon()
         loadingImage.center = view.center
@@ -183,10 +180,7 @@ class MainPage: UIViewController, NewSetDelegate {
         
         let topBar = createTopBar()
         stackView.addArrangedSubview(topBar)
-        let breakView0 = UIView()
-        breakView0.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        breakView0.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        stackView.addArrangedSubview(breakView0)
+        addBreakView(stackView, 30)
         
         loadingImage = createLoadingIcon()
         loadingImage.center = view.center
@@ -195,10 +189,7 @@ class MainPage: UIViewController, NewSetDelegate {
         let recentLabel = createSectionLabel(text: "Recent sets")
         stackView.addArrangedSubview(recentLabel)
         addSets(to: stackView, from: recentSets)
-        let breakView1 = UIView()
-        breakView1.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        breakView1.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        stackView.addArrangedSubview(breakView1)
+        addBreakView(stackView, 30)
         
         let yourLabel = createSectionLabel(text: "Your sets")
         let newButton = UIButton()
