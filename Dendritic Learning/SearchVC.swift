@@ -75,6 +75,14 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         searchBar.delegate = self
         view.addSubview(searchBar)
         
+        let searchButton = UIButton(frame: CGRect(x: view.frame.width - 90, y: 210, width: 30, height: 30))
+        searchButton.layoutMargins = .zero
+        searchButton.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
+        searchButton.imageView!.contentMode = .scaleAspectFit
+        searchButton.tintColor = Colors.highlight
+        searchButton.addTarget(self, action: #selector(self.searchButton(sender:)), for: .touchUpInside)
+        view.addSubview(searchButton)
+        
         //resultsScroll.frame = CGRect(x: 50, y: 350, width: view.frame.width - 100, height: view.frame.height - 400)
         resultsStack.axis = .vertical
         resultsStack.spacing = 20
@@ -200,18 +208,29 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         titleLabel.numberOfLines = 0
         titleLabel.sizeToFit()
         rect.addSubview(titleLabel)
-        let dateLabel = UILabel(frame: CGRect(x: 10, y: 90, width: w - 20, height: 15))
+        let creatorLabel = UILabel(frame: CGRect(x: 10, y: 90, width: w - 20, height: 15))
+        creatorLabel.text = set["author"] as? String
+        creatorLabel.textColor = Colors.text
+        creatorLabel.font = UIFont(name: "LilGrotesk-Bold", size: 20)
+        rect.addSubview(creatorLabel)
+        let dateLabel = UILabel(frame: CGRect(x: 10, y: 120, width: w - 20, height: 15))
         dateLabel.text = formatDate((set["date"] as! Timestamp).dateValue())
         dateLabel.textColor = Colors.text
         dateLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
         rect.addSubview(dateLabel)
-        let creatorLabel = UILabel(frame: CGRect(x: 10, y: 120, width: w - 20, height: 15))
-        creatorLabel.text = set["author"] as? String
-        creatorLabel.textColor = Colors.text
-        creatorLabel.font = UIFont(name: "LilGrotesk-Bold", size: 20)
-        //print(set["author"] as? String)
-        //creatorLabel.backgroundColor = .green
-        rect.addSubview(creatorLabel)
+        let heartLabel = UILabel(frame: CGRect(x: 10, y: 120, width: w - 40, height: 15))
+        heartLabel.text = "645"
+        heartLabel.textColor = Colors.highlight
+        heartLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+        heartLabel.textAlignment = .right
+        rect.addSubview(heartLabel)
+        let heartImage = UIImageView(image: UIImage(systemName: "heart"))
+        heartImage.contentMode = .scaleAspectFit
+        heartImage.tintColor = Colors.highlight
+        heartImage.frame = CGRect(x: w - 25, y: 120, width: 15, height: 15)
+        rect.addSubview(heartImage)
+        let heartButton = UIButton(frame: CGRect(x: w - 80, y: 120, width: 70, height: 15))
+        rect.addSubview(heartButton)
         return rect
     }
     

@@ -417,6 +417,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         oldSet["date"] = Timestamp()
         oldSet["set"] = web
         oldSet["image"] = image
+        oldSet["keyWords"] = getKeyWords(name)
         db.collection("sets").document(set).setData(oldSet, merge: true)
         
         let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
