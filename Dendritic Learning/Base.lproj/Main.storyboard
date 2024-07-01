@@ -250,7 +250,7 @@
                     <connections>
                         <segue destination="o2m-VU-Qpd" kind="unwind" identifier="searchVC_unwind" unwindAction="cancel:" id="xOh-wu-1nA"/>
                         <segue destination="o57-tv-PwE" kind="show" identifier="searchToWeb" id="B2E-Ks-hAU"/>
-                        <segue destination="FIP-K8-yah" kind="show" id="6e6-8N-F7B"/>
+                        <segue destination="FIP-K8-yah" kind="show" identifier="searchToStandard" id="6e6-8N-F7B"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LEH-9V-xZs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

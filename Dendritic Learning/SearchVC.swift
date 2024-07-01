@@ -20,10 +20,12 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     
     var destinationSet = ""
     var destinationType = ""
+    var retrievedSets: [String: Any] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Colors.background
+        setup()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -120,7 +122,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                         var setData = document.data()!
                         if let timestamp = setData["date"] as? Timestamp {
                             let date = timestamp.dateValue()
-                            self.defaults.setValue(formatDate(date), forKey: "searchDate")
+                            self.defaults.setValue(formatDate(date), forKey: "date")
                         }
                         setData.removeValue(forKey: "date")
                         self.defaults.set(setData, forKey: "set")
@@ -153,21 +155,28 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     }
     
     @objc func searchButton(sender: UIButton){
+        for i in resultsStack.arrangedSubviews {
+            resultsStack.removeArrangedSubview(i)
+        }
         let loadView = createLoadingIcon()
         loadView.center = view.center
         view.addSubview(loadView)
         if let text = searchBar.text {
             let input = text.lowercased()
-            db.collection("sets").whereField("keyWords", arrayContains: input).getDocuments { (querySnapshot, error) in
+            db.collection("sets").whereField("keyWords", arrayContains: input).order(by: "likes", descending: true).getDocuments { (querySnapshot, error) in
                 if let error = error {
                     print("Error in query: \(error.localizedDescription)")
                     return
                 }
                 loadView.removeFromSuperview()
+                self.retrievedSets = [:]
+                var ids: [String] = []
                 var sets: [[String: Any]] = []
                 for document in querySnapshot!.documents {
                     let data = document.data()
                     sets.append(data)
+                    self.retrievedSets[document.documentID] = data
+                    ids.append(document.documentID)
                 }
                 for i in 0...((sets.count - 1) / 3) {
                     let row = UIStackView()
@@ -179,13 +188,12 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                     con(row, self.view.frame.width - 100, 150)
                     for j in 3 * i...(3 * i) + 2 {
                         if sets.count > j {
-                            let setView = self.createSetView(set: sets[j])
+                            let setView = self.createSetView(set: sets[j], id: ids[j])
                             row.addArrangedSubview(setView)
                         } else {
                             let setView = UIView()
                             row.addArrangedSubview(setView)
                             NSLayoutConstraint.activate([
-                                //setView.widthAnchor.constraint(equalToConstant: (view.frame.width - 160) / 3),
                                 setView.heightAnchor.constraint(equalTo: row.heightAnchor),
                             ])
                         }
@@ -194,8 +202,9 @@ class SearchVC: UIViewController, UITextFieldDelegate {
             }
         }
     }
+
     
-    func createSetView(set: [String: Any]) -> UIView {
+    func createSetView(set: [String: Any], id: String) -> UIView {
         let w = (view.frame.width - 140)/3
         let rect = UIButton(frame: CGRect(x: 0, y: 0, width: w, height: 150))
         con(rect, w, 150)
@@ -218,8 +227,8 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         dateLabel.textColor = Colors.text
         dateLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
         rect.addSubview(dateLabel)
-        let heartLabel = UILabel(frame: CGRect(x: 10, y: 120, width: w - 40, height: 15))
-        heartLabel.text = "645"
+        let heartLabel = UILabel(frame: CGRect(x: 10, y: 90, width: w - 40, height: 15))
+        heartLabel.text = String(set["likes"] as! Int)
         heartLabel.textColor = Colors.highlight
         heartLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
         heartLabel.textAlignment = .right
@@ -227,11 +236,42 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         let heartImage = UIImageView(image: UIImage(systemName: "heart"))
         heartImage.contentMode = .scaleAspectFit
         heartImage.tintColor = Colors.highlight
-        heartImage.frame = CGRect(x: w - 25, y: 120, width: 15, height: 15)
+        heartImage.frame = CGRect(x: w - 25, y: 90, width: 15, height: 15)
         rect.addSubview(heartImage)
-        let heartButton = UIButton(frame: CGRect(x: w - 80, y: 120, width: 70, height: 15))
+        let heartButton = UIButton(frame: CGRect(x: w - 80, y: 90, width: 70, height: 15))
         rect.addSubview(heartButton)
+        let cardsLabel = UILabel(frame: CGRect(x: 10, y: 120, width: w - 20, height: 15))
+        cardsLabel.text = String((set["set"] as! [[String: Any]]).count) + " terms"
+        cardsLabel.textColor = Colors.text
+        cardsLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+        cardsLabel.textAlignment = .right
+        
+        rect.addSubview(cardsLabel)
+        rect.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
+        var t = "s"
+        if set["type"] as! String == "web" {
+            t = "w"
+        }
+        rect.accessibilityIdentifier = t + id
         return rect
+    }
+    
+    @objc func buttonTapped(_ sender: UIButton) {
+        destinationSet = String(sender.accessibilityIdentifier!.dropFirst())
+        var t = retrievedSets[destinationSet] as! [String: Any]
+        if let timestamp = t["date"] as? Timestamp {
+            let date = timestamp.dateValue()
+            self.defaults.setValue(formatDate(date), forKey: "date")
+        }
+        t.removeValue(forKey: "date")
+        defaults.set(t, forKey: "set")
+        if(String(sender.accessibilityIdentifier!.first!) == "s"){
+            destinationType = "standard"
+            performSegue(withIdentifier: "searchToStandard", sender: self)
+        }else{
+            destinationType = "web"
+            performSegue(withIdentifier: "searchToWeb", sender: self)
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -245,11 +285,11 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         if(destinationType == "standard"){
             guard let vc = segue.destination as? StandardSetVC else {return}
             vc.set = destinationSet
-            vc.fromSearch = true
+            vc.alreadyHasSet = true
         }else{
             guard let vc = segue.destination as? WebSetVC else {return}
             vc.set = destinationSet
-            vc.fromSearch = true
+            vc.alreadyHasSet = true
         }
     }
 }

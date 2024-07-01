@@ -938,35 +938,35 @@ deinit {
         oldSet.removeValue(forKey: "date")
         defaults.setValue(oldSet, forKey: "set")
         
-        let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
-        
-        userRef.getDocument { [weak self] (document, error) in
-            guard let self = self else { return }
-            
-            if let document = document, document.exists {
-                var oldUser = document.data()!
-                var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
-                
-                for (i, set) in oldStudied.enumerated() {
-                    if set["setID"] as! String == self.set {
-                        oldStudied[i]["name"] = name
-                        oldStudied[i]["image"] = image
-                        break
-                    }
-                }
-                
-                oldUser["studiedSets"] = oldStudied
-                self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true) { error in
-                    if let error = error {
-                        print("Error updating user data: \(error.localizedDescription)")
-                    } else {
-                        print("User data successfully updated.")
-                    }
-                }
-            } else {
-                print("Document does not exist")
-            }
-        }
+//        let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
+//        
+//        userRef.getDocument { [weak self] (document, error) in
+//            guard let self = self else { return }
+//            
+//            if let document = document, document.exists {
+//                var oldUser = document.data()!
+//                var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
+//                
+//                for (i, set) in oldStudied.enumerated() {
+//                    if set["setID"] as! String == self.set {
+//                        oldStudied[i]["name"] = name
+//                        oldStudied[i]["image"] = image
+//                        break
+//                    }
+//                }
+//                
+//                oldUser["studiedSets"] = oldStudied
+//                self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true) { error in
+//                    if let error = error {
+//                        print("Error updating user data: \(error.localizedDescription)")
+//                    } else {
+//                        print("User data successfully updated.")
+//                    }
+//                }
+//            } else {
+//                print("Document does not exist")
+//            }
+//        }
     }
     
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
@@ -1004,33 +1004,35 @@ deinit {
             userRef.getDocument { (document, error) in
                 if let document = document, document.exists {
                     oldUser = document.data()!
+                    print(oldUser)
+                    var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
+                    for (i, set) in oldStudied.enumerated() {
+                        if(set["setID"] as! String == self.set){
+                            oldStudied.remove(at: i)
+                            break
+                        }
+                    }
+                    oldUser["studiedSets"] = oldStudied
+                    
+                    var oldCreated = oldUser["createdSets"] as! [String]
+                    for (i, set) in oldCreated.enumerated() {
+                        if(set == self.set){
+                            oldCreated.remove(at: i)
+                            break
+                        }
+                    }
+                    oldUser["createdSets"] = oldCreated
+                    
+                    self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true)
+                    self.db.collection("sets").document(self.set).delete()
+                    self.performSegue(withIdentifier: "standardEditorVC_unwind", sender: nil)
+                    self.performSegue(withIdentifier: "standardEditorVC_unwind", sender: nil)
                 } else {
                     print("Document does not exist")
                 }
             }
             
-            var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
-            for (i, set) in oldStudied.enumerated() {
-                if(set["setID"] as! String == self.set){
-                    oldStudied.remove(at: i)
-                    break
-                }
-            }
-            oldUser["studiedSets"] = oldStudied
             
-            var oldCreated = oldUser["createdSets"] as! [String]
-            for (i, set) in oldCreated.enumerated() {
-                if(set == self.set){
-                    oldCreated.remove(at: i)
-                    break
-                }
-            }
-            oldUser["createdSets"] = oldCreated
-            
-            self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true)
-            self.db.collection("sets").document(self.set).delete()
-            self.performSegue(withIdentifier: "standardEditorVC_unwind", sender: nil)
-            self.performSegue(withIdentifier: "standardEditorVC_unwind", sender: nil)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         

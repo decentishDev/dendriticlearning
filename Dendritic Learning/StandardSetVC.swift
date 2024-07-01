@@ -19,7 +19,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     let scrollView = UIScrollView()
     let stackView = UIStackView()
     
-    var fromSearch = false
+    var alreadyHasSet = false
     var set = "" // passed through mainpage
     var cards: [[String: Any?]] = [] //t: text, d: drawing, s: speech - maybe
     var name: String = ""
@@ -38,6 +38,11 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     var loadingImage = UIImageView()
     
     var bannerViews: [GADBannerView] = []
+    
+    var heartImage = UIImageView()
+    var heartLabel = UILabel()
+    
+    var isLiked = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,14 +94,14 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     }
 
     private func fetchSetData(completion: @escaping () -> Void) {
-        if fromSearch {
-            fromSearch = false
+        if alreadyHasSet {
+            alreadyHasSet = false
             setData = defaults.value(forKey: "set") as! [String : Any]
             cards = setData["set"] as! [[String: Any?]]
             name = setData["name"] as? String ?? ""
             author = setData["author"] as! String
             image = (setData["image"] as? String)!
-            self.date = defaults.value(forKey: "searchDate") as! String
+            self.date = defaults.value(forKey: "date") as! String
             loadingImage.removeFromSuperview()
             completion()
         }else{
@@ -191,6 +196,27 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         
         let titleLabel = createLabel(text: name, font: UIFont(name: "LilGrotesk-Black", size: 50))
         stackView.addArrangedSubview(titleLabel)
+        
+        let heartButton = UIButton(frame: CGRect(x: 0, y: 0, width: 300, height: 20))
+        con(heartButton, 300, 20)
+        heartButton.addTarget(self, action: #selector(self.like(sender:)), for: .touchUpInside)
+        stackView.addArrangedSubview(heartButton)
+        heartLabel = UILabel(frame: CGRect(x: 25, y: 0, width: 275, height: 20))
+        heartLabel.text = String(setData["likes"] as! Int)
+        heartLabel.textColor = Colors.highlight
+        heartLabel.font = UIFont(name: "LilGrotesk-Regular", size: 25)
+        heartLabel.textAlignment = .left
+        heartButton.addSubview(heartLabel)
+        if(isLiked){
+            heartImage = UIImageView(image: UIImage(systemName: "heart.fill"))
+        }else{
+            heartImage = UIImageView(image: UIImage(systemName: "heart"))
+        }
+        heartImage.contentMode = .scaleAspectFit
+        heartImage.tintColor = Colors.highlight
+        heartImage.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+        heartButton.addSubview(heartImage)
+        addBreakView(stackView, 30)
         
         let authorLabel = createLabel(text: author, font: UIFont(name: "LilGrotesk-Bold", size: 25))
         stackView.addArrangedSubview(authorLabel)
@@ -474,6 +500,47 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     @objc func backButton(sender: UIButton){
         //print("back")
         performSegue(withIdentifier: "standardSetVC_unwind", sender: nil)
+    }
+    
+    @objc func like(sender: UIButton){
+        if isLiked {
+            heartImage.image = UIImage(systemName: "heart")
+            setData["likes"] = (setData["likes"] as! Int) - 1
+            let dataRef = db.collection("users").document(Auth.auth().currentUser!.uid)
+            dataRef.getDocument { (document, error) in
+                if let document = document, document.exists {
+                    let userData = document.data()!
+                    var newLiked = userData["likedSets"] as! [String]
+                    newLiked.remove(at: newLiked.firstIndex(of: self.set)!)
+                    self.db.collection("users").document(Auth.auth().currentUser!.uid).setData([
+                        "likedSets": newLiked
+                    ], merge: true)
+                } else {
+                    print("Document does not exist")
+                }
+            }
+        }else{
+            heartImage.image = UIImage(systemName: "heart.fill")
+            setData["likes"] = (setData["likes"] as! Int) + 1
+            let dataRef = db.collection("users").document(Auth.auth().currentUser!.uid)
+            dataRef.getDocument { (document, error) in
+                if let document = document, document.exists {
+                    let userData = document.data()!
+                    var newLiked = userData["likedSets"] as! [String]
+                    newLiked.append(self.set)
+                    self.db.collection("users").document(Auth.auth().currentUser!.uid).setData([
+                        "likedSets": newLiked
+                    ], merge: true)
+                } else {
+                    print("Document does not exist")
+                }
+            }
+        }
+        heartLabel.text = String(setData["likes"] as! Int)
+        
+        isLiked = !isLiked
+        var likeCount: [String: Any] = ["likes": setData["likes"]!]
+        db.collection("sets").document(set).setData(likeCount, merge: true)
     }
     
 //    @objc func export(sender: UIButton){

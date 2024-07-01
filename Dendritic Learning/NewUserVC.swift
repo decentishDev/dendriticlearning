@@ -292,6 +292,7 @@ class NewUserVC: UIViewController {
                                 "transactions": [],
                                 "createdSets": [],
                                 "studiedSets": [],
+                                "likedSets": [],
                                 "settings": [
                                     "theme": "Dark"
                                 ]

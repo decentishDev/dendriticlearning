@@ -544,13 +544,30 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
             if let document = document, document.exists {
                 var oldUser = document.data()!
                 var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
-                
+                var t = false
                 for (i, set) in oldStudied.enumerated() {
                     if set["setID"] as! String == self.set {
                         oldStudied[i]["learn"] = self.known
+                        oldStudied[i]["date"] = Timestamp()
+                        t = true
                         break
                     }
                 }
+                if !t {
+                    oldStudied.append([
+                        "setID": self.set,
+                        "learn": self.known,
+                        "date": Timestamp
+                    ])
+                }
+                
+//                if(!t){
+//                    oldStudied.append([
+//                        "setID": self.set
+//                        "learn": self.known
+//                        "flashcards":
+//                    ])
+//                }
                 
                 oldUser["studiedSets"] = oldStudied
                 

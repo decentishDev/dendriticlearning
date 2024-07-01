@@ -91,7 +91,14 @@ class MainPage: UIViewController, NewSetDelegate {
                     self.updateColors()
                     self.updateSets()
                     
-                    if let studied = self.userData["studiedSets"] as? [[String: Any]] {
+                    if var studied = self.userData["studiedSets"] as? [[String: Any]] {
+                        studied.sort { firstDoc, secondDoc in
+                            guard let firstDate = firstDoc["date"] as? Timestamp,
+                                  let secondDate = secondDoc["date"] as? Timestamp else {
+                                return false
+                            }
+                            return firstDate.dateValue() > secondDate.dateValue()
+                        }
                         for i in studied {
                             if let setID = i["setID"] as? String {
                                 self.recentSets.append(setID)
@@ -100,7 +107,8 @@ class MainPage: UIViewController, NewSetDelegate {
                         }
                     }
                     
-                    if let liked = self.userData["likedSets"] as? [String] {
+                    if var liked = self.userData["likedSets"] as? [String] {
+                        liked.reverse()
                         self.likedSets = liked
                         for i in liked {
                             if self.retrievedSetIDs.firstIndex(of: i) == nil {
@@ -109,7 +117,8 @@ class MainPage: UIViewController, NewSetDelegate {
                         }
                     }
                     
-                    if let my = self.userData["createdSets"] as? [String] {
+                    if var my = self.userData["createdSets"] as? [String] {
+                        my.reverse()
                         self.mySets = my
                         for i in my {
                             if self.retrievedSetIDs.firstIndex(of: i) == nil {
@@ -154,7 +163,7 @@ class MainPage: UIViewController, NewSetDelegate {
                 }
                 
                 if let document = document, document.exists, let docData = document.data() {
-                    self.retrievedSets.updateValue(docData, forKey: docName)
+                    self.retrievedSets[docName] = docData
                 }
                 dispatchGroup.leave()
             }
@@ -498,6 +507,13 @@ class MainPage: UIViewController, NewSetDelegate {
     
     @objc func buttonTapped(_ sender: UIButton) {
         destinationSet = String(sender.accessibilityIdentifier!.dropFirst())
+        var t = retrievedSets[destinationSet] as! [String: Any]
+        if let timestamp = t["date"] as? Timestamp {
+            let date = timestamp.dateValue()
+            self.defaults.setValue(formatDate(date), forKey: "date")
+        }
+        t.removeValue(forKey: "date")
+        defaults.set(t, forKey: "set")
         if(String(sender.accessibilityIdentifier!.first!) == "s"){
             destination = "standard"
             performSegue(withIdentifier: "viewStandardSet", sender: self)
@@ -521,13 +537,21 @@ class MainPage: UIViewController, NewSetDelegate {
             if(goToEditor){
                 vc.goToEditor = true
             }
+            if(likedSets.firstIndex(of: destinationSet) != nil){
+                vc.isLiked = true
+            }
             vc.set = destinationSet
+            vc.alreadyHasSet = true
         }else{
             guard let vc = segue.destination as? WebSetVC else {return}
             if(goToEditor){
                 vc.goToEditor = true
             }
+            if(likedSets.firstIndex(of: destinationSet) != nil){
+                vc.isLiked = true
+            }
             vc.set = destinationSet
+            vc.alreadyHasSet = true
         }
         goToEditor = false
     }
@@ -546,9 +570,10 @@ class MainPage: UIViewController, NewSetDelegate {
         newSet["date"] = Timestamp(date: Date())
         newSet["version"] = Colors.version
         newSet["image"] = ""
-        var studiedSet: [String: Any] = [:]
-        studiedSet["name"] = "New Set"
-        studiedSet["image"] = ""
+        newSet["likes"] = 0
+        //var studiedSet: [String: Any] = [:]
+        //studiedSet["name"] = "New Set"
+        //studiedSet["image"] = ""
         if(type == "Standard"){
             newSet["type"] = "standard"
             newSet["set"] = [[
@@ -557,14 +582,14 @@ class MainPage: UIViewController, NewSetDelegate {
                 "defType": "t",
                 "def": "Example definition"
             ]]
-            studiedSet["type"] = "standard"
-            studiedSet["learn"] = [0]
-            studiedSet["flashcards"] = [false]
+            //studiedSet["type"] = "standard"
+            //studiedSet["learn"] = [0]
+            //studiedSet["flashcards"] = [false]
             destination = "standard"
         }else if(type == "Web"){
-            newSet["type"] = "web"
+            //newSet["type"] = "web"
             newSet["set"] = [] as [[String: Any]]
-            studiedSet["type"] = "web"
+            //studiedSet["type"] = "web"
             destination = "web"
         }
         
@@ -585,15 +610,18 @@ class MainPage: UIViewController, NewSetDelegate {
             }
         }
         self.destinationSet = ref.documentID
-        studiedSet["setID"] = ref.documentID
+        //studiedSet["setID"] = ref.documentID
         var newMy = userData["createdSets"] as! [String]
         newMy.append(ref.documentID)
-        var newStudied = userData["studiedSets"] as! [[String: Any]]
-        newStudied.append(studiedSet)
+        //var newStudied = userData["studiedSets"] as! [[String: Any]]
+        //newStudied.append(studiedSet)
         db.collection("users").document(Auth.auth().currentUser!.uid).setData([
-            "createdSets": newMy,
-            "studiedSets": newStudied
+            "createdSets": newMy//,
+            //"studiedSets": newStudied
         ], merge: true)
+        
+        newSet.removeValue(forKey: "date")
+        defaults.setValue(newSet, forKey: "set")
     }
     
     func newImport() {
