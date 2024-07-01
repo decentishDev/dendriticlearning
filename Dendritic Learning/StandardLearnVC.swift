@@ -557,7 +557,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
                     oldStudied.append([
                         "setID": self.set,
                         "learn": self.known,
-                        "date": Timestamp
+                        "date": Timestamp()
                     ])
                 }
                 

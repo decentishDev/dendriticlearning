@@ -542,7 +542,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
                         oldStudied.append([
                             "setID": self.set,
                             "learn": self.known,
-                            "date": Timestamp
+                            "date": Timestamp()
                         ])
                     }
                     oldUser["studiedSets"] = oldStudied
