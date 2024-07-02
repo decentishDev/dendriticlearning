@@ -24,6 +24,7 @@ class SettingsVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = Colors.background
         if let uid = Auth.auth().currentUser?.uid {
             let dataRef = db.collection("users").document(uid)
             dataRef.getDocument { (document, error) in
@@ -48,7 +49,7 @@ class SettingsVC: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        view.backgroundColor = Colors.background
+        
         //setup()
     }
     

@@ -129,10 +129,12 @@ class NewUserVC: UIViewController {
         signUpUsernameLabel.text = "Username"
         signUpPassword = UITextField(frame: CGRect(x: midX - 200, y: midY + 50, width: 400, height: 30))
         signUpPassword.textContentType = .password
+        signUpPassword.isSecureTextEntry = true
         let signUpPasswordLabel = UILabel(frame: CGRect(x: midX - 200, y: midY + 20, width: 400, height: 30))
         signUpPasswordLabel.text = "Password"
         signUpPassword2 = UITextField(frame: CGRect(x: midX - 200, y: midY + 120, width: 400, height: 30))
         signUpPassword2.textContentType = .password
+        signUpPassword2.isSecureTextEntry = true
         let signUpPassword2Label = UILabel(frame: CGRect(x: midX - 200, y: midY + 90, width: 400, height: 30))
         signUpPassword2Label.text = "Repeat password"
         
@@ -162,9 +164,16 @@ class NewUserVC: UIViewController {
         signInEmailLabel.text = "Email"
         signInPassword = UITextField(frame: CGRect(x: midX - 200, y: midY + 30, width: 400, height: 30))
         signInPassword.textContentType = .password
+        signInPassword.isSecureTextEntry = true
         let signInPasswordLabel = UILabel(frame: CGRect(x: midX - 200, y: midY, width: 400, height: 30))
         signInPasswordLabel.text = "Password"
-        
+        let resetPasswordButton = UIButton(frame: CGRect(x: midX - 200, y: midY + 60, width: 400, height: 30))
+        resetPasswordButton.setTitle("Reset password", for: .normal)
+        resetPasswordButton.setTitleColor(Colors.highlight, for: .normal)
+        resetPasswordButton.titleLabel!.font = UIFont(name: "LilGrotesk-Regular", size: 16)
+        resetPasswordButton.titleLabel!.textAlignment = .left
+        resetPasswordButton.addTarget(self, action: #selector(resetButtonPressed(_:)), for: .touchUpInside)
+        signIn.addSubview(resetPasswordButton)
         for i in [signInEmail, signInEmailLabel, signInPassword, signInPasswordLabel]{
             if let c = i as? UILabel{
                 c.font = UIFont(name: "LilGrotesk-Regular", size: 20)
@@ -401,6 +410,26 @@ class NewUserVC: UIViewController {
         }
     }
     
+    @objc func resetButtonPressed(_ sender: UIButton){
+        let alertController = UIAlertController(title: "Enter the account email:", message: nil, preferredStyle: .alert)
+        alertController.addTextField { (textField) in
+            textField.placeholder = "example@domain.com"
+        }
+        let confirmAction = UIAlertAction(title: "Confirm", style: .default) { [weak alertController] _ in
+            if let textField = alertController?.textFields?.first, let text = textField.text {
+                Auth.auth().sendPasswordReset(withEmail: text)
+                let endController = UIAlertController(title: "A link to reset your password has been sent to: " + text, message: nil, preferredStyle: .alert)
+                let confirmAction = UIAlertAction(title: "Confirm", style: .default, handler: nil)
+                endController.addAction(confirmAction)
+                self.present(endController, animated: true, completion: nil)
+            }
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     @objc func dismissIt(_ sender: UITapGestureRecognizer){
         view.endEditing(true)
     }
@@ -414,7 +443,7 @@ class NewUserVC: UIViewController {
         infoView.frame = CGRect(x: infoView.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
         signUpOrIn.frame = CGRect(x: signUpOrIn.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
         signUp.frame = CGRect(x: signUp.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
-        signIn.frame = CGRect(x: signIn.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+        signIn.frame = CGRect(x: signIn.frame.minX, y: 0, width: fullX, height: fullY - keyboard - 100)
         success.frame = CGRect(x: success.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
     }
 }

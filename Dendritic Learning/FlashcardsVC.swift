@@ -140,7 +140,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
             //bottomSpace = GADCurrentOrientationInlineAdaptiveBannerAdSizeWithWidth(min(view.frame.height, view.frame.width) - 300).size.height + 10
             bottomSpace = 120
         }
-        print(bottomSpace)
+        //print(bottomSpace)
         IncorrectView.backgroundColor = Colors.secondaryBackground
         IncorrectView.layer.cornerRadius = 10
         CardView.backgroundColor = Colors.secondaryBackground
@@ -241,14 +241,14 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         CorrectView.addSubview(correctButton)
         
         let backButton = UIButton()
-        backButton.frame = CGRect(x: 20, y: 20, width: 20, height: 20)
+        backButton.frame = CGRect(x: 15, y: 15, width: 30, height: 30)
         backButton.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
         backButton.tintColor = Colors.highlight
         backButton.contentMode = .scaleAspectFit
         backButton.addTarget(self, action: #selector(self.BackButton(sender:)), for: .touchUpInside)
         view.addSubview(backButton)
         let settingsButton = UIButton()
-        settingsButton.frame = CGRect(x: view.layer.frame.width - 40, y: 20, width: 20, height: 20)
+        settingsButton.frame = CGRect(x: view.layer.frame.width - 45, y: 15, width: 30, height: 30)
         settingsButton.setImage(UIImage(systemName: "gearshape.fill"), for: .normal)
         settingsButton.tintColor = Colors.highlight
         settingsButton.contentMode = .scaleAspectFit

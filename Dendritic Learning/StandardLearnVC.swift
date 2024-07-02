@@ -143,18 +143,25 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
     
     func setup(){
         let backButton = UIButton()
-        backButton.frame = CGRect(x: 10, y: 10, width: 30, height: 30)
+        backButton.frame = CGRect(x: 20, y: 20, width: 30, height: 30)
         backButton.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
         backButton.contentMode = .scaleAspectFit
+        backButton.imageView!.contentMode = .scaleAspectFit
         backButton.addTarget(self, action: #selector(self.BackButton(sender:)), for: .touchUpInside)
         backButton.tintColor = Colors.highlight
+        //backButton.contentVerticalAlignment = .fill
+        //backButton.contentHorizontalAlignment = .fill
+        //backButton.backgroundColor = .red
         view.addSubview(backButton)
         let settingsButton = UIButton()
-        settingsButton.frame = CGRect(x: view.layer.frame.width - 40, y: 10, width: 30, height: 30)
+        settingsButton.frame = CGRect(x: view.layer.frame.width - 50, y: 20, width: 30, height: 30)
         settingsButton.setImage(UIImage(systemName: "gearshape.fill"), for: .normal)
         settingsButton.contentMode = .scaleAspectFit
+        settingsButton.imageView!.contentMode = .scaleAspectFit
         settingsButton.addTarget(self, action: #selector(self.SettingsButton(sender:)), for: .touchUpInside)
         settingsButton.tintColor = Colors.highlight
+        //settingsButton.contentVerticalAlignment = .fill
+        //settingsButton.contentHorizontalAlignment = .fill
         view.addSubview(settingsButton)
         cardCounter.frame = CGRect(x: 60, y: 20, width: view.frame.width - 120, height: 20)
         cardCounter.font = .systemFont(ofSize: 15)
@@ -225,9 +232,9 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         enterButton.layoutMargins = .init(top: 10, left: 10, bottom: 10, right: 10)
         view.addSubview(enterButton)
         
-        EndScreen.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
+        EndScreen.frame = CGRect(x: 50, y: 0, width: view.frame.width - 100, height: view.frame.height)
         view.addSubview(EndScreen)
-        EndLabel.frame = CGRect(x: 100, y: 100, width: view.frame.width - 200, height: view.frame.height - 315)
+        EndLabel.frame = CGRect(x: 0, y: 100, width: view.frame.width - 100, height: view.frame.height - 315)
         EndLabel.text = ""
         EndLabel.font = UIFont(name: "LilGrotesk-Regular", size: 40)
         EndLabel.textColor = Colors.text
@@ -235,7 +242,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         EndLabel.numberOfLines = 0
         EndScreen.addSubview(EndLabel)
         let EndButton = UIButton()
-        EndButton.frame = CGRect(x: (view.frame.width / 2) - 125, y: view.frame.height - 215, width: 250, height: 75)
+        EndButton.frame = CGRect(x: (view.frame.width / 2) - 125 - 50, y: view.frame.height - 215, width: 250, height: 75)
         EndButton.backgroundColor = Colors.highlight
         EndButton.layer.cornerRadius = 15
         EndButton.setTitle("Next round", for: .normal)
