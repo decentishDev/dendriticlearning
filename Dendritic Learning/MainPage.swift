@@ -587,7 +587,7 @@ class MainPage: UIViewController, NewSetDelegate {
             //studiedSet["flashcards"] = [false]
             destination = "standard"
         }else if(type == "Web"){
-            //newSet["type"] = "web"
+            newSet["type"] = "web"
             newSet["set"] = [] as [[String: Any]]
             //studiedSet["type"] = "web"
             destination = "web"

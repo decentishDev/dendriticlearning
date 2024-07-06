@@ -8,6 +8,7 @@
 import UIKit
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseStorage
 
 class SettingsVC: UIViewController {
 
@@ -167,6 +168,42 @@ class SettingsVC: UIViewController {
         pencilSwitch.addTarget(self, action: #selector(self.pencilSwitched(sender:)), for: .valueChanged)
         pencilSwitch.isUserInteractionEnabled = true
         //pencilSwitch.backgroundColor = .green
+        addBreakView(stackView, 15)
+        let accountLabel = UILabel()
+        accountLabel.text = "Account options"
+        accountLabel.font = UIFont(name: "LilGrotesk-Bold", size: 40)
+        accountLabel.sizeToFit()
+        accountLabel.textColor = Colors.text
+        stackView.addArrangedSubview(accountLabel)
+        
+        let signOutButton = UIButton(frame: CGRect(x: 0, y: 0, width: ("Sign out" as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont(name: "LilGrotesk-Bold", size: 25)!]).width + 35, height: 50))
+        con(signOutButton, ("Sign out" as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont(name: "LilGrotesk-Bold", size: 25)!]).width + 35, 50)
+        signOutButton.backgroundColor = Colors.secondaryBackground
+        signOutButton.layer.cornerRadius = 10
+        signOutButton.setTitle("Sign out", for: .normal)
+        signOutButton.setTitleColor(Colors.highlight, for: .normal)
+        signOutButton.titleLabel!.font = UIFont(name: "LilGrotesk-Bold", size: 25)
+        signOutButton.addTarget(self, action: #selector(self.signOut(sender:)), for: .touchUpInside)
+        stackView.addArrangedSubview(signOutButton)
+        let resetPasswordButton = UIButton(frame: CGRect(x: 0, y: 0, width: ("Reset password" as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont(name: "LilGrotesk-Bold", size: 25)!]).width + 35, height: 50))
+        con(resetPasswordButton, ("Reset password" as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont(name: "LilGrotesk-Bold", size: 25)!]).width + 35, 50)
+        resetPasswordButton.backgroundColor = Colors.secondaryBackground
+        resetPasswordButton.layer.cornerRadius = 10
+        resetPasswordButton.setTitle("Reset password", for: .normal)
+        resetPasswordButton.setTitleColor(Colors.highlight, for: .normal)
+        resetPasswordButton.titleLabel!.font = UIFont(name: "LilGrotesk-Bold", size: 25)
+        resetPasswordButton.addTarget(self, action: #selector(self.resetPassword(sender:)), for: .touchUpInside)
+        stackView.addArrangedSubview(resetPasswordButton)
+        let deleteAccountButton = UIButton(frame: CGRect(x: 0, y: 0, width: ("Delete account" as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont(name: "LilGrotesk-Bold", size: 25)!]).width + 35, height: 50))
+        con(deleteAccountButton, ("Delete account" as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont(name: "LilGrotesk-Bold", size: 25)!]).width + 35, 50)
+        deleteAccountButton.backgroundColor = Colors.secondaryBackground
+        deleteAccountButton.layer.cornerRadius = 10
+        deleteAccountButton.setTitle("Delete account", for: .normal)
+        deleteAccountButton.setTitleColor(Colors.highlight, for: .normal)
+        deleteAccountButton.titleLabel!.font = UIFont(name: "LilGrotesk-Bold", size: 25)
+        deleteAccountButton.addTarget(self, action: #selector(self.deleteAccount(sender:)), for: .touchUpInside)
+        stackView.addArrangedSubview(deleteAccountButton)
+        
     }
 
     @objc func themeButton(sender: UIButton){
@@ -184,6 +221,159 @@ class SettingsVC: UIViewController {
         setup()
         save()
     }
+    @objc func signOut(sender: UIButton){
+        let alertController = UIAlertController(title: nil, message: "Are you sure you want to sign out?", preferredStyle: .alert)
+        let deleteAction = UIAlertAction(title: "Delete", style: .destructive) {_ in
+            do {
+                try Auth.auth().signOut()
+            } catch {
+                print("Error signing out: \(error)")
+            }
+            self.performSegue(withIdentifier: "settingsVC_unwind", sender: nil)
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        alertController.addAction(deleteAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+ 
+    }
+    
+    @objc func resetPassword(sender: UIButton){
+        Auth.auth().sendPasswordReset(withEmail: userData["email"] as! String)
+        let endController = UIAlertController(title: "A link to reset your password has been sent to: " + (userData["email"] as! String), message: nil, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: "Confirm", style: .default, handler: nil)
+        endController.addAction(confirmAction)
+        self.present(endController, animated: true, completion: nil)
+    }
+    
+    @objc func deleteAccount(sender: UIButton) {
+        let alertController = UIAlertController(title: nil, message: "Are you sure you want to delete your account and all your sets? This is permanent and no data can be recovered.", preferredStyle: .alert)
+        let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { _ in
+            let alertControl = UIAlertController(title: "Enter your password to confirm this action.", message: nil, preferredStyle: .alert)
+            alertControl.addTextField { (textField) in
+                textField.placeholder = "Password"
+                textField.isSecureTextEntry = true
+                textField.textContentType = .password
+            }
+            let confirmAction = UIAlertAction(title: "Confirm", style: .destructive) { [weak alertControl] _ in
+                if let textField = alertControl?.textFields?.first, let text = textField.text {
+                    for i in self.view.subviews {
+                        i.removeFromSuperview()
+                    }
+                    let loadingImage = createLoadingIcon()
+                    loadingImage.center = self.view.center
+                    self.view.addSubview(loadingImage)
+                    
+                    guard let user = Auth.auth().currentUser else { return }
+                    let uid = user.uid
+                    let db = Firestore.firestore()
+                    let storage = Storage.storage()
+                    
+                    // Prompt user to reauthenticate
+                    let credential = EmailAuthProvider.credential(withEmail: user.email!, password: text) // You need to get the password from the user
+                    
+                    user.reauthenticate(with: credential) { authResult, error in
+                        if let error = error {
+                            print("Reauthentication failed: \(error)")
+                            return
+                        }
+                        
+                        let userDocRef = db.collection("users").document(uid)
+                        
+                        db.runTransaction({ (transaction, errorPointer) -> Any? in
+                            // Get user document
+                            let userDocument: DocumentSnapshot
+                            do {
+                                try userDocument = transaction.getDocument(userDocRef)
+                            } catch let error as NSError {
+                                errorPointer?.pointee = error
+                                return nil
+                            }
+                            
+                            guard let likedSets = userDocument.data()?["likedSets"] as? [String],
+                                  let createdSets = userDocument.data()?["createdSets"] as? [String] else {
+                                return nil
+                            }
+                            
+                            // Update likes for likedSets
+                            for setID in likedSets {
+                                let setDocRef = db.collection("sets").document(setID)
+                                transaction.updateData(["likes": FieldValue.increment(Int64(-1))], forDocument: setDocRef)
+                            }
+                            
+                            // Delete created sets
+                            for setID in createdSets {
+                                let setDocRef = db.collection("sets").document(setID)
+                                transaction.deleteDocument(setDocRef)
+                            }
+                            
+                            // Delete user document
+                            transaction.deleteDocument(userDocRef)
+                            
+                            return nil
+                        }) { (object, error) in
+                            if let error = error {
+                                print("Transaction failed: \(error)")
+                            } else {
+                                print("Transaction successfully committed!")
+                                
+                                // Delete user's folder from storage
+                                let userFolderRef = storage.reference().child(uid)
+                                userFolderRef.listAll { (result, error) in
+                                    if let error = error {
+                                        print("Error listing user folder: \(error)")
+                                    } else {
+                                        let dispatchGroup = DispatchGroup()
+                                        
+                                        for item in result!.items {
+                                            dispatchGroup.enter()
+                                            item.delete { error in
+                                                if let error = error {
+                                                    print("Error deleting item \(item): \(error)")
+                                                } else {
+                                                    print("Item \(item) deleted successfully.")
+                                                }
+                                                dispatchGroup.leave()
+                                            }
+                                        }
+                                        
+                                        dispatchGroup.notify(queue: .main) {
+                                            print("All items deleted.")
+                                            
+                                            // Delete user account from authentication
+                                            user.delete { error in
+                                                if let error = error {
+                                                    print("Error deleting user: \(error)")
+                                                } else {
+                                                    print("User deleted successfully.")
+                                                    self.performSegue(withIdentifier: "settingsVC_unwind", sender: nil)
+                                                    loadingImage.removeFromSuperview()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            alertControl.addAction(confirmAction)
+            alertControl.addAction(cancelAction)
+            self.present(alertControl, animated: true, completion: nil)
+            
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(deleteAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
+
     
     @objc func pencilSwitched(sender: UISwitch){
         defaults.setValue(sender.isOn, forKey: "fingerDrawing")

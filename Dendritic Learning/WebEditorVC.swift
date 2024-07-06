@@ -810,7 +810,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             if let imageData = pickedImage.jpegData(compressionQuality: 0.8) {
-                let imagesRef = storage.reference().child("images")
+                let imagesRef = storage.reference().child(Auth.auth().currentUser!.uid)
                 let imageName = UUID().uuidString
                 let imageRef = imagesRef.child("\(imageName).jpg")
                 

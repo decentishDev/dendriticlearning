@@ -1113,7 +1113,7 @@ deinit {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             if let imageData = pickedImage.jpegData(compressionQuality: 0.8) {
-                let imagesRef = storage.reference().child("images")
+                let imagesRef = storage.reference().child(Auth.auth().currentUser!.uid)
                 let imageName = UUID().uuidString
                 let imageRef = imagesRef.child("\(imageName).jpg")
                 
@@ -1195,7 +1195,7 @@ deinit {
         
         let drawingData = defaults.value(forKey: "changedDrawing") as! Data
         if drawingData != PKDrawing().dataRepresentation(){
-            let drawingsRef = storage.reference().child("drawings")
+            let drawingsRef = storage.reference().child(Auth.auth().currentUser!.uid)
             let drawingName = UUID().uuidString
             let drawingRef = drawingsRef.child("\(drawingName).drawing")
             

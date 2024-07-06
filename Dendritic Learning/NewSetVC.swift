@@ -22,7 +22,7 @@ class NewSetVC: UIViewController, UIDocumentPickerDelegate {
         self.definesPresentationContext = true
         
         view.backgroundColor = .black.withAlphaComponent(0.5)
-        let centeredView = UIView(frame: CGRect(x: 0, y: 0, width: 560, height: 450))
+        let centeredView = UIView(frame: CGRect(x: 0, y: 0, width: 560, height: 250))
         centeredView.backgroundColor = Colors.background
         centeredView.isUserInteractionEnabled = true
         view.addSubview(centeredView)
@@ -70,39 +70,39 @@ class NewSetVC: UIViewController, UIDocumentPickerDelegate {
         webText.textColor = Colors.text
         newWeb.addSubview(webText)
         
-        let importButton = UIButton()
-        importButton.frame = CGRect(x: 30, y: 240, width: 500, height: 75)
-        importButton.backgroundColor = Colors.secondaryBackground
-        //importButton.addTarget(self, action: #selector(importSet(_:)), for: .touchUpInside)
-        importButton.layer.cornerRadius = 10
-        centeredView.addSubview(importButton)
-        let importIcon = UIImageView(image: UIImage(systemName: "doc.badge.arrow.up.fill"))
-        importIcon.frame = CGRect(x: 15, y: 15, width: 45, height: 45)
-        importIcon.tintColor = Colors.highlight
-        importIcon.contentMode = .scaleAspectFit
-        importButton.addSubview(importIcon)
-        let importText = UILabel(frame: CGRect(x: 75, y: 0, width: 410, height: 75))
-        importText.text = "Import set"
-        importText.font = UIFont(name: "LilGrotesk-Regular", size: 30)
-        importText.textColor = Colors.text
-        importButton.addSubview(importText)
-        
-        let searchButton = UIButton()
-        searchButton.frame = CGRect(x: 30, y: 345, width: 500, height: 75)
-        searchButton.backgroundColor = Colors.secondaryBackground.withAlphaComponent(0.3)
-        //searchButton.addTarget(self, action: #selector(searchForSet(_:)), for: .touchUpInside)
-        searchButton.layer.cornerRadius = 10
-        centeredView.addSubview(searchButton)
-        let searchIcon = UIImageView(image: UIImage(systemName: "magnifyingglass"))
-        searchIcon.frame = CGRect(x: 15, y: 15, width: 45, height: 45)
-        searchIcon.tintColor = Colors.darkHighlight
-        searchIcon.contentMode = .scaleAspectFit
-        searchButton.addSubview(searchIcon)
-        let searchText = UILabel(frame: CGRect(x: 75, y: 0, width: 410, height: 75))
-        searchText.text = "Search for sets"
-        searchText.font = UIFont(name: "LilGrotesk-Regular", size: 30)
-        searchText.textColor = Colors.secondaryBackground
-        searchButton.addSubview(searchText)
+//        let importButton = UIButton()
+//        importButton.frame = CGRect(x: 30, y: 240, width: 500, height: 75)
+//        importButton.backgroundColor = Colors.secondaryBackground
+//        //importButton.addTarget(self, action: #selector(importSet(_:)), for: .touchUpInside)
+//        importButton.layer.cornerRadius = 10
+//        centeredView.addSubview(importButton)
+//        let importIcon = UIImageView(image: UIImage(systemName: "doc.badge.arrow.up.fill"))
+//        importIcon.frame = CGRect(x: 15, y: 15, width: 45, height: 45)
+//        importIcon.tintColor = Colors.highlight
+//        importIcon.contentMode = .scaleAspectFit
+//        importButton.addSubview(importIcon)
+//        let importText = UILabel(frame: CGRect(x: 75, y: 0, width: 410, height: 75))
+//        importText.text = "Import set"
+//        importText.font = UIFont(name: "LilGrotesk-Regular", size: 30)
+//        importText.textColor = Colors.text
+//        importButton.addSubview(importText)
+//        
+//        let searchButton = UIButton()
+//        searchButton.frame = CGRect(x: 30, y: 345, width: 500, height: 75)
+//        searchButton.backgroundColor = Colors.secondaryBackground.withAlphaComponent(0.3)
+//        //searchButton.addTarget(self, action: #selector(searchForSet(_:)), for: .touchUpInside)
+//        searchButton.layer.cornerRadius = 10
+//        centeredView.addSubview(searchButton)
+//        let searchIcon = UIImageView(image: UIImage(systemName: "magnifyingglass"))
+//        searchIcon.frame = CGRect(x: 15, y: 15, width: 45, height: 45)
+//        searchIcon.tintColor = Colors.darkHighlight
+//        searchIcon.contentMode = .scaleAspectFit
+//        searchButton.addSubview(searchIcon)
+//        let searchText = UILabel(frame: CGRect(x: 75, y: 0, width: 410, height: 75))
+//        searchText.text = "Search for sets"
+//        searchText.font = UIFont(name: "LilGrotesk-Regular", size: 30)
+//        searchText.textColor = Colors.secondaryBackground
+//        searchButton.addSubview(searchText)
     }
     
     @objc func newStandard(_ sender: UIButton){
