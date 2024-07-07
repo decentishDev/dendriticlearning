@@ -197,10 +197,36 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         let titleLabel = createLabel(text: name, font: UIFont(name: "LilGrotesk-Black", size: 50))
         stackView.addArrangedSubview(titleLabel)
         
+        addBreakView(stackView, 10)
+        
+        let authorLabel = createLabel(text: author, font: UIFont(name: "LilGrotesk-Bold", size: 25))
+        stackView.addArrangedSubview(authorLabel)
+        
+        let dateLabel = createLabel(text: "Last edited on " + date, font: UIFont(name: "LilGrotesk-Light", size: 20))
+        stackView.addArrangedSubview(dateLabel)
+        
+        addBreakView(stackView, 30)
+        
+        let copyButton = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        con(copyButton, 100, 20)
+        copyButton.addTarget(self, action: #selector(self.copy(sender:)), for: .touchUpInside)
+        //stackView.addArrangedSubview(copyButton)
+        let copyImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
+        copyImage.tintColor = Colors.highlight
+        copyImage.image = UIImage(systemName: "square.on.square.fill")
+        copyImage.contentMode = .scaleAspectFit
+        copyButton.addSubview(copyImage)
+        let copyLabel = UILabel(frame: CGRect(x: 25, y: 0, width: 75, height: 20))
+        copyLabel.textColor = Colors.highlight
+        copyLabel.text = "Share"
+        copyLabel.font = UIFont(name: "LilGrotesk-Regular", size: 25)
+        copyButton.addSubview(copyLabel)
+        //addBreakView(stackView, 30)
+        
         let heartButton = UIButton(frame: CGRect(x: 0, y: 0, width: 300, height: 20))
         con(heartButton, 300, 20)
         heartButton.addTarget(self, action: #selector(self.like(sender:)), for: .touchUpInside)
-        stackView.addArrangedSubview(heartButton)
+        //stackView.addArrangedSubview(heartButton)
         heartLabel = UILabel(frame: CGRect(x: 25, y: 0, width: 275, height: 20))
         heartLabel.text = String(setData["likes"] as! Int)
         heartLabel.textColor = Colors.highlight
@@ -216,15 +242,13 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         heartImage.tintColor = Colors.highlight
         heartImage.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
         heartButton.addSubview(heartImage)
-        addBreakView(stackView, 30)
         
-        let authorLabel = createLabel(text: author, font: UIFont(name: "LilGrotesk-Bold", size: 25))
-        stackView.addArrangedSubview(authorLabel)
+        let horiView = UIStackView(arrangedSubviews: [copyButton, heartButton])
+        horiView.axis = .horizontal
+        horiView.spacing = 10
+        stackView.addArrangedSubview(horiView)
         
-        let dateLabel = createLabel(text: "Last edited " + date, font: UIFont(name: "LilGrotesk-Light", size: 20))
-        stackView.addArrangedSubview(dateLabel)
-        
-        addBreakView(stackView, 30)
+        addBreakView(stackView, 40)
     }
 
     private func setupButtons() {
@@ -500,6 +524,10 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     @objc func backButton(sender: UIButton){
         //print("back")
         performSegue(withIdentifier: "standardSetVC_unwind", sender: nil)
+    }
+    
+    @objc func copy(sender: UIButton){
+        
     }
     
     @objc func like(sender: UIButton){

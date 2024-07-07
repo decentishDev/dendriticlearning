@@ -310,6 +310,9 @@ deinit {
                     }
                     button2.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
                     button2.accessibilityIdentifier = "2" + String(i)
+                }else{
+                    con(button2, 0, 0)
+                    button2.isEnabled = false
                 }
                 let button3 = UIButton()
                 button3.frame = CGRect(x: 60, y: 0, width: 30, height: 30)
@@ -414,6 +417,9 @@ deinit {
                 button2.tintColor = Colors.darkHighlight
                 button2.addTarget(self, action: #selector(changeDefaultInput(_:)), for: .touchUpInside)
                 button2.accessibilityIdentifier = "2" + String(cards.count)
+            }else{
+                con(button2, 0, 0)
+                button2.isEnabled = false
             }
             let button3 = UIButton()
             button3.frame = CGRect(x: 60, y: 0, width: 30, height: 30)
@@ -624,6 +630,9 @@ deinit {
             }
             button2.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
             button2.accessibilityIdentifier = "2" + String(i)
+        }else{
+            con(button2, 0, 0)
+            button2.isEnabled = false
         }
         let button3 = UIButton()
         button3.frame = CGRect(x: 60, y: 0, width: 30, height: 30)

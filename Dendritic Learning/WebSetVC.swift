@@ -178,27 +178,8 @@ class WebSetVC: UIViewController {
             titleLabel.textColor = Colors.text
             titleLabel.sizeToFit()
             stackView.addArrangedSubview(titleLabel)
-        //addBreakView(stackView, 30)
-        let heartButton = UIButton(frame: CGRect(x: 0, y: 0, width: 300, height: 20))
-        con(heartButton, 300, 20)
-        heartButton.addTarget(self, action: #selector(self.like(sender:)), for: .touchUpInside)
-        stackView.addArrangedSubview(heartButton)
-        heartLabel = UILabel(frame: CGRect(x: 25, y: 0, width: 275, height: 20))
-        heartLabel.text = String(setData["likes"] as! Int)
-        heartLabel.textColor = Colors.highlight
-        heartLabel.font = UIFont(name: "LilGrotesk-Regular", size: 25)
-        heartLabel.textAlignment = .left
-        heartButton.addSubview(heartLabel)
-        if(isLiked){
-            heartImage = UIImageView(image: UIImage(systemName: "heart.fill"))
-        }else{
-            heartImage = UIImageView(image: UIImage(systemName: "heart"))
-        }
-        heartImage.contentMode = .scaleAspectFit
-        heartImage.tintColor = Colors.highlight
-        heartImage.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
-        heartButton.addSubview(heartImage)
-        addBreakView(stackView, 30)
+
+        addBreakView(stackView, 10)
             
         let authorLabel = UILabel()
         authorLabel.text = author
@@ -210,7 +191,7 @@ class WebSetVC: UIViewController {
         
         
             let dateLabel = UILabel()
-            dateLabel.text = date
+            dateLabel.text = "Last edited on " + date
             dateLabel.font = UIFont(name: "LilGrotesk-Light", size: 20)
             dateLabel.textColor = Colors.text
             dateLabel.sizeToFit()
@@ -245,6 +226,51 @@ class WebSetVC: UIViewController {
 //            shareText.textColor = Colors.highlight
             
         addBreakView(stackView, 30)
+        
+        
+        
+        let copyButton = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        con(copyButton, 100, 20)
+        copyButton.addTarget(self, action: #selector(self.copy(sender:)), for: .touchUpInside)
+        //stackView.addArrangedSubview(copyButton)
+        let copyImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
+        copyImage.tintColor = Colors.highlight
+        copyImage.image = UIImage(systemName: "square.on.square.fill")
+        copyImage.contentMode = .scaleAspectFit
+        copyButton.addSubview(copyImage)
+        let copyLabel = UILabel(frame: CGRect(x: 25, y: 0, width: 75, height: 20))
+        copyLabel.textColor = Colors.highlight
+        copyLabel.text = "Share"
+        copyLabel.font = UIFont(name: "LilGrotesk-Regular", size: 25)
+        copyButton.addSubview(copyLabel)
+        //addBreakView(stackView, 30)
+        
+        let heartButton = UIButton(frame: CGRect(x: 0, y: 0, width: 300, height: 20))
+        con(heartButton, 300, 20)
+        heartButton.addTarget(self, action: #selector(self.like(sender:)), for: .touchUpInside)
+        //stackView.addArrangedSubview(heartButton)
+        heartLabel = UILabel(frame: CGRect(x: 25, y: 0, width: 275, height: 20))
+        heartLabel.text = String(setData["likes"] as! Int)
+        heartLabel.textColor = Colors.highlight
+        heartLabel.font = UIFont(name: "LilGrotesk-Regular", size: 25)
+        heartLabel.textAlignment = .left
+        heartButton.addSubview(heartLabel)
+        if(isLiked){
+            heartImage = UIImageView(image: UIImage(systemName: "heart.fill"))
+        }else{
+            heartImage = UIImageView(image: UIImage(systemName: "heart"))
+        }
+        heartImage.contentMode = .scaleAspectFit
+        heartImage.tintColor = Colors.highlight
+        heartImage.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+        heartButton.addSubview(heartImage)
+        
+        let horiView = UIStackView(arrangedSubviews: [copyButton, heartButton])
+        horiView.axis = .horizontal
+        horiView.spacing = 10
+        stackView.addArrangedSubview(horiView)
+        
+        addBreakView(stackView, 40)
             
             let buttonsStackView = UIStackView()
         buttonsStackView.addArrangedSubview(createButton(withTitle: "View"))
@@ -383,6 +409,10 @@ class WebSetVC: UIViewController {
         isLiked = !isLiked
         var likeCount: [String: Any] = ["likes": setData["likes"]!]
         db.collection("sets").document(set).setData(likeCount, merge: true)
+    }
+    
+    @objc func copy(sender: UIButton){
+        
     }
     
 //    @objc func export(sender: UIButton){

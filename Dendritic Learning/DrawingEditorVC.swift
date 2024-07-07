@@ -83,15 +83,24 @@ class DrawingEditorVC: UIViewController, PKCanvasViewDelegate {
         eraserButton.layer.cornerRadius = 10
         eraserButton.addTarget(self, action: #selector(eraser(_:)), for: .touchUpInside)
         centeredView.addSubview(eraserButton)
+        let undoButton = UIButton(frame: CGRect(x: 190, y: 10, width: 50, height: 50))
+        undoButton.setImage(UIImage(systemName: "arrow.uturn.backward"), for: .normal)
+        undoButton.contentMode = .scaleAspectFit
+        undoButton.tintColor = Colors.highlight
+        undoButton.backgroundColor = Colors.secondaryBackground
+        undoButton.layer.cornerRadius = 10
+        undoButton.addTarget(self, action: #selector(undoButton(_:)), for: .touchUpInside)
+        centeredView.addSubview(undoButton)
     }
     
     @objc func dismissIt(_ sender: UITapGestureRecognizer){
+        defaults.set(canvas.drawing.dataRepresentation(), forKey: "changedDrawing")
         delegate?.updateDrawing(i, term)
         dismiss(animated: true, completion: nil)
     }
     
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
-        defaults.set(canvasView.drawing.dataRepresentation(), forKey: "changedDrawing")
+        //defaults.set(canvasView.drawing.dataRepresentation(), forKey: "changedDrawing")
 //        var card = ((UserDefaults.standard.value(forKey: "sets") as! [Dictionary<String, Any>])[set]["set"] as! [[Any]])
 //        if(term){
 //            card[i][1] = canvasView.drawing.dataRepresentation()
@@ -106,6 +115,7 @@ class DrawingEditorVC: UIViewController, PKCanvasViewDelegate {
     }
     
     @objc func back(_ sender: UIButton) {
+        defaults.set(canvas.drawing.dataRepresentation(), forKey: "changedDrawing")
         delegate?.updateDrawing(i, term)
         dismiss(animated: true, completion: nil)
     }
@@ -123,5 +133,9 @@ class DrawingEditorVC: UIViewController, PKCanvasViewDelegate {
     
     @objc func clear(_ sender: UIButton) {
         canvas.drawing = recolor(PKDrawing())
+    }
+    
+    @objc func undoButton(_ sender: UIButton){
+        canvas.undoManager?.undo()
     }
 }

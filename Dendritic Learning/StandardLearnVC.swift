@@ -222,6 +222,15 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         //eraserButton.layer.cornerRadius = 10
         eraserButton.addTarget(self, action: #selector(eraser(_:)), for: .touchUpInside)
         DrawingView.addSubview(eraserButton)
+        let undoButton = UIButton(frame: CGRect(x: 90, y: 10, width: 30, height: 30))
+        DrawingView.addSubview(undoButton)
+        undoButton.setImage(UIImage(systemName: "arrow.uturn.backward"), for: .normal)
+        undoButton.contentMode = .scaleAspectFit
+        undoButton.tintColor = Colors.highlight
+        undoButton.layoutMargins = .zero
+        //clearButton.backgroundColor = Colors.background
+        //clearButton.layer.cornerRadius = 10
+        undoButton.addTarget(self, action: #selector(self.undoButton(_:)), for: .touchUpInside)
         enterButton.frame = CGRect(x: view.frame.width - 100, y: topHeight-keyboard + 20, width: 50, height: 50)
         enterButton.setImage(UIImage(systemName: "arrowshape.right.fill"), for: .normal)
         enterButton.tintColor = Colors.highlight
@@ -309,6 +318,10 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
     
     @objc func clear(_ sender: UIButton) {
         DrawingView.drawing = recolor(PKDrawing())
+    }
+    
+    @objc func undoButton(_ sender: UIButton){
+        DrawingView.undoManager?.undo()
     }
     
     func correctAnim(_ i: Int){
