@@ -119,6 +119,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                 let dataRef = self.db.collection("sets").document(text)
                 dataRef.getDocument { (document, error) in
                     if let document = document, document.exists {
+                        self.destinationSet = text
                         var setData = document.data()!
                         if let timestamp = setData["date"] as? Timestamp {
                             let date = timestamp.dateValue()
@@ -128,8 +129,10 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                         self.defaults.set(setData, forKey: "set")
                         
                         if setData["type"] as! String == "standard" {
+                            self.destinationSet = "standard"
                             self.performSegue(withIdentifier: "searchToStandard", sender: nil)
                         }else{
+                            self.destinationSet = "web"
                             self.performSegue(withIdentifier: "searchToWeb", sender: nil)
                         }
                     } else {
@@ -283,10 +286,12 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         segue.destination.modalPresentationStyle = .fullScreen
         if(destinationType == "standard"){
+            print("yoooo")
             guard let vc = segue.destination as? StandardSetVC else {return}
             vc.set = destinationSet
             vc.alreadyHasSet = true
         }else{
+            print("noooo")
             guard let vc = segue.destination as? WebSetVC else {return}
             vc.set = destinationSet
             vc.alreadyHasSet = true

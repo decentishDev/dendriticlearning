@@ -381,6 +381,12 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     
     @objc func handleBackTap(_ gestureRecognizer: UITapGestureRecognizer) {
         titleField.resignFirstResponder()
+        selectedButton?.isEnabled = true
+        for i in addedButtons {
+            i.removeFromSuperview()
+        }
+        addedButtons = []
+        updateLines100()
     }
     
     @objc func handlePan(_ gestureRecognizer: UIPanGestureRecognizer) {
@@ -469,6 +475,21 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
                 }
             }
             web[i]["connections"] = newOrder
+        }
+        for (i, term) in web.enumerated() {
+            var previousOrder: [Int] = []
+            for (bI, button) in (rectangles[i].subviews[1] as! UIStackView).arrangedSubviews.enumerated() {
+                //if(bI != (rectangles[i].subviews[1] as! UIStackView).arrangedSubviews.count - 1){
+                    previousOrder.append(Int(button.accessibilityIdentifier!)!)
+                //}
+            }
+            previousOrder = previousOrder.sorted{ (web[$0]["x"] as! CGFloat) < (web[$1]["x"] as! CGFloat) }
+            for (bI, button) in (rectangles[i].subviews[1] as! UIStackView).arrangedSubviews.enumerated() {
+                //if(bI != (rectangles[i].subviews[1] as! UIStackView).arrangedSubviews.count - 1){
+                    button.accessibilityIdentifier = String(previousOrder[bI])
+                    //print(web[previousOrder[bI]][2])
+                //}
+            }
         }
         for (rectI, movedView) in rectangles.enumerated(){
             let outgoing = web[rectI]["connections"] as? [Int]
@@ -643,7 +664,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             }
             updateLines()
         }
-
+        updateLines100()
     }
     
     @objc func finishConnection(_ sender: UIButton){
@@ -698,10 +719,16 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         selectedButton?.setImage(UIImage(systemName: "record.circle"), for: .normal)
         selectedButton?.tintColor = Colors.text
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
-            self.updateLines()
-        }
+        updateLines100()
         save()
+        addedButtons = []
+    }
+    func updateLines100(){
+        for i in 0..<100{
+            DispatchQueue.main.asyncAfter(deadline: .now() + (0.01 * Double(i))){
+                self.updateLines()
+            }
+        }
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -740,9 +767,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             }
         }
         sender.removeFromSuperview()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
-            self.updateLines()
-        }
+        updateLines100()
         save()
     }
     
@@ -786,9 +811,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         }
         
         save()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
-            self.updateLines()
-        }
+        updateLines100()
     }
     
     @objc func changeImage(_ sender: UIButton) {

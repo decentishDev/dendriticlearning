@@ -412,7 +412,12 @@ class WebSetVC: UIViewController {
     }
     
     @objc func copy(sender: UIButton){
+        UIPasteboard.general.string = set
+            
+        let alert = UIAlertController(title: "Copied!", message: "The set ID has been copied to your clipboard.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         
+        self.present(alert, animated: true, completion: nil)
     }
     
 //    @objc func export(sender: UIButton){

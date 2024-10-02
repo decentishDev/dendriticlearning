@@ -293,8 +293,40 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate
 //    }
     
     func updateLines(){
+        for (i, term) in web.enumerated() {
+            var newOrder: [Int] = []
+            for j in (term["connections"] as! [Int]){
+                if newOrder.isEmpty {
+                    newOrder.append(j)
+                }else{
+                    for c in 0 ..< newOrder.count {
+                        if ((web[j]["x"] as! CGFloat) <= (web[newOrder[c]]["x"] as! CGFloat)){
+                            newOrder.insert(j, at: c)
+                            break
+                        }else if ((c + 1) == newOrder.count) {
+                            newOrder.append(j)
+                        }
+                    }
+                }
+            }
+            web[i]["connections"] = newOrder
+        }
+        for (i, term) in web.enumerated() {
+            var previousOrder: [Int] = []
+            for (bI, button) in (rectangles[i].subviews[1] as! UIStackView).arrangedSubviews.enumerated() {
+                //if(bI != (rectangles[i].subviews[1] as! UIStackView).arrangedSubviews.count - 1){
+                    previousOrder.append(Int(button.accessibilityIdentifier!)!)
+                //}
+            }
+            previousOrder = previousOrder.sorted{ (web[$0]["x"] as! CGFloat) < (web[$1]["x"] as! CGFloat) }
+            for (bI, button) in (rectangles[i].subviews[1] as! UIStackView).arrangedSubviews.enumerated() {
+                //if(bI != (rectangles[i].subviews[1] as! UIStackView).arrangedSubviews.count - 1){
+                    button.accessibilityIdentifier = String(previousOrder[bI])
+                    //print(web[previousOrder[bI]][2])
+                //}
+            }
+        }
         for (rectI, movedView) in rectangles.enumerated(){
-//            let rectI = rectangles.firstIndex(of: movedView)
             let outgoing = web[rectI]["connections"] as? [Int]
             if(outgoing!.count > 0){
                 for i in 0...outgoing!.count - 1 {
@@ -303,22 +335,19 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate
                     
                     for button in (rectangles[outgoing![i]].subviews[1] as! UIStackView).arrangedSubviews{
                         otherButtonI += 1
-                        if(Int(button.accessibilityIdentifier!) == rectI){ //Unexpectedly found nil while unwrapping an optional value
+                        if(Int(button.accessibilityIdentifier!) == rectI){
                             break
                         }
                     }
                     
                     let otherButton = (rectangles[outgoing![i]].subviews[1] as! UIStackView).arrangedSubviews[otherButtonI]
-                    //print(otherButtonI)
+
                     let endPoint = otherButton.convert(otherButton.anchorPoint, to: thisButton)
-                    //print(thisButton.center)
+
                     let linePath = UIBezierPath()
                     linePath.move(to: CGPoint(x: 15, y: 15))
                     linePath.addLine(to: CGPoint(x: endPoint.x + 15, y: endPoint.y + 15))
-                    
-                    //print(thisButton.layer.sublayers!.count)
-                    //print(thisButton.layer.sublayers!)
-                    (thisButton.layer.sublayers![1] as! CAShapeLayer).path = linePath.cgPath //Could not cast value of type '_UILabelLayer' (0x1f494d310) to 'CAShapeLayer' (0x1f49a2870).
+                    (thisButton.layer.sublayers![1] as! CAShapeLayer).path = linePath.cgPath
                     
                 }
             }

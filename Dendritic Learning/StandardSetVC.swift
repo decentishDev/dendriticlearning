@@ -46,6 +46,8 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print(set)
+        print(alreadyHasSet)
         //print(goToEditor)
         view.backgroundColor = Colors.background
         if goToEditor {
@@ -527,7 +529,12 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     }
     
     @objc func copy(sender: UIButton){
+        UIPasteboard.general.string = set
+            
+        let alert = UIAlertController(title: "Copied!", message: "The set ID has been copied to your clipboard.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         
+        self.present(alert, animated: true, completion: nil)
     }
     
     @objc func like(sender: UIButton){
