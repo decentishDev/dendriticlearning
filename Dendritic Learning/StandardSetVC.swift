@@ -46,8 +46,6 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(set)
-        print(alreadyHasSet)
         //print(goToEditor)
         view.backgroundColor = Colors.background
         if goToEditor {

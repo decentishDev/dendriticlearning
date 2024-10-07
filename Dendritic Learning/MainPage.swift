@@ -13,8 +13,8 @@ class MainPage: UIViewController, NewSetDelegate {
     
     let defaults = UserDefaults.standard
     
-    let scrollView = UIScrollView()
-    let stackView = UIStackView()
+    var scrollView = UIScrollView()
+    var stackView = UIStackView()
     
     var destination = ""
     var destinationSet = ""
@@ -64,7 +64,7 @@ class MainPage: UIViewController, NewSetDelegate {
         
         let topBar = createTopBar()
         stackView.addArrangedSubview(topBar)
-        addBreakView(stackView, 30)
+        //addBreakView(stackView, 30)
         
         loadingImage = createLoadingIcon()
         loadingImage.center = view.center
@@ -249,7 +249,17 @@ class MainPage: UIViewController, NewSetDelegate {
             subview.removeFromSuperview()
         }
         
+        scrollView = UIScrollView()
+        stackView = UIStackView()
         view.backgroundColor = Colors.background
+        
+        let bgimage = UIImageView(image: UIImage(named: "dendriticbackground.svg")?.withRenderingMode(.alwaysTemplate))
+        bgimage.tintColor = Colors.darkHighlight
+        bgimage.contentMode = .scaleAspectFill
+        bgimage.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
+        bgimage.layer.opacity = 0.6
+        view.addSubview(bgimage)
+        
         
         stackView.axis = .vertical
         stackView.spacing = 20
@@ -268,7 +278,9 @@ class MainPage: UIViewController, NewSetDelegate {
             stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 60),
             stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -60),
         ])
+        //scrollView.bounds = scrollView.frame
         
+        scrollView.contentInset = .zero
         
         let topBar = createTopBar()
         stackView.addArrangedSubview(topBar)
@@ -345,7 +357,7 @@ class MainPage: UIViewController, NewSetDelegate {
         let topBar = UIView()
         con(topBar, view.frame.width - 120, 50)
         
-        let icon = UIImageView(image: UIImage(named: "DendriticLearningIcon-01.svg")?.withRenderingMode(.alwaysTemplate))
+        let icon = UIImageView(image: UIImage(named: "DendriticLearningIconBold1.svg")?.withRenderingMode(.alwaysTemplate))
         icon.tintColor = Colors.highlight
         icon.contentMode = .scaleAspectFit
         topBar.addSubview(icon)

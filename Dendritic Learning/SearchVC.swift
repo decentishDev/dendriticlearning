@@ -21,6 +21,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     var destinationSet = ""
     var destinationType = ""
     var retrievedSets: [String: Any] = [:]
+    var likedSets: [String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -104,6 +105,24 @@ class SearchVC: UIViewController, UITextFieldDelegate {
             resultsStack.leadingAnchor.constraint(equalTo: resultsScroll.leadingAnchor),
             resultsStack.trailingAnchor.constraint(equalTo: resultsScroll.trailingAnchor)
         ])
+        
+        if let uid = Auth.auth().currentUser?.uid {
+            let dataRef = db.collection("users").document(uid)
+            dataRef.getDocument { (document, error) in
+                if let document = document, document.exists {
+                    let userData = document.data()!
+                    
+                    if var liked = userData["likedSets"] as? [String] {
+                        liked.reverse()
+                        self.likedSets = liked
+                    }
+                } else {
+                    self.performSegue(withIdentifier: "searchVC_unwind", sender: nil)
+                }
+            }
+        } else {
+            performSegue(withIdentifier: "searchVC_unwind", sender: nil)
+        }
     }
     
     @objc func idButton(sender: UIButton){
@@ -129,10 +148,10 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                         self.defaults.set(setData, forKey: "set")
                         
                         if setData["type"] as! String == "standard" {
-                            self.destinationSet = "standard"
+                            self.destinationType = "standard"
                             self.performSegue(withIdentifier: "searchToStandard", sender: nil)
                         }else{
-                            self.destinationSet = "web"
+                            self.destinationType = "web"
                             self.performSegue(withIdentifier: "searchToWeb", sender: nil)
                         }
                     } else {
@@ -213,37 +232,40 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         con(rect, w, 150)
         rect.backgroundColor = Colors.secondaryBackground
         rect.layer.cornerRadius = 10
-        let titleLabel = UILabel(frame: CGRect(x: 10, y: 10, width: w - 20, height: 100))
+        let titleLabel = UILabel(frame: CGRect(x: 15, y: 15, width: w - 30, height: 100))
         titleLabel.text = set["name"] as? String
         titleLabel.textColor = Colors.text
         titleLabel.font = UIFont(name: "LilGrotesk-Bold", size: 30)
         titleLabel.numberOfLines = 0
         titleLabel.sizeToFit()
         rect.addSubview(titleLabel)
-        let creatorLabel = UILabel(frame: CGRect(x: 10, y: 90, width: w - 20, height: 15))
+        let creatorLabel = UILabel(frame: CGRect(x: 15, y: 85, width: w - 30, height: 15))
         creatorLabel.text = set["author"] as? String
         creatorLabel.textColor = Colors.text
         creatorLabel.font = UIFont(name: "LilGrotesk-Bold", size: 20)
         rect.addSubview(creatorLabel)
-        let dateLabel = UILabel(frame: CGRect(x: 10, y: 120, width: w - 20, height: 15))
+        let dateLabel = UILabel(frame: CGRect(x: 15, y: 115, width: w - 30, height: 15))
         dateLabel.text = formatDate((set["date"] as! Timestamp).dateValue())
         dateLabel.textColor = Colors.text
         dateLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
         rect.addSubview(dateLabel)
-        let heartLabel = UILabel(frame: CGRect(x: 10, y: 90, width: w - 40, height: 15))
+        let heartLabel = UILabel(frame: CGRect(x: 15, y: 85, width: w - 55, height: 15))
         heartLabel.text = String(set["likes"] as! Int)
         heartLabel.textColor = Colors.highlight
         heartLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
         heartLabel.textAlignment = .right
         rect.addSubview(heartLabel)
         let heartImage = UIImageView(image: UIImage(systemName: "heart"))
+        if(likedSets.firstIndex(of: id) != nil){
+            heartImage.image = UIImage(systemName: "heart.fill")
+        }
         heartImage.contentMode = .scaleAspectFit
         heartImage.tintColor = Colors.highlight
-        heartImage.frame = CGRect(x: w - 25, y: 90, width: 15, height: 15)
+        heartImage.frame = CGRect(x: w - 35, y: 85, width: 15, height: 15)
         rect.addSubview(heartImage)
-        let heartButton = UIButton(frame: CGRect(x: w - 80, y: 90, width: 70, height: 15))
+        let heartButton = UIButton(frame: CGRect(x: w - 85, y: 85, width: 70, height: 15))
         rect.addSubview(heartButton)
-        let cardsLabel = UILabel(frame: CGRect(x: 10, y: 120, width: w - 20, height: 15))
+        let cardsLabel = UILabel(frame: CGRect(x: 15, y: 115, width: w - 30, height: 15))
         cardsLabel.text = String((set["set"] as! [[String: Any]]).count) + " terms"
         cardsLabel.textColor = Colors.text
         cardsLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
@@ -286,14 +308,18 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         segue.destination.modalPresentationStyle = .fullScreen
         if(destinationType == "standard"){
-            print("yoooo")
             guard let vc = segue.destination as? StandardSetVC else {return}
             vc.set = destinationSet
+            if(likedSets.firstIndex(of: destinationSet) != nil){
+                vc.isLiked = true
+            }
             vc.alreadyHasSet = true
         }else{
-            print("noooo")
             guard let vc = segue.destination as? WebSetVC else {return}
             vc.set = destinationSet
+            if(likedSets.firstIndex(of: destinationSet) != nil){
+                vc.isLiked = true
+            }
             vc.alreadyHasSet = true
         }
     }
