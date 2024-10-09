@@ -223,7 +223,7 @@ class SettingsVC: UIViewController {
     }
     @objc func signOut(sender: UIButton){
         let alertController = UIAlertController(title: nil, message: "Are you sure you want to sign out?", preferredStyle: .alert)
-        let deleteAction = UIAlertAction(title: "Delete", style: .destructive) {_ in
+        let deleteAction = UIAlertAction(title: "Sign out", style: .destructive) {_ in
             do {
                 try Auth.auth().signOut()
             } catch {

@@ -1012,6 +1012,26 @@ deinit {
             let userRef = self.db.collection("users").document(Auth.auth().currentUser!.uid)
             userRef.getDocument { (document, error) in
                 if let document = document, document.exists {
+                    for i in 0..<self.cards.count {
+                        if(self.cards[i]["defType"] as! String == "d" || self.cards[i]["defType"] as! String == "i"){
+                            self.defaults.removeObject(forKey: self.cards[i]["def"] as! String)
+                            let imageRef = self.storage.reference().child(self.cards[i]["def"] as! String)
+                            imageRef.delete(){ error in
+                                if let error = error{
+                                    print("Error deleting media: \(error.localizedDescription)")
+                                }
+                            }
+                        }
+                        if(self.cards[i]["termType"] as! String == "d"){
+                            self.defaults.removeObject(forKey: self.cards[i]["term"] as! String)
+                            let imageRef = self.storage.reference().child(self.cards[i]["term"] as! String)
+                            imageRef.delete(){ error in
+                                if let error = error{
+                                    print("Error deleting media: \(error.localizedDescription)")
+                                }
+                            }
+                        }
+                    }
                     oldUser = document.data()!
                     print(oldUser)
                     var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
@@ -1056,6 +1076,24 @@ deinit {
         let actualI = indexes.firstIndex(of: i)!
         allTermsStackView.arrangedSubviews[actualI].removeFromSuperview()
         //allTermsStackView.removeArrangedSubview(allTermsStackView.arrangedSubviews[i])
+        if(self.cards[actualI]["defType"] as! String == "d" || self.cards[i]["defType"] as! String == "i"){
+            self.defaults.removeObject(forKey: self.cards[actualI]["def"] as! String)
+            let imageRef = self.storage.reference().child(self.cards[actualI]["def"] as! String)
+            imageRef.delete(){ error in
+                if let error = error{
+                    print("Error deleting media: \(error.localizedDescription)")
+                }
+            }
+        }
+        if(self.cards[actualI]["termType"] as! String == "d"){
+            self.defaults.removeObject(forKey: self.cards[actualI]["term"] as! String)
+            let imageRef = self.storage.reference().child(self.cards[actualI]["term"] as! String)
+            imageRef.delete(){ error in
+                if let error = error{
+                    print("Error deleting media: \(error.localizedDescription)")
+                }
+            }
+        }
         cards.remove(at: actualI)
         indexes.remove(at: actualI)
         save()

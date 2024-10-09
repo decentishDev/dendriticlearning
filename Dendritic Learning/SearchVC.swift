@@ -183,7 +183,10 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         let loadView = createLoadingIcon()
         loadView.center = view.center
         view.addSubview(loadView)
-        if let text = searchBar.text {
+        if var text = searchBar.text {
+            if(text.last == " "){
+                text = String(text.dropLast())
+            }
             let input = text.lowercased()
             db.collection("sets").whereField("keyWords", arrayContains: input).order(by: "likes", descending: true).getDocuments { (querySnapshot, error) in
                 if let error = error {

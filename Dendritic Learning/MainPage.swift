@@ -77,16 +77,16 @@ class MainPage: UIViewController, NewSetDelegate {
     }
     
     func setup() {
-        retrievedSetIDs = []
-        retrievedSets = [:]
-        recentSets = []
-        likedSets = []
-        mySets = []
-        
         if let fingerDrawing = defaults.value(forKey: "fingerDrawing") as? Bool, let uid = Auth.auth().currentUser?.uid {
             let dataRef = db.collection("users").document(uid)
             dataRef.getDocument { (document, error) in
                 if let document = document, document.exists {
+                    self.retrievedSetIDs = []
+                    self.retrievedSets = [:]
+                    self.recentSets = []
+                    self.likedSets = []
+                    self.mySets = []
+                    
                     self.userData = document.data()!
                     self.updateColors()
                     self.updateSets()
@@ -254,10 +254,10 @@ class MainPage: UIViewController, NewSetDelegate {
         view.backgroundColor = Colors.background
         
         let bgimage = UIImageView(image: UIImage(named: "dendriticbackground.svg")?.withRenderingMode(.alwaysTemplate))
-        bgimage.tintColor = Colors.darkHighlight
+        bgimage.tintColor = Colors.highlight
         bgimage.contentMode = .scaleAspectFill
         bgimage.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
-        bgimage.layer.opacity = 0.6
+        bgimage.layer.opacity = 0.35
         view.addSubview(bgimage)
         
         
@@ -466,7 +466,7 @@ class MainPage: UIViewController, NewSetDelegate {
         titleLabel.numberOfLines = 0
         titleLabel.sizeToFit()
         rect.addSubview(titleLabel)
-        let creatorLabel = UILabel(frame: CGRect(x: 15, y: 90, width: w - 30, height: 15))
+        let creatorLabel = UILabel(frame: CGRect(x: 15, y: 80, width: w - 30, height: 25))
         creatorLabel.text = set["author"] as? String
         creatorLabel.textColor = Colors.text
         creatorLabel.font = UIFont(name: "LilGrotesk-Regular", size: 22)

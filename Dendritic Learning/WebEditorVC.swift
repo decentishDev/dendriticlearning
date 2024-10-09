@@ -91,7 +91,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         addButton.setTitleColor(Colors.highlight, for: .normal)
         addButton.titleLabel?.font = UIFont(name: "LilGrotesk-Bold", size: 25)
         addButton.addTarget(self, action: #selector(addButtonTapped(_:)), for: .touchUpInside)
-        addButton.frame = CGRect(x: view.frame.width - 420, y: 30, width: 150, height: 50)
+        addButton.frame = CGRect(x: view.frame.width - 300, y: 30, width: 150, height: 50)
         addButton.backgroundColor = Colors.secondaryBackground
         addButton.layer.cornerRadius = 10
         
@@ -244,7 +244,6 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             addConnection.heightAnchor.constraint(equalToConstant: 30).isActive = true
             addConnection.translatesAutoresizingMaskIntoConstraints = false
             addConnection.widthAnchor.constraint(equalToConstant: 30).isActive = true
-
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
@@ -333,34 +332,34 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             userRef.getDocument { (document, error) in
                 if let document = document, document.exists {
                     oldUser = document.data()!
+                    print(oldUser)
+                    var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
+                    for (i, set) in oldStudied.enumerated() {
+                        if(set["setID"] as! String == self.set){
+                            oldStudied.remove(at: i)
+                            break
+                        }
+                    }
+                    oldUser["studiedSets"] = oldStudied
+                    
+                    var oldCreated = oldUser["createdSets"] as! [String]
+                    for (i, set) in oldCreated.enumerated() {
+                        if(set == self.set){
+                            oldCreated.remove(at: i)
+                            break
+                        }
+                    }
+                    oldUser["createdSets"] = oldCreated
+                    
+                    self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true)
+                    self.db.collection("sets").document(self.set).delete()
+                    
+                    self.performSegue(withIdentifier: "webEditorVC_unwind", sender: nil)
+                    self.performSegue(withIdentifier: "webEditorVC_unwind", sender: nil)
                 } else {
                     print("Document does not exist")
                 }
             }
-            
-            var oldStudied = oldUser["studiedSets"] as! [[String: Any]]
-            for (i, set) in oldStudied.enumerated() {
-                if(set["setID"] as! String == self.set){
-                    oldStudied.remove(at: i)
-                    break
-                }
-            }
-            oldUser["studiedSets"] = oldStudied
-            
-            var oldCreated = oldUser["createdSets"] as! [String]
-            for (i, set) in oldCreated.enumerated() {
-                if(set == self.set){
-                    oldCreated.remove(at: i)
-                    break
-                }
-            }
-            oldUser["createdSets"] = oldCreated
-            
-            self.db.collection("users").document(Auth.auth().currentUser!.uid).setData(oldUser, merge: true)
-            self.db.collection("sets").document(self.set).delete()
-            
-            self.performSegue(withIdentifier: "webEditorVC_unwind", sender: nil)
-            self.performSegue(withIdentifier: "webEditorVC_unwind", sender: nil)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         

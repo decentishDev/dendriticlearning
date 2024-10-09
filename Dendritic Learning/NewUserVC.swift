@@ -11,12 +11,12 @@ import FirebaseFirestore
 
 class NewUserVC: UIViewController {
     
-    let welcomeView = UIScrollView()
-    let infoView = UIScrollView()
-    let signUpOrIn = UIScrollView()
-    let signUp = UIScrollView()
-    let signIn = UIScrollView()
-    let success = UIScrollView()
+    let welcomeView = UIView()
+    let infoView = UIView()
+    let signUpOrIn = UIView()
+    let signUp = UIView()
+    let signIn = UIView()
+    let success = UIView()
     
     var signUpName = UITextField()
     var signUpEmail = UITextField()
@@ -35,6 +35,8 @@ class NewUserVC: UIViewController {
     let db = Firestore.firestore()
     
     var keyboard: CGFloat = 0
+    
+    var scrollFrame = UIScrollView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,25 +58,36 @@ class NewUserVC: UIViewController {
         let fullY = view.frame.height
         
         view.backgroundColor = Colors.background
+        
+        let bgimage = UIImageView(image: UIImage(named: "dendriticbackground.svg")?.withRenderingMode(.alwaysTemplate))
+        bgimage.tintColor = Colors.highlight
+        bgimage.contentMode = .scaleAspectFill
+        bgimage.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
+        bgimage.layer.opacity = 0.35
+        view.addSubview(bgimage)
 
+        scrollFrame.frame = view.frame
+        view.addSubview(scrollFrame)
+        scrollFrame.contentSize = view.frame.size
+        
         welcomeView.frame = view.frame
-        view.addSubview(welcomeView)
-        welcomeView.contentSize = view.frame.size
+        scrollFrame.addSubview(welcomeView)
+        
         infoView.frame = CGRect(x: fullX, y: 0, width: fullX, height: fullY)
-        view.addSubview(infoView)
-        infoView.contentSize = view.frame.size
+        scrollFrame.addSubview(infoView)
+
         signUpOrIn.frame = CGRect(x: fullX, y: 0, width: fullX, height: fullY)
-        view.addSubview(signUpOrIn)
-        signUpOrIn.contentSize = view.frame.size
+        scrollFrame.addSubview(signUpOrIn)
+
         signUp.frame = CGRect(x: fullX, y: 0, width: fullX, height: fullY)
-        view.addSubview(signUp)
-        signUp.contentSize = view.frame.size
+        scrollFrame.addSubview(signUp)
+
         signIn.frame = CGRect(x: fullX, y: 0, width: fullX, height: fullY)
-        view.addSubview(signIn)
-        signIn.contentSize = view.frame.size
+        scrollFrame.addSubview(signIn)
+
         success.frame = CGRect(x: fullX, y: 0, width: fullX, height: fullY)
-        view.addSubview(success)
-        success.contentSize = view.frame.size
+        scrollFrame.addSubview(success)
+
         
         let welcomeText = UILabel(frame: CGRect(x: 0, y: 0, width: fullX, height: fullY - 200))
         welcomeText.font = UIFont(name: "LilGrotesk-Black", size: 40)
@@ -204,7 +217,7 @@ class NewUserVC: UIViewController {
         nextButton.layer.cornerRadius = 10
         nextButton.titleLabel!.font = UIFont(name: "LilGrotesk-Regular", size: 20)
         nextButton.addTarget(self, action: #selector(nextButtonPressed(_:)) , for: .touchUpInside)
-        view.addSubview(nextButton)
+        scrollFrame.addSubview(nextButton)
         backButton = UIButton(frame: CGRect(x: midX - 160, y: fullY - 200, width: 150, height: 50))
         backButton.backgroundColor = Colors.secondaryBackground
         backButton.setTitle("< Back", for: .normal)
@@ -214,7 +227,7 @@ class NewUserVC: UIViewController {
         backButton.addTarget(self, action: #selector(backButtonPressed(_:)), for: .touchUpInside)
         backButton.isEnabled = false
         backButton.alpha = 0.5
-        view.addSubview(backButton)
+        scrollFrame.addSubview(backButton)
     }
     
     @objc func signUp(_ sender: UIButton){
@@ -439,12 +452,14 @@ class NewUserVC: UIViewController {
     func reformat(){
         let fullX = view.frame.width
         let fullY = view.frame.width
-        welcomeView.frame = CGRect(x: welcomeView.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
-        infoView.frame = CGRect(x: infoView.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
-        signUpOrIn.frame = CGRect(x: signUpOrIn.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
-        signUp.frame = CGRect(x: signUp.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
-        signIn.frame = CGRect(x: signIn.frame.minX, y: 0, width: fullX, height: fullY - keyboard - 100)
-        success.frame = CGRect(x: success.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+        //scrollFrame.contentSize = CGSize(width: fullX, height: fullY - keyboard)
+        scrollFrame.frame = CGRect(x: 0, y: 0, width: fullX, height: fullY - keyboard)
+//        welcomeView.frame = CGRect(x: 0, y: 0, width: fullX, height: fullY - keyboard)
+//        infoView.frame = CGRect(x: infoView.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+//        signUpOrIn.frame = CGRect(x: signUpOrIn.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+//        signUp.frame = CGRect(x: signUp.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+//        signIn.frame = CGRect(x: signIn.frame.minX, y: 0, width: fullX, height: fullY - keyboard - 100)
+//        success.frame = CGRect(x: success.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
     }
 }
 extension NewUserVC {
