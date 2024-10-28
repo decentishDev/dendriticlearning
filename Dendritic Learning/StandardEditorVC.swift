@@ -170,8 +170,7 @@ deinit {
                 allTermsStackView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor),
                 allTermsStackView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor)
             ])
-            for (i, card) in cards.enumerated()
-            {
+            for (i, card) in cards.enumerated(){
                 indexes.append(i)
                 let termDefinitionStackView = UIStackView()
                 termDefinitionStackView.translatesAutoresizingMaskIntoConstraints = false
@@ -300,6 +299,7 @@ deinit {
                 button1.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
                 button1.accessibilityIdentifier = "1" + String(i)
                 let button2 = UIButton()
+                let button3 = UIButton()
                 if(isPaid){
                     button2.frame = CGRect(x: 30, y: 0, width: 30, height: 30)
                     button2.setImage(UIImage(systemName: "photo"), for: .normal)
@@ -310,12 +310,14 @@ deinit {
                     }
                     button2.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
                     button2.accessibilityIdentifier = "2" + String(i)
+                    button3.frame = CGRect(x: 60, y: 0, width: 30, height: 30)
                 }else{
                     con(button2, 0, 0)
                     button2.isEnabled = false
+                    button3.frame = CGRect(x: 30, y: 0, width: 30, height: 30)
                 }
-                let button3 = UIButton()
-                button3.frame = CGRect(x: 60, y: 0, width: 30, height: 30)
+                
+                
                 button3.setImage(UIImage(systemName: "pencil.and.scribble"), for: .normal)
                 if(cards[i]["termType"] as! String == "d"){
                     button3.tintColor = Colors.highlight
@@ -411,18 +413,19 @@ deinit {
             button1.addTarget(self, action: #selector(changeDefaultInput(_:)), for: .touchUpInside)
             button1.accessibilityIdentifier = "1" + String(cards.count)
             let button2 = UIButton()
+            let button3 = UIButton()
             if isPaid {
                 button2.frame = CGRect(x: 30, y: 0, width: 30, height: 30)
                 button2.setImage(UIImage(systemName: "photo"), for: .normal)
                 button2.tintColor = Colors.darkHighlight
                 button2.addTarget(self, action: #selector(changeDefaultInput(_:)), for: .touchUpInside)
                 button2.accessibilityIdentifier = "2" + String(cards.count)
+                button3.frame = CGRect(x: 60, y: 0, width: 30, height: 30)
             }else{
                 con(button2, 0, 0)
                 button2.isEnabled = false
+                button3.frame = CGRect(x: 30, y: 0, width: 30, height: 30)
             }
-            let button3 = UIButton()
-            button3.frame = CGRect(x: 60, y: 0, width: 30, height: 30)
             button3.setImage(UIImage(systemName: "pencil.and.scribble"), for: .normal)
             button3.tintColor = Colors.darkHighlight
 
@@ -726,6 +729,17 @@ deinit {
         switch sender.accessibilityIdentifier!.first.map(String.init) {
         case "1":
             if cards[i]["termType"] as! String != "t" {
+                let media = cards[i]["term"] as! String
+                if(media != ""){
+                    self.defaults.removeObject(forKey: media)
+                    let mediaRef = storage.reference().child(Auth.auth().currentUser!.uid).child(media)
+                    mediaRef.delete(){ error in
+                        if let error = error{
+                            print("Error deleting media: \(error.localizedDescription)")
+                        }
+                    }
+                }
+                
                 sender.tintColor = Colors.highlight
                 sender.superview!.subviews[1].tintColor = Colors.darkHighlight
                 sender.superview!.subviews[2].tintColor = Colors.darkHighlight
@@ -750,6 +764,18 @@ deinit {
             }
         case "2":
             if cards[i]["termType"] as! String != "i" {
+                if(cards[i]["termType"] as! String == "d"){
+                    let media = cards[i]["term"] as! String
+                    if(media != ""){
+                        self.defaults.removeObject(forKey: media)
+                        let mediaRef = storage.reference().child(Auth.auth().currentUser!.uid).child(media)
+                        mediaRef.delete(){ error in
+                            if let error = error{
+                                print("Error deleting media: \(error.localizedDescription)")
+                            }
+                        }
+                    }
+                }
                 sender.tintColor = Colors.highlight
                 sender.superview!.subviews[0].tintColor = Colors.darkHighlight
                 sender.superview!.subviews[2].tintColor = Colors.darkHighlight
@@ -778,6 +804,18 @@ deinit {
             }
         case "3":
             if cards[i]["termType"] as! String != "d" {
+                if(cards[i]["termType"] as! String == "i"){
+                    let media = cards[i]["term"] as! String
+                    if(media != ""){
+                        self.defaults.removeObject(forKey: media)
+                        let mediaRef = storage.reference().child(Auth.auth().currentUser!.uid).child(media)
+                        mediaRef.delete(){ error in
+                            if let error = error{
+                                print("Error deleting media: \(error.localizedDescription)")
+                            }
+                        }
+                    }
+                }
                 sender.tintColor = Colors.highlight
                 sender.superview!.subviews[0].tintColor = Colors.darkHighlight
                 sender.superview!.subviews[1].tintColor = Colors.darkHighlight
@@ -815,6 +853,16 @@ deinit {
             }
         case "4":
             if cards[i]["defType"] as! String != "t" && cards[i]["defType"] as! String != "d-r"{
+                let media = cards[i]["def"] as! String
+                if(media != ""){
+                    self.defaults.removeObject(forKey: media)
+                    let mediaRef = storage.reference().child(Auth.auth().currentUser!.uid).child(media)
+                    mediaRef.delete(){ error in
+                        if let error = error{
+                            print("Error deleting media: \(error.localizedDescription)")
+                        }
+                    }
+                }
                 sender.tintColor = Colors.highlight
                 sender.superview!.subviews[4].tintColor = Colors.darkHighlight
                 cards[i]["defType"] = "t"
