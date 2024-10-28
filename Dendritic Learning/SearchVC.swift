@@ -30,7 +30,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        setup()
+        //setup()
     }
     
     func setup(){
@@ -177,9 +177,11 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     }
     
     @objc func searchButton(sender: UIButton){
-        for i in resultsStack.arrangedSubviews {
-            resultsStack.removeArrangedSubview(i)
+        for subview in resultsStack.arrangedSubviews {
+            resultsStack.removeArrangedSubview(subview)
+            subview.removeFromSuperview()
         }
+        retrievedSets = [:]
         let loadView = createLoadingIcon()
         loadView.center = view.center
         view.addSubview(loadView)
