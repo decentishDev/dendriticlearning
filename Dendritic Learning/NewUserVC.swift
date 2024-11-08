@@ -128,24 +128,29 @@ class NewUserVC: UIViewController {
         signUpLabel.text = "Sign up"
         signUpLabel.textAlignment = .center
         signUp.addSubview(signUpLabel)
-        signUpName = UITextField(frame: CGRect(x: midX - 200, y: midY - 160, width: 400, height: 30))
+        signUpName = UITextField(frame: CGRect(x: midX - 200, y: midY - 160, width: 400, height: 40))
+        addLeftPadding(signUpName, 5)
         signUpName.textContentType = .name
         let signUpNameLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 190, width: 400, height: 30))
         signUpNameLabel.text = "Name"
-        signUpEmail = UITextField(frame: CGRect(x: midX - 200, y: midY - 90, width: 400, height: 30))
+        signUpEmail = UITextField(frame: CGRect(x: midX - 200, y: midY - 90, width: 400, height: 40))
+        addLeftPadding(signUpEmail, 5)
         signUpEmail.textContentType = .emailAddress
         let signUpEmailLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 120, width: 400, height: 30))
         signUpEmailLabel.text = "Email"
-        signUpUsername = UITextField(frame: CGRect(x: midX - 200, y: midY - 20, width: 400, height: 30))
+        signUpUsername = UITextField(frame: CGRect(x: midX - 200, y: midY - 20, width: 400, height: 40))
+        addLeftPadding(signUpUsername, 5)
         signUpUsername.textContentType = .username
         let signUpUsernameLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 50, width: 400, height: 30))
         signUpUsernameLabel.text = "Username"
-        signUpPassword = UITextField(frame: CGRect(x: midX - 200, y: midY + 50, width: 400, height: 30))
+        signUpPassword = UITextField(frame: CGRect(x: midX - 200, y: midY + 50, width: 400, height: 40))
+        addLeftPadding(signUpPassword, 5)
         signUpPassword.textContentType = .password
         signUpPassword.isSecureTextEntry = true
         let signUpPasswordLabel = UILabel(frame: CGRect(x: midX - 200, y: midY + 20, width: 400, height: 30))
         signUpPasswordLabel.text = "Password"
-        signUpPassword2 = UITextField(frame: CGRect(x: midX - 200, y: midY + 120, width: 400, height: 30))
+        signUpPassword2 = UITextField(frame: CGRect(x: midX - 200, y: midY + 120, width: 400, height: 40))
+        addLeftPadding(signUpPassword2, 5)
         signUpPassword2.textContentType = .password
         signUpPassword2.isSecureTextEntry = true
         let signUpPassword2Label = UILabel(frame: CGRect(x: midX - 200, y: midY + 90, width: 400, height: 30))
@@ -171,13 +176,15 @@ class NewUserVC: UIViewController {
         signInLabel.text = "Sign in"
         signInLabel.textAlignment = .center
         signIn.addSubview(signInLabel)
-        signInEmail = UITextField(frame: CGRect(x: midX - 200, y: midY - 70, width: 400, height: 30))
+        signInEmail = UITextField(frame: CGRect(x: midX - 200, y: midY - 70, width: 400, height: 40))
+        addLeftPadding(signInEmail, 5)
         signInEmail.textContentType = .emailAddress
         let signInEmailLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 100, width: 400, height: 30))
         signInEmailLabel.text = "Email"
-        signInPassword = UITextField(frame: CGRect(x: midX - 200, y: midY + 30, width: 400, height: 30))
+        signInPassword = UITextField(frame: CGRect(x: midX - 200, y: midY + 30, width: 400, height: 40))
         signInPassword.textContentType = .password
         signInPassword.isSecureTextEntry = true
+        addLeftPadding(signInPassword, 5)
         let signInPasswordLabel = UILabel(frame: CGRect(x: midX - 200, y: midY, width: 400, height: 30))
         signInPasswordLabel.text = "Password"
         let resetPasswordButton = UIButton(frame: CGRect(x: midX - 200, y: midY + 60, width: 400, height: 30))

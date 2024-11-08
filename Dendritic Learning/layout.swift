@@ -203,3 +203,9 @@ func addBreakView(_ to: UIStackView, _ size: CGFloat){
     con(breakView, size, size)
     to.addArrangedSubview(breakView)
 }
+
+func addLeftPadding(_ to: UITextField, _ size: CGFloat){
+    let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 40))
+    to.leftView = paddingView
+    to.leftViewMode = .always
+}
