@@ -24,8 +24,15 @@ class NewUserVC: UIViewController {
     var signUpPassword = UITextField()
     var signUpPassword2 = UITextField()
     
+    var signUpEmailError = UILabel()
+    var signUpPasswordError = UILabel()
+    var signUpPassword2Error = UILabel()
+    
     var signInEmail = UITextField()
     var signInPassword = UITextField()
+    
+    var signInEmailError = UILabel()
+    var signInPasswordError = UILabel()
     
     var nextButton = UIButton()
     var backButton = UIButton()
@@ -89,7 +96,7 @@ class NewUserVC: UIViewController {
         scrollFrame.addSubview(success)
 
         
-        let welcomeText = UILabel(frame: CGRect(x: 0, y: 0, width: fullX, height: fullY - 200))
+        let welcomeText = UILabel(frame: CGRect(x: 0, y: 50, width: fullX, height: fullY - 200))
         welcomeText.font = UIFont(name: "LilGrotesk-Black", size: 40)
         welcomeText.text = "Welcome to\nDendritic Learning."
         welcomeText.numberOfLines = 0
@@ -97,7 +104,7 @@ class NewUserVC: UIViewController {
         welcomeText.textAlignment = .center
         welcomeView.addSubview(welcomeText)
         
-        let info1 = UILabel(frame: CGRect(x: 100, y: 0, width: fullX - 200, height: fullY - 200))
+        let info1 = UILabel(frame: CGRect(x: 100, y: 50, width: fullX - 200, height: fullY - 200))
         info1.font = UIFont(name: "LilGrotesk-Regular", size: 30)
         info1.text = "Dendritic is an innovative learning platform.\n\nThrough writing recognition, web sets, smart study modes, and simple integration of different types of content, our tools allow all students to learn in better ways."
         info1.numberOfLines = 0
@@ -123,38 +130,49 @@ class NewUserVC: UIViewController {
         signInButton.addTarget(self, action: #selector(signIn(_:)), for: .touchUpInside)
         signUpOrIn.addSubview(signInButton)
         
-        let signUpLabel = UILabel(frame: CGRect(x: 0, y: midY - 230, width: fullX, height: 50))
+        let signUpLabel = UILabel(frame: CGRect(x: 0, y: midY - 230 - 100, width: fullX, height: 50))
         signUpLabel.font = UIFont(name: "LilGrotesk-Regular", size: 30)
         signUpLabel.text = "Sign up"
         signUpLabel.textAlignment = .center
         signUp.addSubview(signUpLabel)
-        signUpName = UITextField(frame: CGRect(x: midX - 200, y: midY - 160, width: 400, height: 40))
-        addLeftPadding(signUpName, 5)
+        
+        signUpName = UITextField(frame: CGRect(x: midX - 200, y: midY - 160 - 80, width: 400, height: 40))
         signUpName.textContentType = .name
-        let signUpNameLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 190, width: 400, height: 30))
+        
+        let signUpNameLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 190 - 80, width: 400, height: 30))
         signUpNameLabel.text = "Name"
-        signUpEmail = UITextField(frame: CGRect(x: midX - 200, y: midY - 90, width: 400, height: 40))
-        addLeftPadding(signUpEmail, 5)
+        
+        signUpEmail = UITextField(frame: CGRect(x: midX - 200, y: midY - 90 - 60, width: 400, height: 40))
         signUpEmail.textContentType = .emailAddress
-        let signUpEmailLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 120, width: 400, height: 30))
+        
+        let signUpEmailLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 120 - 60, width: 400, height: 30))
         signUpEmailLabel.text = "Email"
-        signUpUsername = UITextField(frame: CGRect(x: midX - 200, y: midY - 20, width: 400, height: 40))
-        addLeftPadding(signUpUsername, 5)
+        
+        signUpEmailError = UILabel(frame: CGRect(x: midX - 200, y: midY - 120 - 60, width: 400, height: 30))
+        
+        signUpUsername = UITextField(frame: CGRect(x: midX - 200, y: midY - 20 - 40, width: 400, height: 40))
         signUpUsername.textContentType = .username
-        let signUpUsernameLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 50, width: 400, height: 30))
+        
+        let signUpUsernameLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 50 - 40, width: 400, height: 30))
         signUpUsernameLabel.text = "Username"
-        signUpPassword = UITextField(frame: CGRect(x: midX - 200, y: midY + 50, width: 400, height: 40))
-        addLeftPadding(signUpPassword, 5)
+        
+        signUpPassword = UITextField(frame: CGRect(x: midX - 200, y: midY + 50 - 20, width: 400, height: 40))
         signUpPassword.textContentType = .password
         signUpPassword.isSecureTextEntry = true
-        let signUpPasswordLabel = UILabel(frame: CGRect(x: midX - 200, y: midY + 20, width: 400, height: 30))
+        
+        let signUpPasswordLabel = UILabel(frame: CGRect(x: midX - 200, y: midY + 20 - 20, width: 400, height: 30))
         signUpPasswordLabel.text = "Password"
+        
+        signUpPasswordError = UILabel(frame: CGRect(x: midX - 200, y: midY + 20 - 20, width: 400, height: 30))
+        
         signUpPassword2 = UITextField(frame: CGRect(x: midX - 200, y: midY + 120, width: 400, height: 40))
-        addLeftPadding(signUpPassword2, 5)
         signUpPassword2.textContentType = .password
         signUpPassword2.isSecureTextEntry = true
+        
         let signUpPassword2Label = UILabel(frame: CGRect(x: midX - 200, y: midY + 90, width: 400, height: 30))
         signUpPassword2Label.text = "Repeat password"
+        
+        signUpPassword2Error = UILabel(frame: CGRect(x: midX - 200, y: midY + 90, width: 400, height: 30))
         
         for i in [signUpName, signUpNameLabel, signUpEmail, signUpEmailLabel, signUpUsername, signUpUsernameLabel, signUpPassword, signUpPasswordLabel, signUpPassword2, signUpPassword2Label]{
             if let c = i as? UILabel{
@@ -164,9 +182,18 @@ class NewUserVC: UIViewController {
                 c.font = UIFont(name: "LilGrotesk-Regular", size: 20)
                 c.backgroundColor = Colors.secondaryBackground
                 c.layer.cornerRadius = 7
-                let paddingView = UIView(frame: CGRectMake(0, 0, 6, c.frame.height))
+                let paddingView = UIView(frame: CGRectMake(0, 0, 10, c.frame.height))
                 c.leftView = paddingView
                 c.leftViewMode = .always
+            }
+            signUp.addSubview(i)
+        }
+        
+        for i in [signUpEmailError, signUpPasswordError, signUpPassword2Error]{
+            if let c = i as? UILabel{
+                c.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+                c.textColor = Colors.red
+                c.textAlignment = .right
             }
             signUp.addSubview(i)
         }
@@ -175,25 +202,35 @@ class NewUserVC: UIViewController {
         signInLabel.font = UIFont(name: "LilGrotesk-Regular", size: 30)
         signInLabel.text = "Sign in"
         signInLabel.textAlignment = .center
+        
         signIn.addSubview(signInLabel)
-        signInEmail = UITextField(frame: CGRect(x: midX - 200, y: midY - 70, width: 400, height: 40))
-        addLeftPadding(signInEmail, 5)
+        signInEmail = UITextField(frame: CGRect(x: midX - 200, y: midY - 120, width: 400, height: 40))
         signInEmail.textContentType = .emailAddress
-        let signInEmailLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 100, width: 400, height: 30))
+        
+        let signInEmailLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 150, width: 400, height: 30))
         signInEmailLabel.text = "Email"
-        signInPassword = UITextField(frame: CGRect(x: midX - 200, y: midY + 30, width: 400, height: 40))
+        
+        signInEmailError = UILabel(frame: CGRect(x: midX - 200, y: midY - 150, width: 400, height: 30))
+        
+        signInPassword = UITextField(frame: CGRect(x: midX - 200, y: midY - 20, width: 400, height: 40))
         signInPassword.textContentType = .password
         signInPassword.isSecureTextEntry = true
-        addLeftPadding(signInPassword, 5)
-        let signInPasswordLabel = UILabel(frame: CGRect(x: midX - 200, y: midY, width: 400, height: 30))
+        
+        let signInPasswordLabel = UILabel(frame: CGRect(x: midX - 200, y: midY - 50, width: 400, height: 30))
         signInPasswordLabel.text = "Password"
-        let resetPasswordButton = UIButton(frame: CGRect(x: midX - 200, y: midY + 60, width: 400, height: 30))
-        resetPasswordButton.setTitle("Reset password", for: .normal)
+        
+        signInPasswordError = UILabel(frame: CGRect(x: midX - 200, y: midY - 50, width: 400, height: 30))
+        
+        let resetPasswordButton = UIButton(frame: CGRect(x: midX - 200, y: midY + 20, width: 400, height: 30))
+        resetPasswordButton.setTitle("Forgot password?", for: .normal)
         resetPasswordButton.setTitleColor(Colors.highlight, for: .normal)
         resetPasswordButton.titleLabel!.font = UIFont(name: "LilGrotesk-Regular", size: 16)
         resetPasswordButton.titleLabel!.textAlignment = .left
+        resetPasswordButton.contentHorizontalAlignment = .left
         resetPasswordButton.addTarget(self, action: #selector(resetButtonPressed(_:)), for: .touchUpInside)
+        
         signIn.addSubview(resetPasswordButton)
+        
         for i in [signInEmail, signInEmailLabel, signInPassword, signInPasswordLabel]{
             if let c = i as? UILabel{
                 c.font = UIFont(name: "LilGrotesk-Regular", size: 20)
@@ -202,9 +239,18 @@ class NewUserVC: UIViewController {
                 c.font = UIFont(name: "LilGrotesk-Regular", size: 20)
                 c.backgroundColor = Colors.secondaryBackground
                 c.layer.cornerRadius = 7
-                let paddingView = UIView(frame: CGRectMake(0, 0, 6, c.frame.height))
+                let paddingView = UIView(frame: CGRectMake(0, 0, 10, c.frame.height))
                 c.leftView = paddingView
                 c.leftViewMode = .always
+            }
+            signIn.addSubview(i)
+        }
+        
+        for i in [signInEmailError, signInPasswordError]{
+            if let c = i as? UILabel{
+                c.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+                c.textColor = Colors.red
+                c.textAlignment = .right
             }
             signIn.addSubview(i)
         }
@@ -217,7 +263,7 @@ class NewUserVC: UIViewController {
         successLabel.textAlignment = .center
         success.addSubview(successLabel)
         
-        nextButton = UIButton(frame: CGRect(x: midX + 10, y: fullY - 200, width: 150, height: 50))
+        nextButton = UIButton(frame: CGRect(x: midX + 10, y: fullY - 200 + 50, width: 150, height: 50))
         nextButton.backgroundColor = Colors.secondaryBackground
         nextButton.setTitle("Next >", for: .normal)
         nextButton.setTitleColor(Colors.text, for: .normal)
@@ -225,7 +271,7 @@ class NewUserVC: UIViewController {
         nextButton.titleLabel!.font = UIFont(name: "LilGrotesk-Regular", size: 20)
         nextButton.addTarget(self, action: #selector(nextButtonPressed(_:)) , for: .touchUpInside)
         scrollFrame.addSubview(nextButton)
-        backButton = UIButton(frame: CGRect(x: midX - 160, y: fullY - 200, width: 150, height: 50))
+        backButton = UIButton(frame: CGRect(x: midX - 160, y: fullY - 200 + 50, width: 150, height: 50))
         backButton.backgroundColor = Colors.secondaryBackground
         backButton.setTitle("< Back", for: .normal)
         backButton.setTitleColor(Colors.text, for: .normal)
@@ -262,6 +308,7 @@ class NewUserVC: UIViewController {
     }
     
     @objc func nextButtonPressed(_ sender: UIButton){
+        view.endEditing(true)
         let midX = view.frame.width / 2
         let midY = view.frame.height / 2
         let fullX = view.frame.width
@@ -338,22 +385,21 @@ class NewUserVC: UIViewController {
                 }
             }
         case 4:
-            print("ok")
             let email = signInEmail.text
             let password = signInPassword.text
             if(email != nil && isValidEmail(email!)){
-                print("ok")
+                signInEmailError.text = ""
                 if(password != nil && isValidPassword(password!)){
-                    print("ok")
+                    signInPasswordError.text = ""
                     backButton.isEnabled = false
                     nextButton.isEnabled = false
                     Auth.auth().signIn(withEmail: signInEmail.text!, password: signInPassword.text!) { authResult, error in
                         if let error = error {
-                            print("Error: \(error.localizedDescription)")
+                            self.signInPasswordError.text = "Incorrect password"
                             self.backButton.isEnabled = true
                             self.nextButton.isEnabled = true
                         }else{
-                            print("User signed in successfully")
+                            self.signInPasswordError.text = ""
                             UIView.animate(withDuration: 0.5, animations: {
                                 self.signIn.frame = CGRect(x: -fullX, y: 0, width: fullX, height: fullY)
                                 self.success.frame = CGRect(x: 0, y: 0, width: fullX, height: fullY)
@@ -364,7 +410,11 @@ class NewUserVC: UIViewController {
                             
                         }
                     }
+                }else{
+                    signInPasswordError.text = "Invalid password"
                 }
+            }else{
+                signInEmailError.text = "Invalid email"
             }
         case 5:
             performSegue(withIdentifier: "newUser_unwind", sender: nil)
@@ -387,6 +437,7 @@ class NewUserVC: UIViewController {
     }
     
     @objc func backButtonPressed(_ sender: UIButton){
+        view.endEditing(true)
         let midX = view.frame.width / 2
         let midY = view.frame.height / 2
         let fullX = view.frame.width

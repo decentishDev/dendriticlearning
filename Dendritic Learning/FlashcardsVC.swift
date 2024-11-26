@@ -142,12 +142,12 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         }
         //print(bottomSpace)
         IncorrectView.backgroundColor = Colors.secondaryBackground
-        IncorrectView.layer.cornerRadius = 10
+        IncorrectView.layer.cornerRadius = 20
         CardView.backgroundColor = Colors.secondaryBackground
-        CardView.layer.cornerRadius = 10
+        CardView.layer.cornerRadius = 20
         
         CorrectView.backgroundColor = Colors.secondaryBackground
-        CorrectView.layer.cornerRadius = 10
+        CorrectView.layer.cornerRadius = 20
         
         view.addSubview(CorrectView)
         view.addSubview(IncorrectView)
@@ -175,7 +175,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         CardView.addSubview(CardLabel)
         CardDrawing.frame = CGRect(x: 0, y: 0, width: (view.frame.width - 161), height: 2*(view.frame.width - 161)/3 - bottomSpace)
         CardDrawing.isUserInteractionEnabled = false
-        CardDrawing.layer.cornerRadius = 10
+        CardDrawing.layer.cornerRadius = 20
         CardDrawing.backgroundColor = .clear
         CardDrawing.tool = Colors.pen
         CardDrawing.overrideUserInterfaceStyle = .light
@@ -262,7 +262,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         view.addSubview(cardCounter)
         
         OverlayCard.frame = CardView.frame
-        OverlayCard.layer.cornerRadius = 10
+        OverlayCard.layer.cornerRadius = 20
         OverlayCard.backgroundColor = Colors.secondaryBackground
         OverlayLabel.font = UIFont(name: "LilGrotesk-Regular", size: 40)
         OverlayLabel.textAlignment = .center
@@ -272,7 +272,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         OverlayCard.addSubview(OverlayLabel)
         OverlayDrawing.frame = CGRect(x: 0, y: 0, width: (view.frame.width - 161), height: 2*(view.frame.width - 161)/3 - bottomSpace)
         OverlayDrawing.isUserInteractionEnabled = false
-        OverlayDrawing.layer.cornerRadius = 10
+        OverlayDrawing.layer.cornerRadius = 20
         OverlayDrawing.backgroundColor = .clear
         OverlayDrawing.tool = Colors.pen
         OverlayDrawing.overrideUserInterfaceStyle = .light
