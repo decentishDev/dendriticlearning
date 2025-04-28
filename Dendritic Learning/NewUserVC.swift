@@ -510,8 +510,9 @@ class NewUserVC: UIViewController {
     func reformat(){
         let fullX = view.frame.width
         let fullY = view.frame.width
-        //scrollFrame.contentSize = CGSize(width: fullX, height: fullY - keyboard)
+        scrollFrame.contentSize = CGSize(width: fullX, height: fullY)
         scrollFrame.frame = CGRect(x: 0, y: 0, width: fullX, height: fullY - keyboard)
+        //scrollFrame.backgroundColor = .red
 //        welcomeView.frame = CGRect(x: 0, y: 0, width: fullX, height: fullY - keyboard)
 //        infoView.frame = CGRect(x: infoView.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
 //        signUpOrIn.frame = CGRect(x: signUpOrIn.frame.minX, y: 0, width: fullX, height: fullY - keyboard)

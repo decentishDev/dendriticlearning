@@ -43,7 +43,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
 
     var known: [Bool] = []
     var index: Int = 0
-    let cardAnimation = 0.6
+    let cardAnimation = 4.0
     
     let endScreen = UIView()
     let endLabel = UILabel()
@@ -281,7 +281,6 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         OverlayImage.frame = CGRect(x: 20, y: 20, width: CardView.frame.width - 40, height: CardView.frame.height - 40)
         OverlayImage.contentMode = .scaleAspectFit
         OverlayCard.addSubview(OverlayImage)
-        CardView.addSubview(CardImage)
         OverlayCard.isHidden = true
         view.addSubview(OverlayCard)
         
@@ -564,54 +563,61 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
 
     
     @objc func CardButton(sender: UIButton) {
-        if(onFront){
-            DispatchQueue.main.asyncAfter(deadline: .now() + (cardAnimation/2)){
-                if(self.cards[self.cardOrder[self.index]]["defType"] as! String == "t" || self.cards[self.cardOrder[self.index]]["defType"] as! String == "d-r"){
-                    self.CardLabel.text = self.cards[self.cardOrder[self.index]]["def"] as? String
-                    self.CardLabel.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 1, 0, 0)
-                    self.CardLabel.isHidden = false
-                    self.CardDrawing.isHidden = true
-                    self.CardImage.isHidden = true
-                }else if(self.cards[self.cardOrder[self.index]]["defType"] as! String == "d"){
-                    loadDrawing(url: self.cards[self.cardOrder[self.index]]["def"] as? String, canvas: self.CardDrawing)
-                    self.CardDrawing.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 1, 0, 0)
-                    self.CardLabel.isHidden = true
-                    self.CardDrawing.isHidden = false
-                    self.CardImage.isHidden = true
+        var perspective = CATransform3DIdentity
+        perspective.m34 = -1.0 / 1000.0 // Stronger perspective
+
+        let halfwayDuration = cardAnimation / 2
+
+        UIView.animate(withDuration: halfwayDuration, delay: 0, options: [.curveEaseIn], animations: {
+            self.CardView.layer.transform = CATransform3DRotate(perspective, .pi / 2, 1, 0, 0)
+        }, completion: { _ in
+            if self.onFront {
+                if let defType = self.cards[self.cardOrder[self.index]]["defType"] as? String {
+                    if defType == "t" || defType == "d-r" {
+                        self.CardLabel.text = self.cards[self.cardOrder[self.index]]["def"] as? String
+                        self.CardLabel.isHidden = false
+                        self.CardDrawing.isHidden = true
+                        self.CardImage.isHidden = true
+                    } else if defType == "d" {
+                        loadDrawing(url: self.cards[self.cardOrder[self.index]]["def"] as? String, canvas: self.CardDrawing)
+                        self.CardLabel.isHidden = true
+                        self.CardDrawing.isHidden = false
+                        self.CardImage.isHidden = true
+                    }
+                }
+            } else {
+                if let termType = self.cards[self.cardOrder[self.index]]["termType"] as? String {
+                    if termType == "t" {
+                        self.CardLabel.text = self.cards[self.cardOrder[self.index]]["term"] as? String
+                        self.CardLabel.isHidden = false
+                        self.CardDrawing.isHidden = true
+                        self.CardImage.isHidden = true
+                    } else if termType == "d" {
+                        loadDrawing(url: self.cards[self.cardOrder[self.index]]["term"] as? String, canvas: self.CardDrawing)
+                        self.CardLabel.isHidden = true
+                        self.CardDrawing.isHidden = false
+                        self.CardImage.isHidden = true
+                    } else {
+                        loadImage(url: self.cards[self.cardOrder[self.index]]["term"] as? String, imageView: self.CardImage)
+                        self.CardLabel.isHidden = true
+                        self.CardDrawing.isHidden = true
+                        self.CardImage.isHidden = false
+                    }
                 }
             }
-            UIView.animate(withDuration: cardAnimation, animations: {
-                self.CardView.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 1, 0, 0)
+            self.onFront.toggle()
+
+            self.CardView.layer.transform = CATransform3DRotate(perspective, -.pi / 2, 1, 0, 0)
+
+            UIView.animate(withDuration: halfwayDuration, delay: 0, options: [.curveEaseOut], animations: {
+                self.CardView.layer.transform = CATransform3DIdentity
             })
-        }else{
-            DispatchQueue.main.asyncAfter(deadline: .now() + (cardAnimation/2)){
-                if(self.cards[self.cardOrder[self.index]]["termType"] as! String == "t"){
-                    self.CardLabel.text = self.cards[self.cardOrder[self.index]]["term"] as? String
-                    self.CardLabel.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 0, 0, 0)
-                    self.CardLabel.isHidden = false
-                    self.CardDrawing.isHidden = true
-                    self.CardImage.isHidden = true
-                }else if(self.cards[self.cardOrder[self.index]]["termType"] as! String == "d"){
-                    loadDrawing(url: self.cards[self.cardOrder[self.index]]["term"] as? String, canvas: self.CardDrawing)
-                    self.CardDrawing.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 0, 0, 0)
-                    self.CardLabel.isHidden = true
-                    self.CardDrawing.isHidden = false
-                    self.CardImage.isHidden = true
-                }else{
-                    loadImage(url: self.cards[self.cardOrder[self.index]]["term"] as? String, imageView: self.CardImage)
-                    self.CardImage.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 0, 0, 0)
-                    self.CardLabel.isHidden = true
-                    self.CardDrawing.isHidden = true
-                    self.CardImage.isHidden = false
-                }
-            }
-            UIView.animate(withDuration: cardAnimation, animations: {
-                self.CardView.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 0, 0, 0)
-            })
-        }
-        onFront = !onFront
+        })
     }
-    
+
+
+
+
     @objc func BackButton(sender: UIButton){
         performSegue(withIdentifier: "flashcardsVC_unwind", sender: nil)
     }

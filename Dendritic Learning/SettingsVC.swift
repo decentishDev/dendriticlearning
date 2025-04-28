@@ -9,6 +9,7 @@ import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 import FirebaseStorage
+import PencilKit
 
 class SettingsVC: UIViewController {
 
@@ -218,6 +219,7 @@ class SettingsVC: UIViewController {
         Colors.highlight = Colors.themes[i][4] as! UIColor
         Colors.lightHighlight = Colors.themes[i][5] as! UIColor
         Colors.text = Colors.themes[i][6] as! UIColor
+        Colors.pen = PKInkingTool(.pen, color: Colors.text, width: PKInkingTool.InkType.pen.defaultWidth)
         setup()
         save()
     }

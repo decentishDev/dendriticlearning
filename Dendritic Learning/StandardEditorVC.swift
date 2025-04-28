@@ -346,6 +346,7 @@ deinit {
                 recognize.text = "Recognize:"
                 recognize.textAlignment = .right
                 recognize.font = UIFont(name: "LilGrotesk-Regular", size: 15)
+                recognize.textColor = Colors.text
                 let button7 = UIButton()
                 button7.frame = CGRect(x: ((view.frame.width - 100) / 2) + 160, y: 0, width: 30, height: 30)
                 
@@ -446,6 +447,7 @@ deinit {
             let recognize = UILabel(frame: CGRect(x: ((view.frame.width - 100) / 2) + 60, y: 0, width: 100, height: 30))
             recognize.text = "Recognize:"
             recognize.textAlignment = .right
+            recognize.textColor = Colors.text
             recognize.font = UIFont(name: "LilGrotesk-Regular", size: 15)
             let button7 = UIButton()
             button7.frame = CGRect(x: ((view.frame.width - 100) / 2) + 160, y: 0, width: 30, height: 30)
@@ -672,6 +674,7 @@ deinit {
         let recognize = UILabel(frame: CGRect(x: ((view.frame.width - 100) / 2) + 60, y: 0, width: 100, height: 30))
         recognize.text = "Recognize:"
         recognize.textAlignment = .right
+        recognize.textColor = Colors.text
         recognize.font = UIFont(name: "LilGrotesk-Regular", size: 15)
         let button7 = UIButton()
         button7.frame = CGRect(x: ((view.frame.width - 100) / 2) + 160, y: 0, width: 30, height: 30)
