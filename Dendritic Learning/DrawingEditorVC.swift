@@ -35,6 +35,10 @@ class DrawingEditorVC: UIViewController, PKCanvasViewDelegate {
     
     let defaults = UserDefaults.standard
     let storage = Storage.storage()
+    
+    var pencil = UIButton()
+    var eraser = UIButton()
+    var lasso = UIButton()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,10 +56,10 @@ class DrawingEditorVC: UIViewController, PKCanvasViewDelegate {
         let gesture = UITapGestureRecognizer(target: self, action: #selector(dismissIt(_:)))
         view.addGestureRecognizer(gesture)
         
-        canvas.frame = CGRect(x: 0, y: 70, width: centeredView.frame.width, height: centeredView.frame.height - 70)
+        canvas.frame = CGRect(x: 10, y: 70, width: centeredView.frame.width - 20, height: centeredView.frame.height - 80)
         canvas.layer.cornerRadius = 10
         canvas.clipsToBounds = true
-        canvas.backgroundColor = Colors.background
+        canvas.backgroundColor = .clear
         canvas.overrideUserInterfaceStyle = .light
         canvas.allowsFingerDrawing = defaults.bool(forKey: "fingerDrawing")
         canvas.delegate = self
@@ -66,36 +70,74 @@ class DrawingEditorVC: UIViewController, PKCanvasViewDelegate {
             loadDrawing(url: card[i][tempI] as? String, canvas: self.canvas)
         }
         
+        let backgroundView = UIView(frame: CGRect(x: 10, y: 70, width: centeredView.frame.width - 20, height: centeredView.frame.height - 80))
+        backgroundView.backgroundColor = Colors.secondaryBackground
+        backgroundView.layer.cornerRadius = 10
+        centeredView.addSubview(backgroundView)
+        
         centeredView.addSubview(canvas)
         
         setupToolbar(centeredView)
         updateCanvasTool()
+        
+        let gesture1 = UITapGestureRecognizer(target: self, action: nil)
+        centeredView.addGestureRecognizer(gesture1)
     }
     
     func setupToolbar(_ container: UIView) {
         let buttonSize = CGSize(width: 50, height: 50)
         let spacing: CGFloat = 10
-        let buttonY: CGFloat = 10
         
-        let buttons: [(String, Selector)] = [
-            ("pencil", #selector(selectPencil)),
-            ("eraser", #selector(selectEraser)),
-            ("lasso", #selector(selectLasso)),
-            ("arrow.circlepath", #selector(clear)),
-            ("arrow.uturn.backward", #selector(undoButton)),
-            ("checkmark.circle.fill", #selector(back))
-        ]
+        let toolbar = UIView(frame: CGRect(x: spacing, y: spacing, width: buttonSize.width * 3, height: buttonSize.height))
+        toolbar.layer.cornerRadius = 10
+        toolbar.backgroundColor = Colors.secondaryBackground
+        container.addSubview(toolbar)
         
-        for (index, (systemImageName, selector)) in buttons.enumerated() {
-            let button = UIButton(frame: CGRect(x: CGFloat(index) * (buttonSize.width + spacing) + 10, y: buttonY, width: buttonSize.width, height: buttonSize.height))
-            button.setImage(UIImage(systemName: systemImageName), for: .normal)
-            button.contentMode = .scaleAspectFit
-            button.tintColor = Colors.highlight
-            button.backgroundColor = Colors.secondaryBackground
-            button.layer.cornerRadius = 10
-            button.addTarget(self, action: selector, for: .touchUpInside)
-            container.addSubview(button)
-        }
+        pencil = UIButton(frame: CGRect(x: spacing, y: spacing, width: buttonSize.width, height: buttonSize.height))
+        eraser = UIButton(frame: CGRect(x: spacing + buttonSize.width, y: spacing, width: buttonSize.width, height: buttonSize.height))
+        lasso = UIButton(frame: CGRect(x: spacing + buttonSize.width * 2, y: spacing, width: buttonSize.width, height: buttonSize.height))
+        configBarButton(pencil, container)
+        configBarButton(eraser, container)
+        configBarButton(lasso, container)
+        pencil.setImage(UIImage(systemName: "pencil"), for: .normal)
+        pencil.addTarget(self, action: #selector(selectPencil), for: .touchUpInside)
+        eraser.setImage(UIImage(systemName: "eraser"), for: .normal)
+        eraser.addTarget(self, action: #selector(selectEraser), for: .touchUpInside)
+        lasso.setImage(UIImage(systemName: "lasso"), for: .normal)
+        lasso.addTarget(self, action: #selector(selectLasso), for: .touchUpInside)
+        
+        pencil.tintColor = Colors.highlight
+        
+        let undo = UIButton(frame: CGRect(x: spacing * 2 + buttonSize.width * 3, y: spacing, width: buttonSize.width, height: buttonSize.height))
+        configButton(undo, container)
+        undo.setImage(UIImage(systemName: "arrow.uturn.backward"), for: .normal)
+        undo.addTarget(self, action: #selector(undoButton), for: .touchUpInside)
+        
+        let done = UIButton(frame: CGRect(x: container.frame.width - spacing - buttonSize.width, y: spacing, width: buttonSize.width, height: buttonSize.height))
+        configButton(done, container)
+        done.setImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
+        done.addTarget(self, action: #selector(back), for: .touchUpInside)
+        
+        let reset = UIButton(frame: CGRect(x: container.frame.width - spacing * 2 - buttonSize.width * 2, y: spacing, width: buttonSize.width, height: buttonSize.height))
+        configButton(reset, container)
+        reset.setImage(UIImage(systemName: "arrow.circlepath"), for: .normal)
+        reset.addTarget(self, action: #selector(clear), for: .touchUpInside)
+        
+        //overlayCrosshairAndBorder(canvas)
+    }
+    
+    func configButton(_ button: UIButton, _ centeredView: UIView){
+        button.contentMode = .scaleAspectFit
+        button.tintColor = Colors.highlight
+        button.backgroundColor = Colors.secondaryBackground
+        button.layer.cornerRadius = 10
+        centeredView.addSubview(button)
+    }
+    
+    func configBarButton(_ button: UIButton, _ centeredView: UIView){
+        button.contentMode = .scaleAspectFit
+        button.tintColor = Colors.darkHighlight
+        centeredView.addSubview(button)
     }
     
     @objc func dismissIt(_ sender: UITapGestureRecognizer){
@@ -112,14 +154,23 @@ class DrawingEditorVC: UIViewController, PKCanvasViewDelegate {
     
     @objc func selectPencil() {
         currentTool = .pencil
+        pencil.tintColor = Colors.highlight
+        eraser.tintColor = Colors.darkHighlight
+        lasso.tintColor = Colors.darkHighlight
     }
     
     @objc func selectEraser() {
         currentTool = .eraser
+        pencil.tintColor = Colors.darkHighlight
+        eraser.tintColor = Colors.highlight
+        lasso.tintColor = Colors.darkHighlight
     }
     
     @objc func selectLasso() {
         currentTool = .lasso
+        pencil.tintColor = Colors.darkHighlight
+        eraser.tintColor = Colors.darkHighlight
+        lasso.tintColor = Colors.highlight
     }
     
     func updateCanvasTool() {

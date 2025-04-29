@@ -416,6 +416,8 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
             stackView.addArrangedSubview(drawingsuperview)
             //centerDrawing(termDrawing)
             //termDrawing.backgroundColor = .red
+            
+            //overlayCrosshairAndBorder(termDrawing)
         }
         
         let breakView = UIView()

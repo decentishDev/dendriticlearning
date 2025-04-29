@@ -43,7 +43,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
 
     var known: [Bool] = []
     var index: Int = 0
-    let cardAnimation = 4.0
+    let cardAnimation = 0.4
     
     let endScreen = UIView()
     let endLabel = UILabel()
@@ -141,6 +141,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
             bottomSpace = 120
         }
         //print(bottomSpace)
+        
         IncorrectView.backgroundColor = Colors.secondaryBackground
         IncorrectView.layer.cornerRadius = 20
         CardView.backgroundColor = Colors.secondaryBackground
@@ -151,7 +152,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         
         view.addSubview(CorrectView)
         view.addSubview(IncorrectView)
-        view.addSubview(CardView)
+        
         
         if(view.layer.frame.width > view.layer.frame.height){
             IncorrectView.frame = CGRect(x: 20, y: 60, width: (view.layer.frame.width - 80) * 0.15, height: view.frame.height - 80 - bottomSpace)
@@ -166,6 +167,19 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
             CorrectView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 80 + topHeight, width: (view.layer.frame.width - 60) * 0.5, height: optionsHeight)
             
         }
+        
+        let incorrectImage = UIImageView()
+        incorrectImage.image = UIImage(systemName: "xmark")
+        incorrectImage.tintColor = Colors.text
+        incorrectImage.layer.frame = CGRect(x: (IncorrectView.layer.frame.width / 2) - 25, y: (IncorrectView.layer.frame.height / 2) - 25, width: 50, height: 50)
+        incorrectImage.contentMode = .scaleAspectFit
+        IncorrectView.addSubview(incorrectImage)
+        let incorrectButton = UIButton()
+        incorrectButton.addTarget(self, action: #selector(self.IncorrectButton(sender:)), for: .touchUpInside)
+        incorrectButton.layer.frame = CGRect(x: 0, y: 0, width: IncorrectView.frame.width, height: IncorrectView.frame.height)
+        IncorrectView.addSubview(incorrectButton)
+        
+        
         
         CardLabel.font = UIFont(name: "LilGrotesk-Regular", size: 40)
         CardLabel.textAlignment = .center
@@ -208,16 +222,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         CardView.addSubview(cardButton)
         CardView.bringSubviewToFront(cardButton)
         
-        let incorrectImage = UIImageView()
-        incorrectImage.image = UIImage(systemName: "xmark")
-        incorrectImage.tintColor = Colors.text
-        incorrectImage.layer.frame = CGRect(x: (IncorrectView.layer.frame.width / 2) - 25, y: (IncorrectView.layer.frame.height / 2) - 25, width: 50, height: 50)
-        incorrectImage.contentMode = .scaleAspectFit
-        IncorrectView.addSubview(incorrectImage)
-        let incorrectButton = UIButton()
-        incorrectButton.addTarget(self, action: #selector(self.IncorrectButton(sender:)), for: .touchUpInside)
-        incorrectButton.layer.frame = CGRect(x: 0, y: 0, width: IncorrectView.frame.width, height: IncorrectView.frame.height)
-        IncorrectView.addSubview(incorrectButton)
+        
         
         swipeLeft.addTarget(self, action: #selector(self.IncorrectSwipe(sender:)))
         swipeLeft.direction = .left
@@ -310,6 +315,11 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         view.bringSubviewToFront(OverlayCard)
         
         CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80 - bottomSpace)
+        
+        //overlayCrosshairAndBorder(CardDrawing)
+        
+        view.addSubview(CardView)
+        view.bringSubviewToFront(CardView)
     }
     
     @objc func nextRound(sender: UIButton){
@@ -564,12 +574,18 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
     
     @objc func CardButton(sender: UIButton) {
         var perspective = CATransform3DIdentity
-        perspective.m34 = -1.0 / 1000.0 // Stronger perspective
+        perspective.m34 = -1.0 / 1000.0
 
         let halfwayDuration = cardAnimation / 2
+        let originalColor = self.CardView.backgroundColor
 
         UIView.animate(withDuration: halfwayDuration, delay: 0, options: [.curveEaseIn], animations: {
-            self.CardView.layer.transform = CATransform3DRotate(perspective, .pi / 2, 1, 0, 0)
+            var transform = CATransform3DRotate(perspective, .pi / 2, 1, 0, 0)
+            self.CardView.layer.transform = transform
+            self.CardView.backgroundColor = lighten(originalColor!)
+            self.CardDrawing.alpha = 0.5
+            self.CardLabel.alpha = 0.5
+            self.CardImage.alpha = 0.5
         }, completion: { _ in
             if self.onFront {
                 if let defType = self.cards[self.cardOrder[self.index]]["defType"] as? String {
@@ -607,16 +623,22 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
             }
             self.onFront.toggle()
 
-            self.CardView.layer.transform = CATransform3DRotate(perspective, -.pi / 2, 1, 0, 0)
+            var backTransform = CATransform3DRotate(perspective, -.pi / 2, 1, 0, 0)
+            self.CardView.layer.transform = backTransform
+            self.CardView.backgroundColor = darken(originalColor!)
+            self.CardDrawing.alpha = 0.15
+            self.CardLabel.alpha = 0.15
+            self.CardImage.alpha = 0.15
 
             UIView.animate(withDuration: halfwayDuration, delay: 0, options: [.curveEaseOut], animations: {
                 self.CardView.layer.transform = CATransform3DIdentity
+                self.CardView.backgroundColor = originalColor
+                self.CardDrawing.alpha = 1.0
+                self.CardLabel.alpha = 1.0
+                self.CardImage.alpha = 1.0
             })
         })
     }
-
-
-
 
     @objc func BackButton(sender: UIButton){
         performSegue(withIdentifier: "flashcardsVC_unwind", sender: nil)

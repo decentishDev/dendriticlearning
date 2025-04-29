@@ -204,4 +204,71 @@ func addBreakView(_ to: UIStackView, _ size: CGFloat){
     to.addArrangedSubview(breakView)
 }
 
+func overlayCrosshairAndBorder(_ canvasView: PKCanvasView) {
+    // Remove any existing overlays (optional, depending on your app)
+//    canvasView.subviews.filter { $0.tag == 999 }.forEach { $0.removeFromSuperview() }
+    
+    // Create a new overlay view
+    let overlay = UIView(frame: canvasView.bounds)
+    overlay.backgroundColor = .clear
+    overlay.isUserInteractionEnabled = false
+    overlay.tag = 999  // Tag it so we can find/remove later if needed
+
+    // Draw crosshair
+    let crosshair = CAShapeLayer()
+    let crosshairPath = UIBezierPath()
+    
+    let centerX = overlay.bounds.midX
+    let centerY = overlay.bounds.midY
+    
+    // Horizontal line
+    crosshairPath.move(to: CGPoint(x: 0, y: centerY))
+    crosshairPath.addLine(to: CGPoint(x: overlay.bounds.width, y: centerY))
+    
+    // Vertical line
+    crosshairPath.move(to: CGPoint(x: centerX, y: 0))
+    crosshairPath.addLine(to: CGPoint(x: centerX, y: overlay.bounds.height))
+    
+    crosshair.path = crosshairPath.cgPath
+    crosshair.strokeColor = UIColor.red.cgColor
+    crosshair.lineWidth = 1.5
+
+    // Draw border
+    let border = CAShapeLayer()
+    let borderPath = UIBezierPath(rect: overlay.bounds)
+    border.path = borderPath.cgPath
+    border.strokeColor = UIColor.red.cgColor
+    border.lineWidth = 2.0
+    border.fillColor = UIColor.clear.cgColor
+
+    // Add layers
+    overlay.layer.addSublayer(crosshair)
+    overlay.layer.addSublayer(border)
+    
+    // Add overlay to canvasView
+    canvasView.addSubview(overlay)
+}
+func darken(_ color: UIColor) -> UIColor {
+    return adjust(color: color, by: -abs(20.0))
+}
+
+func lighten(_ color: UIColor) -> UIColor {
+    return adjust(color: color, by: abs(7.0))
+}
+
+private func adjust(color: UIColor, by percentage: CGFloat) -> UIColor {
+    var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+    
+    if color.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
+        let adjustment = percentage / 100
+        return UIColor(
+            red: min(max(red + adjustment, 0.0), 1.0),
+            green: min(max(green + adjustment, 0.0), 1.0),
+            blue: min(max(blue + adjustment, 0.0), 1.0),
+            alpha: alpha
+        )
+    }
+    return color // return the original color if it couldn't extract components
+}
+
 
