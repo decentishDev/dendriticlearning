@@ -351,6 +351,9 @@ class MainPage: UIViewController, NewSetDelegate {
             stackView.addArrangedSubview(noSets)
         }
         //addBreakView(stackView, 30)
+        
+        
+        //print(stackView.arrangedSubviews)
     }
 
     func createTopBar() -> UIView {
@@ -370,8 +373,7 @@ class MainPage: UIViewController, NewSetDelegate {
         titleLabel.textColor = Colors.text
         titleLabel.font = UIFont(name: "LilGrotesk-Black", size: 30)
         topBar.addSubview(titleLabel)
-        titleLabel.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        titleLabel.widthAnchor.constraint(equalToConstant: 400).isActive = true
+        con(titleLabel, 400, 50)
         titleLabel.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 10).isActive = true
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -379,15 +381,13 @@ class MainPage: UIViewController, NewSetDelegate {
         settingsIcon.image = UIImage(systemName: "gear")
         settingsIcon.contentMode = .scaleAspectFit
         settingsIcon.tintColor = Colors.highlight
-        settingsIcon.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        settingsIcon.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        con(settingsIcon, 50, 50)
         topBar.addSubview(settingsIcon)
         settingsIcon.trailingAnchor.constraint(equalTo: topBar.trailingAnchor).isActive = true
         settingsIcon.translatesAutoresizingMaskIntoConstraints = false
         
         let settingsButton = UIButton()
-        settingsButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        settingsButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        con(settingsButton, 50, 50)
         topBar.addSubview(settingsButton)
         settingsButton.trailingAnchor.constraint(equalTo: topBar.trailingAnchor).isActive = true
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
@@ -397,19 +397,33 @@ class MainPage: UIViewController, NewSetDelegate {
         searchIcon.image = UIImage(systemName: "magnifyingglass")
         searchIcon.contentMode = .scaleAspectFit
         searchIcon.tintColor = Colors.highlight
-        searchIcon.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        searchIcon.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        con(searchIcon, 50, 50)
         topBar.addSubview(searchIcon)
         searchIcon.trailingAnchor.constraint(equalTo: settingsIcon.leadingAnchor, constant: -15).isActive = true
         searchIcon.translatesAutoresizingMaskIntoConstraints = false
         
         let searchButton = UIButton()
-        searchButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        searchButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        con(searchButton, 50, 50)
         topBar.addSubview(searchButton)
         searchButton.trailingAnchor.constraint(equalTo: settingsIcon.leadingAnchor, constant: -15).isActive = true
         searchButton.translatesAutoresizingMaskIntoConstraints = false
         searchButton.addTarget(self, action: #selector(search(_:)), for: .touchUpInside)
+        
+        let classIcon = UIImageView()
+        classIcon.image = UIImage(systemName: "graduationcap")
+        classIcon.contentMode = .scaleAspectFit
+        classIcon.tintColor = Colors.highlight
+        con(classIcon, 50, 50)
+        topBar.addSubview(classIcon)
+        classIcon.trailingAnchor.constraint(equalTo: searchIcon.leadingAnchor, constant: -15).isActive = true
+        classIcon.translatesAutoresizingMaskIntoConstraints = false
+        
+        let classButton = UIButton()
+        con(classButton, 50, 50)
+        topBar.addSubview(classButton)
+        classButton.trailingAnchor.constraint(equalTo: searchIcon.leadingAnchor, constant: -15).isActive = true
+        classButton.translatesAutoresizingMaskIntoConstraints = false
+        classButton.addTarget(self, action: #selector(search(_:)), for: .touchUpInside)
         
         return topBar
     }
@@ -519,22 +533,21 @@ class MainPage: UIViewController, NewSetDelegate {
     
     @objc func buttonTapped(_ sender: UIButton) {
         destinationSet = String(sender.accessibilityIdentifier!.dropFirst())
-        var t = retrievedSets[destinationSet] as! [String: Any]
-        if let timestamp = t["date"] as? Timestamp {
-            let date = timestamp.dateValue()
-            self.defaults.setValue(formatDate(date), forKey: "date")
+        if var t = retrievedSets[destinationSet] as? [String: Any] {
+            if let timestamp = t["date"] as? Timestamp {
+                let date = timestamp.dateValue()
+                self.defaults.setValue(formatDate(date), forKey: "date")
+            }
+            t.removeValue(forKey: "date")
+            defaults.set(t, forKey: "set")
+            if(String(sender.accessibilityIdentifier!.first!) == "s"){
+                destination = "standard"
+                performSegue(withIdentifier: "viewStandardSet", sender: self)
+            }else{
+                destination = "web"
+                performSegue(withIdentifier: "viewWebSet", sender: self)
+            }
         }
-        t.removeValue(forKey: "date")
-        defaults.set(t, forKey: "set")
-        if(String(sender.accessibilityIdentifier!.first!) == "s"){
-            destination = "standard"
-            performSegue(withIdentifier: "viewStandardSet", sender: self)
-        }else{
-            destination = "web"
-            performSegue(withIdentifier: "viewWebSet", sender: self)
-        }
-        
-        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
