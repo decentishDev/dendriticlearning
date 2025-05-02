@@ -127,6 +127,10 @@ class MainPage: UIViewController, NewSetDelegate {
                         }
                     }
                     
+                    if var classes = self.userData["classes"] as? [[String: Any]] {
+                        self.defaults.setValue(classes, forKey: "classes")
+                    }
+                    
                     self.getSets { error in
                         if let error = error {
                             print("Error fetching documents: \(error)")
@@ -423,7 +427,7 @@ class MainPage: UIViewController, NewSetDelegate {
         topBar.addSubview(classButton)
         classButton.trailingAnchor.constraint(equalTo: searchIcon.leadingAnchor, constant: -15).isActive = true
         classButton.translatesAutoresizingMaskIntoConstraints = false
-        classButton.addTarget(self, action: #selector(search(_:)), for: .touchUpInside)
+        classButton.addTarget(self, action: #selector(classes(_:)), for: .touchUpInside)
         
         return topBar
     }
@@ -529,6 +533,11 @@ class MainPage: UIViewController, NewSetDelegate {
     @objc func search(_ sender: UIButton){
         destination = "search"
         performSegue(withIdentifier: "searchVC", sender: nil)
+    }
+    
+    @objc func classes(_ sender: UIButton){
+        destination = "classes"
+        performSegue(withIdentifier: "classesVC", sender: nil)
     }
     
     @objc func buttonTapped(_ sender: UIButton) {

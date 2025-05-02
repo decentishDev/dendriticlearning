@@ -650,6 +650,4 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
         
     }
-    
-
 }

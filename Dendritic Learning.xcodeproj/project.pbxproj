@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E83658E2DC2A8B800B0E1E2 /* ClassesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E83658D2DC2A8B800B0E1E2 /* ClassesVC.swift */; };
 		8D873A702C2B60480036A928 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 8D873A6F2C2B60480036A928 /* GoogleMobileAds */; };
 		8D873A732C2B66D40036A928 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D873A722C2B66D40036A928 /* WebKit.framework */; };
 		8D90809A2C1FE88500DB36AB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080992C1FE88500DB36AB /* AppDelegate.swift */; };
@@ -54,6 +55,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0E83658D2DC2A8B800B0E1E2 /* ClassesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassesVC.swift; sourceTree = "<group>"; };
 		8D873A722C2B66D40036A928 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		8D9080962C1FE88500DB36AB /* Dendritic Learning.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Dendritic Learning.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D9080992C1FE88500DB36AB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 				8D9080CD2C1FEAC200DB36AB /* WebViewerVC.swift */,
 				8DCF23E22C2082BB00B0DFA6 /* NewUserVC.swift */,
 				8DDBE08D2C2C96470050D7DB /* SearchVC.swift */,
+				0E83658D2DC2A8B800B0E1E2 /* ClassesVC.swift */,
 			);
 			path = "Dendritic Learning";
 			sourceTree = "<group>";
@@ -254,6 +257,7 @@
 				8D9080AE2C1FEA5700DB36AB /* Colors.swift in Sources */,
 				8D9080C22C1FEAAB00DB36AB /* layout.swift in Sources */,
 				8D9080B42C1FEA7800DB36AB /* SetsVC.swift in Sources */,
+				0E83658E2DC2A8B800B0E1E2 /* ClassesVC.swift in Sources */,
 				8D9080B02C1FEA5D00DB36AB /* FlashcardsVC.swift in Sources */,
 				8D9080CC2C1FEABF00DB36AB /* WebTermEditorVC.swift in Sources */,
 				8D9080B82C1FEA8400DB36AB /* StandardSetVC.swift in Sources */,

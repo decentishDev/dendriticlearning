@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hw7-sh-ECA">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hw7-sh-ECA">
     <device id="ipad10_2" orientation="landscape" layout="fullscreen" appearance="dark"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -13,7 +13,7 @@
             <objects>
                 <viewController id="Ga0-Av-FmX" customClass="NewUserVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="f7q-fm-057">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="ZkS-BW-C5X"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -33,7 +33,7 @@
             <objects>
                 <viewController id="FIP-K8-yah" customClass="StandardSetVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Cwc-Eq-mnx">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="l27-JP-IAh"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -56,7 +56,7 @@
             <objects>
                 <viewController id="o57-tv-PwE" customClass="WebSetVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="TUI-B2-tRt">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="ury-Yf-eZA"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -79,7 +79,7 @@
             <objects>
                 <viewController id="xrB-Kn-VpP" customClass="WebStudyVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="VAv-uT-3uf">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="nU7-8o-Slr"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -99,7 +99,7 @@
             <objects>
                 <viewController id="p2I-rF-R5p" customClass="FlashcardsVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="NVv-6G-daE">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="sQc-UA-dnk"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -119,7 +119,7 @@
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="StandardLearnVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -139,7 +139,7 @@
             <objects>
                 <viewController id="5am-Nv-7bx" customClass="StandardEditorVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="CBS-Yn-s6a">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="doo-W2-Qax"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -170,6 +170,7 @@
                         <segue destination="Xpx-KQ-zv9" kind="show" identifier="settingsVC" id="mdz-NW-Lqh"/>
                         <segue destination="Ga0-Av-FmX" kind="show" identifier="newUserVC" animates="NO" id="rdL-81-wd4"/>
                         <segue destination="vBn-Dh-7Wy" kind="show" identifier="searchVC" id="737-9o-Gji"/>
+                        <segue destination="c8h-b6-fp3" kind="show" identifier="classesVC" id="hGe-9B-nsH"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QPn-Te-KUs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -181,7 +182,7 @@
             <objects>
                 <viewController id="f2G-xL-ZWJ" customClass="WebEditorVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="tME-Ed-Uq7">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="57C-Ob-5yJ"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -201,7 +202,7 @@
             <objects>
                 <viewController id="nc8-Oa-BiA" customClass="WebViewerVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="bk3-u4-ZxL">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="XHr-9G-G0A"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -221,7 +222,7 @@
             <objects>
                 <viewController id="Xpx-KQ-zv9" customClass="SettingsVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="GAw-r7-n12">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="wvt-0g-3TT"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -236,12 +237,32 @@
             </objects>
             <point key="canvasLocation" x="1408" y="-2544"/>
         </scene>
+        <!--ClassesVC-->
+        <scene sceneID="CNR-AY-cQf">
+            <objects>
+                <viewController id="c8h-b6-fp3" customClass="ClassesVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="uLm-Oy-p8T">
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="HUh-L9-PQY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="QjK-0Q-XQa"/>
+                    <connections>
+                        <segue destination="eX0-0I-dJS" kind="unwind" identifier="classesVC_unwind" unwindAction="cancel:" id="AXr-UJ-5b7"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="AW6-Je-iAh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="eX0-0I-dJS" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="1408" y="-1765"/>
+        </scene>
         <!--SearchVC-->
         <scene sceneID="K4d-BP-EcK">
             <objects>
                 <viewController id="vBn-Dh-7Wy" customClass="SearchVC" customModule="Dendritic_Learning" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Xti-BC-YkQ">
-                        <rect key="frame" x="0.0" y="0.0" width="704" height="770"/>
+                        <rect key="frame" x="0.0" y="0.0" width="580" height="640"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="8TK-Kl-H5g"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
