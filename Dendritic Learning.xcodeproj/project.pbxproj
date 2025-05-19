@@ -31,6 +31,7 @@
 		8D9080CA2C1FEABB00DB36AB /* WebStudyVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080C92C1FEABB00DB36AB /* WebStudyVC.swift */; };
 		8D9080CC2C1FEABF00DB36AB /* WebTermEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080CB2C1FEABF00DB36AB /* WebTermEditorVC.swift */; };
 		8D9080CE2C1FEAC200DB36AB /* WebViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080CD2C1FEAC200DB36AB /* WebViewerVC.swift */; };
+		8D9191032DDA5E3C00D2271A /* ClassCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9191022DDA5E3C00D2271A /* ClassCardCell.swift */; };
 		8DCF23D82C207D2200B0DFA6 /* LilGrotesk[wght].ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8DCF23D72C207D2200B0DFA6 /* LilGrotesk[wght].ttf */; };
 		8DCF23DB2C2081B200B0DFA6 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8DCF23DA2C2081B200B0DFA6 /* FirebaseAuth */; };
 		8DCF23DD2C2081B200B0DFA6 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8DCF23DC2C2081B200B0DFA6 /* FirebaseFirestore */; };
@@ -80,6 +81,7 @@
 		8D9080C92C1FEABB00DB36AB /* WebStudyVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebStudyVC.swift; sourceTree = "<group>"; };
 		8D9080CB2C1FEABF00DB36AB /* WebTermEditorVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebTermEditorVC.swift; sourceTree = "<group>"; };
 		8D9080CD2C1FEAC200DB36AB /* WebViewerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewerVC.swift; sourceTree = "<group>"; };
+		8D9191022DDA5E3C00D2271A /* ClassCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassCardCell.swift; sourceTree = "<group>"; };
 		8DCF23D72C207D2200B0DFA6 /* LilGrotesk[wght].ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "LilGrotesk[wght].ttf"; path = "../../../Downloads/LilGrotesk[wght].ttf"; sourceTree = "<group>"; };
 		8DCF23E22C2082BB00B0DFA6 /* NewUserVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewUserVC.swift; sourceTree = "<group>"; };
 		8DDBE08D2C2C96470050D7DB /* SearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVC.swift; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 				8DCF23E22C2082BB00B0DFA6 /* NewUserVC.swift */,
 				8DDBE08D2C2C96470050D7DB /* SearchVC.swift */,
 				0E83658D2DC2A8B800B0E1E2 /* ClassesVC.swift */,
+				8D9191022DDA5E3C00D2271A /* ClassCardCell.swift */,
 			);
 			path = "Dendritic Learning";
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 				8D9080AE2C1FEA5700DB36AB /* Colors.swift in Sources */,
 				8D9080C22C1FEAAB00DB36AB /* layout.swift in Sources */,
 				8D9080B42C1FEA7800DB36AB /* SetsVC.swift in Sources */,
+				8D9191032DDA5E3C00D2271A /* ClassCardCell.swift in Sources */,
 				0E83658E2DC2A8B800B0E1E2 /* ClassesVC.swift in Sources */,
 				8D9080B02C1FEA5D00DB36AB /* FlashcardsVC.swift in Sources */,
 				8D9080CC2C1FEABF00DB36AB /* WebTermEditorVC.swift in Sources */,

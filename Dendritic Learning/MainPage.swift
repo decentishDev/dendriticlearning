@@ -129,6 +129,9 @@ class MainPage: UIViewController, NewSetDelegate {
                     
                     if var classes = self.userData["classes"] as? [[String: Any]] {
                         self.defaults.setValue(classes, forKey: "classes")
+                    }else{
+                        let classes: [[String: Any]] = []
+                        self.defaults.setValue(classes, forKey: "classes")
                     }
                     
                     self.getSets { error in

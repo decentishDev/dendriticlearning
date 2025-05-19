@@ -1,83 +1,131 @@
-//
-//  ClassesVC.swift
-//  Dendritic Learning
-//
-//  Created by Matthew J. Lundeen on 4/30/25.
-//
-
 import UIKit
-import FirebaseAuth
-import FirebaseFirestore
 
 class ClassesVC: UIViewController {
     
-    var scrollView = UIScrollView()
-    var stackView = UIStackView()
+    let defaults = UserDefaults.standard
+
+    var collectionView: UICollectionView!
+    var classes: [[String: Any]] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         view.backgroundColor = Colors.background
         setup()
+        loadData()
     }
-    
-    func setup(){
-        view.backgroundColor = Colors.background
-        // Clear any existing views
-        for subview in stackView.arrangedSubviews {
-            stackView.removeArrangedSubview(subview)
-            subview.removeFromSuperview()
-        }
-        stackView.removeFromSuperview()
-        for subview in view.subviews {
-            subview.removeFromSuperview()
-        }
-        
-        // Configure stackView and scrollView
-        stackView.axis = .vertical
-        stackView.spacing = 10
-        stackView.alignment = .leading
-        scrollView.addSubview(stackView)
-        view.addSubview(scrollView)
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 50),
-            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -50),
-            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 50),
-            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -50),
-            stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, constant: -100)
-        ])
-        
-        // Add other subviews
-        let backButton = UIButton()
-        backButton.setTitle("< Back", for: .normal)
-        backButton.titleLabel!.font = UIFont(name: "LilGrotesk-Bold", size: 20)
-        backButton.addTarget(self, action: #selector(self.backButton(sender:)), for: .touchUpInside)
+
+    func setup() {
+        // Common Symbol Config for smaller, bold icons
+        let iconConfig = UIImage.SymbolConfiguration(pointSize: 14, weight: .bold)
+
+        // Back Button
+        let backButton = UIButton(type: .system)
+        backButton.setTitle(" Back", for: .normal)
+        let backIcon = UIImage(systemName: "chevron.left", withConfiguration: iconConfig)
+        backButton.setImage(backIcon, for: .normal)
+        backButton.tintColor = Colors.highlight
         backButton.setTitleColor(Colors.highlight, for: .normal)
-        stackView.addArrangedSubview(backButton)
-        
-        addBreakView(stackView, 15)
-        
+        backButton.titleLabel?.font = UIFont(name: "LilGrotesk-Bold", size: 18)
+        backButton.backgroundColor = Colors.secondaryBackground
+        backButton.layer.cornerRadius = 10
+        backButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 12)
+        backButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        backButton.addTarget(self, action: #selector(self.backButton(sender:)), for: .touchUpInside)
+
+
+        // Title Label
         let titleLabel = UILabel()
-        titleLabel.text = "Classes"
-        titleLabel.font = UIFont(name: "LilGrotesk-Black", size: 50)
-        titleLabel.sizeToFit()
+        titleLabel.text = "My Classes"
+        titleLabel.font = UIFont(name: "LilGrotesk-Bold", size: 40)
         titleLabel.textColor = Colors.text
-        stackView.addArrangedSubview(titleLabel)
-        
-        addBreakView(stackView, 15)
+
+        // Add Class Button
+        let addClassButton = UIButton(type: .system)
+        addClassButton.setTitle(" Add a class", for: .normal)
+        let plusIcon = UIImage(systemName: "plus", withConfiguration: iconConfig)
+        addClassButton.setImage(plusIcon, for: .normal)
+        addClassButton.tintColor = Colors.highlight
+        addClassButton.setTitleColor(Colors.highlight, for: .normal)
+        addClassButton.titleLabel?.font = UIFont(name: "LilGrotesk-Bold", size: 18)
+        addClassButton.backgroundColor = Colors.secondaryBackground
+        addClassButton.layer.cornerRadius = 10
+        addClassButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
+        addClassButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 0)
+        // addClassButton.addTarget(self, action: #selector(addClass), for: .touchUpInside)
+
+        // Top Horizontal Stack
+        let topStack = UIStackView()
+        topStack.axis = .horizontal
+        topStack.alignment = .center
+        topStack.spacing = 30
+        topStack.translatesAutoresizingMaskIntoConstraints = false
+
+        topStack.addArrangedSubview(backButton)
+        topStack.addArrangedSubview(titleLabel)
+        topStack.addArrangedSubview(UIView()) // Flexible spacer
+        topStack.addArrangedSubview(addClassButton)
+
+        view.addSubview(topStack)
+
+        NSLayoutConstraint.activate([
+            topStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),
+            topStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
+            topStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50)
+        ])
+
+        // Collection View Layout
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 20
+        layout.minimumInteritemSpacing = 20
+
+        let width = (view.frame.width - 120) / 2
+        layout.itemSize = CGSize(width: width, height: 150)
+
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.register(ClassCardCell.self, forCellWithReuseIdentifier: ClassCardCell.reuseIdentifier)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+
+        view.addSubview(collectionView)
+
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: topStack.bottomAnchor, constant: 50),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
     }
-    
-    @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
-        
+
+
+    func loadData() {
+        classes = defaults.value(forKey: "classes") as! [[String: Any]]
     }
-    
+
+    @objc func addClassTapped() {
+        // TODO: Present your class creation UI here
+        print("Add Class button tapped")
+    }
+
+    @objc func cancel() {
+        dismiss(animated: true, completion: nil)
+    }
+
     @objc func backButton(sender: UIButton){
         performSegue(withIdentifier: "classesVC_unwind", sender: nil)
+    }
+}
+
+extension ClassesVC: UICollectionViewDataSource, UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return classes.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ClassCardCell.reuseIdentifier, for: indexPath) as! ClassCardCell
+        cell.configure(with: classes[indexPath.item])
+        return cell
     }
 }
