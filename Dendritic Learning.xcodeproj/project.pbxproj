@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0E83658E2DC2A8B800B0E1E2 /* ClassesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E83658D2DC2A8B800B0E1E2 /* ClassesVC.swift */; };
+		0ECADE692DDB7D95000777D7 /* JoinClassVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ECADE682DDB7D85000777D7 /* JoinClassVC.swift */; };
 		8D873A702C2B60480036A928 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 8D873A6F2C2B60480036A928 /* GoogleMobileAds */; };
 		8D873A732C2B66D40036A928 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D873A722C2B66D40036A928 /* WebKit.framework */; };
 		8D90809A2C1FE88500DB36AB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080992C1FE88500DB36AB /* AppDelegate.swift */; };
@@ -57,6 +58,7 @@
 
 /* Begin PBXFileReference section */
 		0E83658D2DC2A8B800B0E1E2 /* ClassesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassesVC.swift; sourceTree = "<group>"; };
+		0ECADE682DDB7D85000777D7 /* JoinClassVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinClassVC.swift; sourceTree = "<group>"; };
 		8D873A722C2B66D40036A928 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		8D9080962C1FE88500DB36AB /* Dendritic Learning.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Dendritic Learning.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D9080992C1FE88500DB36AB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 		8D9080982C1FE88500DB36AB /* Dendritic Learning */ = {
 			isa = PBXGroup;
 			children = (
+				0ECADE682DDB7D85000777D7 /* JoinClassVC.swift */,
 				8DE6FA2E2C21DA93004E0C58 /* GoogleService-Info.plist */,
 				8DCF23D72C207D2200B0DFA6 /* LilGrotesk[wght].ttf */,
 				8D9080992C1FE88500DB36AB /* AppDelegate.swift */,
@@ -251,6 +254,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DCF23E32C2082BB00B0DFA6 /* NewUserVC.swift in Sources */,
+				0ECADE692DDB7D95000777D7 /* JoinClassVC.swift in Sources */,
 				8D9080CE2C1FEAC200DB36AB /* WebViewerVC.swift in Sources */,
 				8D9080C42C1FEAAF00DB36AB /* NewSetVC.swift in Sources */,
 				8D9080C02C1FEAA600DB36AB /* DrawingEditorVC.swift in Sources */,

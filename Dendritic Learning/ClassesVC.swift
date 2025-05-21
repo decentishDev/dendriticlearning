@@ -1,6 +1,6 @@
 import UIKit
 
-class ClassesVC: UIViewController {
+class ClassesVC: UIViewController, JoinClassDelegate {
     
     let defaults = UserDefaults.standard
 
@@ -51,7 +51,7 @@ class ClassesVC: UIViewController {
         addClassButton.layer.cornerRadius = 10
         addClassButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
         addClassButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 0)
-        // addClassButton.addTarget(self, action: #selector(addClass), for: .touchUpInside)
+        addClassButton.addTarget(self, action: #selector(addClass), for: .touchUpInside)
 
         // Top Horizontal Stack
         let topStack = UIStackView()
@@ -64,7 +64,7 @@ class ClassesVC: UIViewController {
         topStack.addArrangedSubview(titleLabel)
         topStack.addArrangedSubview(UIView()) // Flexible spacer
         topStack.addArrangedSubview(addClassButton)
-
+            
         view.addSubview(topStack)
 
         NSLayoutConstraint.activate([
@@ -104,9 +104,12 @@ class ClassesVC: UIViewController {
         classes = defaults.value(forKey: "classes") as! [[String: Any]]
     }
 
-    @objc func addClassTapped() {
-        // TODO: Present your class creation UI here
-        print("Add Class button tapped")
+    @objc func addClass() {
+        let popupVC = JoinClassVC()
+        popupVC.delegate = self
+        popupVC.modalPresentationStyle = .overCurrentContext
+        popupVC.modalTransitionStyle = .crossDissolve
+        present(popupVC, animated: true, completion: nil)
     }
 
     @objc func cancel() {
