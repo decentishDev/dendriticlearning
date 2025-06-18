@@ -35,12 +35,12 @@ class MainPage: UIViewController, NewSetDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        for family in UIFont.familyNames {
-//            print("family: \(family)")
-//            for name in UIFont.fontNames(forFamilyName: family){
-//                print("        Font: \(name)~")
-//            }
-//        }
+        for family in UIFont.familyNames {
+            print("family: \(family)")
+            for name in UIFont.fontNames(forFamilyName: family){
+                print("        Font: \(name)~")
+            }
+        }
         view.backgroundColor = Colors.background
         
         stackView.axis = .vertical

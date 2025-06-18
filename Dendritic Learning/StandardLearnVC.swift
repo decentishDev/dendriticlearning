@@ -166,6 +166,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         cardCounter.frame = CGRect(x: 60, y: 20, width: view.frame.width - 120, height: 20)
         cardCounter.font = .systemFont(ofSize: 15)
         cardCounter.textAlignment = .center
+        cardCounter.textColor = Colors.text
         cardCounter.text = String(index + 1) + "/" + String(cardOrder.count)
         view.addSubview(cardCounter)
         CardLabel.font = UIFont(name: "LilGrotesk-Regular", size: 50)
@@ -264,7 +265,7 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
             let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(view.frame.height, view.frame.width) - 50, height: 100)))
             EndScreen.addSubview(bannerView)
             bannerView.delegate = self
-            bannerView.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+            bannerView.adUnitID = "ca-app-pub-5124969442805102/1739631380"
             bannerView.rootViewController = self
             bannerView.load(GADRequest())
             bannerView.translatesAutoresizingMaskIntoConstraints = false

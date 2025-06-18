@@ -177,6 +177,7 @@ class NewUserVC: UIViewController {
         for i in [signUpName, signUpNameLabel, signUpEmail, signUpEmailLabel, signUpUsername, signUpUsernameLabel, signUpPassword, signUpPasswordLabel, signUpPassword2, signUpPassword2Label]{
             if let c = i as? UILabel{
                 c.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+                c.textColor = Colors.text
             }
             if let c = i as? UITextField{
                 c.font = UIFont(name: "LilGrotesk-Regular", size: 20)
@@ -185,6 +186,7 @@ class NewUserVC: UIViewController {
                 let paddingView = UIView(frame: CGRectMake(0, 0, 10, c.frame.height))
                 c.leftView = paddingView
                 c.leftViewMode = .always
+                c.textColor = Colors.text
             }
             signUp.addSubview(i)
         }
@@ -202,6 +204,7 @@ class NewUserVC: UIViewController {
         signInLabel.font = UIFont(name: "LilGrotesk-Regular", size: 30)
         signInLabel.text = "Sign in"
         signInLabel.textAlignment = .center
+        signInLabel.textColor = Colors.text
         
         signIn.addSubview(signInLabel)
         signInEmail = UITextField(frame: CGRect(x: midX - 200, y: midY - 120, width: 400, height: 40))
@@ -234,9 +237,11 @@ class NewUserVC: UIViewController {
         for i in [signInEmail, signInEmailLabel, signInPassword, signInPasswordLabel]{
             if let c = i as? UILabel{
                 c.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+                c.textColor = Colors.text
             }
             if let c = i as? UITextField{
                 c.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+                c.textColor = Colors.text
                 c.backgroundColor = Colors.secondaryBackground
                 c.layer.cornerRadius = 7
                 let paddingView = UIView(frame: CGRectMake(0, 0, 10, c.frame.height))

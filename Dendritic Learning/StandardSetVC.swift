@@ -278,6 +278,8 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         let allTermsStackView = UIStackView()
         allTermsStackView.axis = .vertical
         allTermsStackView.spacing = 10
+        allTermsStackView.alignment = .center
+        //allTermsStackView.alignment = .fill
         allTermsStackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(allTermsStackView)
         
@@ -290,30 +292,10 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         for card in cards {
             if c == 6 && paid == false{
                 c = 0
-                let containerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width - 100, height: 150))
-                containerView.translatesAutoresizingMaskIntoConstraints = false
-                con(containerView, view.frame.width - 100, 150)
-                allTermsStackView.addArrangedSubview(containerView)
-                let bannerView = GADBannerView(adSize: GADCurrentOrientationInlineAdaptiveBannerAdSizeWithWidth(min(view.frame.height, view.frame.width) - 200))
-                bannerView.isAutoloadEnabled = true
-                bannerView.delegate = self
-                bannerView.adUnitID = "ca-app-pub-3940256099942544/2435281174"
-                bannerView.rootViewController = self
-                bannerView.translatesAutoresizingMaskIntoConstraints = false
-//                NSLayoutConstraint.activate([
-//                    bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -50),
-//                    bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-//                ])
                 
-                //conH(bannerView, GADCurrentOrientationInlineAdaptiveBannerAdSizeWithWidth(min(view.frame.height, view.frame.width) - 100).size.height)
-                con(bannerView, view.frame.width - 200, 100)
-                bannerView.load(GADRequest())
-                
-                containerView.addSubview(bannerView)
-                NSLayoutConstraint.activate([
-                    bannerView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-                    bannerView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor)
-                ])
+                let adView = createCenteredBannerAdView()
+                allTermsStackView.addArrangedSubview(adView)
+
             }
             let termDefinitionStackView = createTermDefinitionStackView(for: card)
             allTermsStackView.addArrangedSubview(termDefinitionStackView)
@@ -632,4 +614,49 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
 //
 //        //bannerView.backgroundColor = .white
 //    }
+    
+    private func createCenteredBannerAdView() -> UIView {
+        let screenWidth = UIScreen.main.bounds.width
+        let adWidth = screenWidth * 0.8
+        let adSize = GADCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(adWidth)
+
+        let bannerView = GADBannerView(adSize: adSize)
+        bannerView.adUnitID = "ca-app-pub-5124969442805102/1739631380"
+        //bannerView.rootViewController = getRootViewController()
+        bannerView.rootViewController = self
+        bannerView.load(GADRequest())
+
+//        let container = UIView()
+//        container.translatesAutoresizingMaskIntoConstraints = false
+//        container.addSubview(bannerView)
+//
+//        bannerView.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            bannerView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+//            bannerView.topAnchor.constraint(equalTo: container.topAnchor),
+//            bannerView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+//            bannerView.widthAnchor.constraint(equalToConstant: adWidth)
+//        ])
+//
+//        container.heightAnchor.constraint(equalToConstant: adSize.size.height).isActive = true
+
+        return bannerView
+    }
+
+    
+    private func getRootViewController() -> UIViewController? {
+        // iOS 13+ safe method to get the foreground scene's root VC
+        guard let scene = UIApplication.shared.connectedScenes
+            .filter({ $0.activationState == .foregroundActive })
+            .first as? UIWindowScene,
+            let window = scene.windows.first(where: { $0.isKeyWindow }) else {
+            return nil
+        }
+        return window.rootViewController
+    }
+
+
+
+    
+    
 }
