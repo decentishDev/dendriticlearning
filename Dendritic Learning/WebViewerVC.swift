@@ -25,8 +25,13 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate
     var canUpdate = true
     let loadingView = UILabel()
     
+    var previousSize = CGSize()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        previousSize = view.bounds.size
+        
         view.backgroundColor = Colors.background
 
         let data = defaults.value(forKey: "set") as! [String: Any]
@@ -122,7 +127,7 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate
             //topConnections.backgroundColor = .purple
             topConnections.alignment = .fill
             topConnections.distribution = .fillProportionally
-            topConnections.translatesAutoresizingMaskIntoConstraints = false
+            
             topConnections.isUserInteractionEnabled = true
             topConnections.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
             topConnections.autoresizesSubviews = false
@@ -130,7 +135,7 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate
             //bottomConnections.backgroundColor = .orange
             bottomConnections.alignment = .fill
             bottomConnections.distribution = .fillProportionally
-            bottomConnections.translatesAutoresizingMaskIntoConstraints = false
+            tAMC([topConnections, bottomConnections])
             bottomConnections.isUserInteractionEnabled = true
             bottomConnections.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
             bottomConnections.autoresizesSubviews = false
@@ -173,7 +178,7 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate
                 //connectButton.setImage(nil, for: .normal)
                 connectButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
                 connectButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-                connectButton.translatesAutoresizingMaskIntoConstraints = false
+
                 (rect.subviews[2] as! UIStackView).addArrangedSubview(connectButton)
                 //connectButton.backgroundColor = .blue
 
@@ -184,7 +189,7 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate
                 //otherButton.setImage(nil, for: .normal)
                 otherButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
                 otherButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-                otherButton.translatesAutoresizingMaskIntoConstraints = false
+                tAMC([connectButton, otherButton])
                 otherButton.accessibilityIdentifier = String(i)
                 //otherButton.backgroundColor = .brown
                 (rectangles[connection].subviews[1] as! UIStackView).addArrangedSubview(otherButton)
@@ -203,20 +208,6 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate
                 
                 connectButton.layer.addSublayer(lineLayer)
             }
-
-//            let addConnection = UIButton()
-//            addConnection.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
-//            addConnection.imageView?.tintColor = Colors.highlight
-//            addConnection.imageView?.translatesAutoresizingMaskIntoConstraints = false
-//            //addConnection.backgroundColor = .red
-//            addConnection.addTarget(self, action: #selector(newConnection(_:)), for: .touchUpInside)
-//            (rect.subviews[2] as! UIStackView).addArrangedSubview(addConnection)
-////            rectangle.addSubview(addConnection)
-////            addConnection.frame = CGRect(x: rectangle.frame.width / 2 - 15, y: rectangle.frame.height, width: 30, height: 30)
-//            addConnection.heightAnchor.constraint(equalToConstant: 30).isActive = true
-//            addConnection.translatesAutoresizingMaskIntoConstraints = false
-//            addConnection.widthAnchor.constraint(equalToConstant: 30).isActive = true
-
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
@@ -230,14 +221,14 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate
         
         
         if(defaults.value(forKey: "isPaid") as! Bool != true){
-            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(view.frame.height, view.frame.width) - 50, height: 100)))
+            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(600, previousSize.width), height: 100)))
             view.addSubview(bannerView)
             bannerView.delegate = self
             bannerView.adUnitID = "ca-app-pub-5124969442805102/1739631380"
             bannerView.rootViewController = self
             bannerView.load(GADRequest())
             
-            bannerView.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(bannerView)
             NSLayoutConstraint.activate([
                 bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
                 bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
@@ -396,96 +387,6 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate
         gestureRecognizer.setTranslation(.zero, in: view)
     }
     
-//    func didAddTerm(data: [Any]){
-//        if(currentEdit == -1){
-//            let rectWidth: CGFloat = 180
-//            let rectHeight: CGFloat = 180
-//            
-//            let centerX = scrollView.contentOffset.x + scrollView.bounds.width / 2
-//            let centerY = scrollView.contentOffset.y + scrollView.bounds.height / 2
-//            
-//            let newX = centerX - rectWidth / 2
-//            let newY = centerY - rectHeight / 2
-//            
-//            let rectangle = UIView(frame: CGRect(x: newX, y: newY, width: rectWidth, height: rectHeight))
-//            rectangle.backgroundColor = .clear
-//            
-//            let visible = UIView(frame: CGRect(x: 0, y: 30, width: rectWidth, height: rectHeight - 60))
-//            visible.backgroundColor = Colors.secondaryBackground
-//            visible.layer.cornerRadius = 10
-//            rectangle.addSubview(visible)
-//            
-//            let topConnections = UIStackView()
-//            let bottomConnections = UIStackView()
-//            topConnections.axis = .horizontal
-//            //topConnections.backgroundColor = .purple
-//            topConnections.alignment = .fill
-//            topConnections.distribution = .fillProportionally
-//            topConnections.translatesAutoresizingMaskIntoConstraints = false
-//            topConnections.isUserInteractionEnabled = true
-//            topConnections.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-//            topConnections.autoresizesSubviews = false
-//            bottomConnections.axis = .horizontal
-//            //bottomConnections.backgroundColor = .orange
-//            bottomConnections.alignment = .fill
-//            bottomConnections.distribution = .fillProportionally
-//            bottomConnections.translatesAutoresizingMaskIntoConstraints = false
-//            bottomConnections.isUserInteractionEnabled = true
-//            bottomConnections.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-//            bottomConnections.autoresizesSubviews = false
-//            
-//            let addConnection = UIButton()
-//
-//            addConnection.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
-//            addConnection.imageView?.tintColor = Colors.highlight
-//            addConnection.imageView?.translatesAutoresizingMaskIntoConstraints = false
-//            //addConnection.backgroundColor = .red
-//            addConnection.addTarget(self, action: #selector(newConnection(_:)), for: .touchUpInside)
-//            bottomConnections.addArrangedSubview(addConnection)
-////            rectangle.addSubview(addConnection)
-////            addConnection.frame = CGRect(x: rectangle.frame.width / 2 - 15, y: rectangle.frame.height, width: 30, height: 30)
-//            addConnection.heightAnchor.constraint(equalToConstant: 30).isActive = true
-//            addConnection.translatesAutoresizingMaskIntoConstraints = false
-//            addConnection.widthAnchor.constraint(equalToConstant: 30).isActive = true
-////            addConnection.centerXAnchor.constraint(equalTo: rectangle.centerXAnchor).isActive = true
-////            addConnection.bottomAnchor.constraint(equalTo: rectangle.bottomAnchor).isActive = true
-//            rectangle.addSubview(topConnections)
-//            rectangle.addSubview(bottomConnections)
-//            NSLayoutConstraint.activate([
-//                topConnections.topAnchor.constraint(equalTo: rectangle.topAnchor),
-//                topConnections.centerXAnchor.constraint(equalTo: rectangle.centerXAnchor),
-//                bottomConnections.bottomAnchor.constraint(equalTo: rectangle.bottomAnchor),
-//                bottomConnections.centerXAnchor.constraint(equalTo: rectangle.centerXAnchor)
-//            ])
-//            
-//            let termLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 180, height: 180))
-//            termLabel.text = data[0] as? String
-//            termLabel.textColor = Colors.text
-//            termLabel.font = UIFont(name: "LilGrotesk-Normal", size: 15)
-//            termLabel.textAlignment = .center
-//            rectangle.addSubview(termLabel)
-//            
-//            let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
-//            rectangle.addGestureRecognizer(panGesture)
-//            
-//            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(editCard(_:)))
-//            rectangle.addGestureRecognizer(tapGesture)
-//            
-//            scrollView.addSubview(rectangle)
-//            rectangles.append(rectangle)
-//            web.append([data[0], data[1], newX, newY, []])
-//            web[web.count - 1][2] = newX
-//            web[web.count - 1][3] = newY
-//            
-////            print(bottomConnections.frame)
-////            print(addConnection.frame)
-//            
-//            save()
-//        }else{
-//            web[currentEdit] = [data[0], data[1], web[currentEdit][2], web[currentEdit][3], web[currentEdit][4]]
-//            (rectangles[currentEdit].subviews[3] as! UILabel).text = data[0] as? String
-//        }
-//    }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 

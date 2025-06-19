@@ -24,6 +24,16 @@ func conH(_ sender: UIView, _ y: CGFloat){
     sender.heightAnchor.constraint(equalToConstant: y).isActive = true
 }
 
+func tAMC(_ sender: UIView){
+    sender.translatesAutoresizingMaskIntoConstraints = false
+}
+
+func tAMC(_ sender: [UIView]){
+    for i in sender{
+        i.translatesAutoresizingMaskIntoConstraints = false
+    }
+}
+
 func recolor(_ drawing: PKDrawing) -> PKDrawing {
     var newStrokes = [PKStroke]()
     for stroke in drawing.strokes {

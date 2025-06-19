@@ -117,18 +117,18 @@ class WebSetVC: UIViewController {
     
     func setup(){
         let storageRef = storage.reference()
-//        if(sets.count == set){
-//            performSegue(withIdentifier: "webSetVC_unwind", sender: nil)
-//        }else{
+        //        if(sets.count == set){
+        //            performSegue(withIdentifier: "webSetVC_unwind", sender: nil)
+        //        }else{
         
-            for subview in stackView.arrangedSubviews {
-                stackView.removeArrangedSubview(subview)
-                subview.removeFromSuperview()
-            }
-            stackView.removeFromSuperview()
-            for subview in view.subviews {
-                subview.removeFromSuperview()
-            }
+        for subview in stackView.arrangedSubviews {
+            stackView.removeArrangedSubview(subview)
+            subview.removeFromSuperview()
+        }
+        stackView.removeFromSuperview()
+        for subview in view.subviews {
+            subview.removeFromSuperview()
+        }
         if(image == ""){
             view.backgroundColor = Colors.background
         }else{
@@ -136,7 +136,7 @@ class WebSetVC: UIViewController {
             loadImage(url: image!, imageView: backgroundImage)
             backgroundImage.contentMode = .scaleAspectFill
             view.addSubview(backgroundImage)
-            backgroundImage.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(backgroundImage)
             NSLayoutConstraint.activate([
                 backgroundImage.topAnchor.constraint(equalTo: view.topAnchor),
                 backgroundImage.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -144,13 +144,12 @@ class WebSetVC: UIViewController {
                 backgroundImage.trailingAnchor.constraint(equalTo: view.trailingAnchor)
             ])
         }
-            stackView.axis = .vertical
-            stackView.spacing = 0
-            stackView.alignment = .leading
-            scrollView.addSubview(stackView)
-            view.addSubview(scrollView)
-            scrollView.translatesAutoresizingMaskIntoConstraints = false
-            stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.spacing = 0
+        stackView.alignment = .leading
+        scrollView.addSubview(stackView)
+        view.addSubview(scrollView)
+        tAMC([scrollView, stackView])
             NSLayoutConstraint.activate([
                 scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
                 scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -196,34 +195,6 @@ class WebSetVC: UIViewController {
             dateLabel.textColor = Colors.text
             dateLabel.sizeToFit()
             stackView.addArrangedSubview(dateLabel)
-            
-//            let breakView5 = UIView()
-//            breakView5.widthAnchor.constraint(equalToConstant: 30).isActive = true
-//            breakView5.heightAnchor.constraint(equalToConstant: 30).isActive = true
-//            stackView.addArrangedSubview(breakView5)
-//            
-//            let shareButton = UIButton()
-//            con(shareButton, 200, 30)
-//            shareButton.addTarget(self, action: #selector(self.export(sender:)), for: .touchUpInside)
-//            shareButton.translatesAutoresizingMaskIntoConstraints = false
-//            stackView.addArrangedSubview(shareButton)
-//            let shareIcon = UIImageView()
-//            shareIcon.translatesAutoresizingMaskIntoConstraints = false
-//            con(shareIcon, 30, 30)
-//            shareButton.addSubview(shareIcon)
-//            shareIcon.image = UIImage(systemName: "arrow.down.square.fill")
-//            shareIcon.leadingAnchor.constraint(equalTo: shareButton.leadingAnchor).isActive = true
-//            shareIcon.tintColor = Colors.highlight
-//            shareIcon.contentMode = .scaleAspectFit
-//            let shareText = UILabel()
-//            shareText.translatesAutoresizingMaskIntoConstraints = false
-//            shareButton.addSubview(shareText)
-//            conH(shareText, 30)
-//            shareText.leadingAnchor.constraint(equalTo: shareIcon.trailingAnchor, constant: 10).isActive = true
-//            shareText.trailingAnchor.constraint(equalTo: shareButton.trailingAnchor).isActive = true
-//            shareText.text = "Download"
-//            shareText.font = UIFont(name: "LilGrotesk-Regular", size: 20)
-//            shareText.textColor = Colors.highlight
             
         addBreakView(stackView, 30)
         
@@ -296,14 +267,14 @@ class WebSetVC: UIViewController {
         
         
         if(defaults.value(forKey: "isPaid") as! Bool != true){
-            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(view.frame.height, view.frame.width) - 50, height: 100)))
+            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(600, view.bounds.width), height: 100)))
             view.addSubview(bannerView)
             bannerView.delegate = self
             bannerView.adUnitID = "ca-app-pub-5124969442805102/1739631380"
             bannerView.rootViewController = self
             bannerView.load(GADRequest())
             
-            bannerView.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(bannerView)
             NSLayoutConstraint.activate([
                 bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
                 bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)

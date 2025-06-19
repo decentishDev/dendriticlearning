@@ -58,7 +58,7 @@ class ClassesVC: UIViewController, JoinClassDelegate {
         topStack.axis = .horizontal
         topStack.alignment = .center
         topStack.spacing = 30
-        topStack.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(topStack)
 
         topStack.addArrangedSubview(backButton)
         topStack.addArrangedSubview(titleLabel)
@@ -84,7 +84,7 @@ class ClassesVC: UIViewController, JoinClassDelegate {
 
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(collectionView)
         collectionView.register(ClassCardCell.self, forCellWithReuseIdentifier: ClassCardCell.reuseIdentifier)
         collectionView.delegate = self
         collectionView.dataSource = self

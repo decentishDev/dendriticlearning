@@ -33,14 +33,16 @@ class MainPage: UIViewController, NewSetDelegate {
     
     var loadingImage = UIImageView()
     
+    var previousSize: CGSize?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        for family in UIFont.familyNames {
-            print("family: \(family)")
-            for name in UIFont.fontNames(forFamilyName: family){
-                print("        Font: \(name)~")
-            }
-        }
+//        for family in UIFont.familyNames {
+//            print("family: \(family)")
+//            for name in UIFont.fontNames(forFamilyName: family){
+//                print("        Font: \(name)~")
+//            }
+//        }
         view.backgroundColor = Colors.background
         
         stackView.axis = .vertical
@@ -48,8 +50,8 @@ class MainPage: UIViewController, NewSetDelegate {
         stackView.alignment = .leading
         scrollView.addSubview(stackView)
         view.addSubview(scrollView)
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(scrollView)
+        tAMC(stackView)
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -60,7 +62,7 @@ class MainPage: UIViewController, NewSetDelegate {
             stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 60),
             stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -60),
         ])
-        
+        previousSize = view.bounds.size
         
         let topBar = createTopBar()
         stackView.addArrangedSubview(topBar)
@@ -73,8 +75,24 @@ class MainPage: UIViewController, NewSetDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         setup()
-        
     }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.setup()
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if previousSize != view.bounds.size {
+            previousSize = view.bounds.size
+            setup()
+        }
+    }
+
+
     
     func setup() {
         if let fingerDrawing = defaults.value(forKey: "fingerDrawing") as? Bool, let uid = Auth.auth().currentUser?.uid {
@@ -273,8 +291,8 @@ class MainPage: UIViewController, NewSetDelegate {
         stackView.alignment = .leading
         scrollView.addSubview(stackView)
         view.addSubview(scrollView)
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(scrollView)
+        tAMC(stackView)
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -373,16 +391,18 @@ class MainPage: UIViewController, NewSetDelegate {
         topBar.addSubview(icon)
         con(icon, 50, 50)
         icon.leadingAnchor.constraint(equalTo: topBar.leadingAnchor).isActive = true
-        icon.translatesAutoresizingMaskIntoConstraints = false
         
         let titleLabel = UILabel()
-        titleLabel.text = "Dendritic Learning"
+        //titleLabel.text = "Dendritic Learning"
         titleLabel.textColor = Colors.text
         titleLabel.font = UIFont(name: "LilGrotesk-Black", size: 30)
         topBar.addSubview(titleLabel)
         con(titleLabel, 400, 50)
         titleLabel.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 10).isActive = true
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        if (previousSize?.width)! > 600 {
+            titleLabel.text = "Dendritic Learning"
+        }
         
         let settingsIcon = UIImageView()
         settingsIcon.image = UIImage(systemName: "gear")
@@ -391,13 +411,11 @@ class MainPage: UIViewController, NewSetDelegate {
         con(settingsIcon, 50, 50)
         topBar.addSubview(settingsIcon)
         settingsIcon.trailingAnchor.constraint(equalTo: topBar.trailingAnchor).isActive = true
-        settingsIcon.translatesAutoresizingMaskIntoConstraints = false
         
         let settingsButton = UIButton()
         con(settingsButton, 50, 50)
         topBar.addSubview(settingsButton)
         settingsButton.trailingAnchor.constraint(equalTo: topBar.trailingAnchor).isActive = true
-        settingsButton.translatesAutoresizingMaskIntoConstraints = false
         settingsButton.addTarget(self, action: #selector(settings(_:)), for: .touchUpInside)
         
         let searchIcon = UIImageView()
@@ -407,31 +425,30 @@ class MainPage: UIViewController, NewSetDelegate {
         con(searchIcon, 50, 50)
         topBar.addSubview(searchIcon)
         searchIcon.trailingAnchor.constraint(equalTo: settingsIcon.leadingAnchor, constant: -15).isActive = true
-        searchIcon.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(searchIcon)
         
         let searchButton = UIButton()
         con(searchButton, 50, 50)
         topBar.addSubview(searchButton)
         searchButton.trailingAnchor.constraint(equalTo: settingsIcon.leadingAnchor, constant: -15).isActive = true
-        searchButton.translatesAutoresizingMaskIntoConstraints = false
         searchButton.addTarget(self, action: #selector(search(_:)), for: .touchUpInside)
         
         let classIcon = UIImageView()
         classIcon.image = UIImage(systemName: "graduationcap")
         classIcon.contentMode = .scaleAspectFit
-        classIcon.tintColor = Colors.highlight
+        classIcon.tintColor = Colors.highlight.withAlphaComponent(0.5)
         con(classIcon, 50, 50)
         topBar.addSubview(classIcon)
         classIcon.trailingAnchor.constraint(equalTo: searchIcon.leadingAnchor, constant: -15).isActive = true
-        classIcon.translatesAutoresizingMaskIntoConstraints = false
         
         let classButton = UIButton()
         con(classButton, 50, 50)
         topBar.addSubview(classButton)
         classButton.trailingAnchor.constraint(equalTo: searchIcon.leadingAnchor, constant: -15).isActive = true
-        classButton.translatesAutoresizingMaskIntoConstraints = false
         classButton.addTarget(self, action: #selector(classes(_:)), for: .touchUpInside)
+        classButton.isEnabled = false
         
+        tAMC([icon, titleLabel, settingsIcon, settingsButton, searchIcon, searchButton, classIcon, classButton])
         return topBar
     }
 
@@ -450,15 +467,21 @@ class MainPage: UIViewController, NewSetDelegate {
         for i in setIDs {
             sets.append(retrievedSets[i] as! [String: Any])
         }
-        for i in 0...((sets.count - 1) / 3) {
+        
+        let minimumWidth: CGFloat = 300
+        let rowCount = Int(max((previousSize!.width - 100) / minimumWidth, 1))
+        
+        for i in 0...((sets.count - 1) / rowCount) {
             let row = UIStackView()
             row.axis = .horizontal
             row.spacing = 20
             row.alignment = .leading
-            row.translatesAutoresizingMaskIntoConstraints = false
+            row.distribution = .fillEqually
+            tAMC(row)
             stackView.addArrangedSubview(row)
-            con(row, view.frame.width - 120, 120)
-            for j in 3 * i...(3 * i) + 2 {
+            
+            conW(row, view.frame.width - 120)
+            for j in rowCount * i...(rowCount * i) + rowCount - 1 {
                 if sets.count > j {
                     let setView = createSetView(set: sets[j], id: setIDs[j])
                     row.addArrangedSubview(setView)
@@ -475,50 +498,75 @@ class MainPage: UIViewController, NewSetDelegate {
     }
 
     func createSetView(set: [String: Any], id: String) -> UIView {
-        let w = (view.frame.width - 160)/3
-        let rect = UIButton(frame: CGRect(x: 0, y: 0, width: w, height: 120))
-        con(rect, w, 120)
-        rect.backgroundColor = Colors.secondaryBackground
-        rect.layer.cornerRadius = 10
-        let titleLabel = UILabel(frame: CGRect(x: 15, y: 15, width: w - 30, height: 100))
+        let container = UIButton()
+        container.backgroundColor = Colors.secondaryBackground
+        container.layer.cornerRadius = 10
+        container.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
+
+        var typePrefix = "s"
+        if set["type"] as? String == "web" {
+            typePrefix = "w"
+        }
+        container.accessibilityIdentifier = typePrefix + id
+
+        let titleLabel = UILabel()
         titleLabel.text = set["name"] as? String
         titleLabel.textColor = Colors.text
         titleLabel.font = UIFont(name: "LilGrotesk-Medium", size: 30)
         titleLabel.numberOfLines = 0
-        titleLabel.sizeToFit()
-        rect.addSubview(titleLabel)
-        let creatorLabel = UILabel(frame: CGRect(x: 15, y: 80, width: w - 30, height: 25))
+
+        let creatorLabel = UILabel()
         creatorLabel.text = set["author"] as? String
         creatorLabel.textColor = Colors.text
         creatorLabel.font = UIFont(name: "LilGrotesk-Regular", size: 22)
-        rect.addSubview(creatorLabel)
-//        let dateLabel = UILabel(frame: CGRect(x: 10, y: 120, width: w - 20, height: 15))
-//        dateLabel.text = formatDate((set["date"] as! Timestamp).dateValue())
-//        dateLabel.textColor = Colors.text
-//        dateLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
-//        rect.addSubview(dateLabel)
-//        let heartLabel = UILabel(frame: CGRect(x: 10, y: 120, width: w - 40, height: 15))
-//        heartLabel.text = "645"
-//        heartLabel.textColor = Colors.highlight
-//        heartLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
-//        heartLabel.textAlignment = .right
-//        rect.addSubview(heartLabel)
-//        let heartImage = UIImageView(image: UIImage(systemName: "heart"))
-//        heartImage.contentMode = .scaleAspectFit
-//        heartImage.tintColor = Colors.highlight
-//        heartImage.frame = CGRect(x: w - 25, y: 120, width: 15, height: 15)
-//        rect.addSubview(heartImage)
-//        let heartButton = UIButton(frame: CGRect(x: w - 80, y: 120, width: 70, height: 15))
-//        rect.addSubview(heartButton)
-        rect.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
-        var t = "s"
-        if set["type"] as! String == "web" {
-            t = "w"
-        }
-        rect.accessibilityIdentifier = t + id
-        return rect
-    }
 
+        let likeCount = set["likes"] as? Int ?? 0
+        let heartLabel = UILabel()
+        heartLabel.text = "\(likeCount)"
+        heartLabel.textColor = Colors.highlight
+        heartLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+        heartLabel.textAlignment = .right
+
+        let heartImageName = likedSets.contains(id) ? "heart.fill" : "heart"
+        let heartImage = UIImageView(image: UIImage(systemName: heartImageName))
+        heartImage.contentMode = .scaleAspectFit
+        heartImage.tintColor = Colors.highlight
+
+        let heartStack = UIStackView(arrangedSubviews: [heartLabel, heartImage])
+        heartStack.axis = .horizontal
+        heartStack.spacing = 4
+        heartStack.alignment = .center
+
+        let bottomRow = UIStackView(arrangedSubviews: [creatorLabel, heartStack])
+        bottomRow.axis = .horizontal
+        bottomRow.spacing = 8
+        bottomRow.alignment = .center
+        bottomRow.distribution = .equalSpacing
+
+        let stack = UIStackView(arrangedSubviews: [titleLabel, bottomRow])
+        stack.axis = .vertical
+        stack.spacing = 6
+        stack.alignment = .fill
+
+        container.addSubview(stack)
+
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: container.topAnchor, constant: 12),
+            stack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
+            stack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12),
+            stack.bottomAnchor.constraint(lessThanOrEqualTo: container.bottomAnchor, constant: -12),
+            heartImage.widthAnchor.constraint(equalToConstant: 15),
+            heartImage.heightAnchor.constraint(equalToConstant: 15)
+        ])
+        
+        tAMC([container, titleLabel, creatorLabel, heartLabel, heartImage, heartStack, bottomRow, stack])
+        
+        for i in container.subviews {
+            i.isUserInteractionEnabled = false
+        }
+
+        return container
+    }
     
     @objc func newSet(_ sender: UIButton){
         let popupVC = NewSetVC()

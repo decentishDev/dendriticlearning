@@ -58,6 +58,8 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
     let db = Firestore.firestore()
     let storage = Storage.storage()
     
+    var previousSize = CGSize()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Colors.background
@@ -66,6 +68,8 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         
         // Fetch data and initialize the view after fetching
         fetchDataAndInitialize()
+        
+        previousSize = view.bounds.size
     }
 
     func fetchDataAndInitialize() {
@@ -262,13 +266,13 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         EndScreen.addSubview(EndButton)
         
         if(defaults.value(forKey: "isPaid") as! Bool != true){
-            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(view.frame.height, view.frame.width) - 50, height: 100)))
+            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(600, previousSize.width), height: 100)))
             EndScreen.addSubview(bannerView)
             bannerView.delegate = self
             bannerView.adUnitID = "ca-app-pub-5124969442805102/1739631380"
             bannerView.rootViewController = self
             bannerView.load(GADRequest())
-            bannerView.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(bannerView)
             NSLayoutConstraint.activate([
                 bannerView.bottomAnchor.constraint(equalTo: EndScreen.bottomAnchor, constant: -20),
                 bannerView.centerXAnchor.constraint(equalTo: EndScreen.centerXAnchor)

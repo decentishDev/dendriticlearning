@@ -106,7 +106,8 @@ class NewUserVC: UIViewController {
         
         let info1 = UILabel(frame: CGRect(x: 100, y: 50, width: fullX - 200, height: fullY - 200))
         info1.font = UIFont(name: "LilGrotesk-Regular", size: 30)
-        info1.text = "Dendritic is an innovative learning platform.\n\nThrough writing recognition, web sets, smart study modes, and simple integration of different types of content, our tools allow all students to learn in better ways."
+        //info1.text = "Dendritic is an innovative learning platform.\n\nThrough writing recognition, web sets, smart study modes, and simple integration of different types of content, our tools allow all students to learn in better ways."
+        info1.text = "This is the first release version of Dendritic Learning, our innovative platform meant for learning in natural and efficient ways.\n\nWe are still in the early stages of development, so please let us know if you have any suggestions or feedback.\n\nMore features and bug fixes will be coming soon!"
         info1.numberOfLines = 0
         info1.textColor = Colors.text
         info1.textAlignment = .center

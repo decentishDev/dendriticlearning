@@ -160,14 +160,13 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             topConnections.axis = .horizontal
             topConnections.alignment = .fill
             topConnections.distribution = .fillProportionally
-            topConnections.translatesAutoresizingMaskIntoConstraints = false
             topConnections.isUserInteractionEnabled = true
             topConnections.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
             topConnections.autoresizesSubviews = false
             bottomConnections.axis = .horizontal
             bottomConnections.alignment = .fill
             bottomConnections.distribution = .fillProportionally
-            bottomConnections.translatesAutoresizingMaskIntoConstraints = false
+            tAMC([bottomConnections, topConnections])
             bottomConnections.isUserInteractionEnabled = true
             bottomConnections.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
             bottomConnections.autoresizesSubviews = false
@@ -206,7 +205,6 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
                 connectButton.tintColor = Colors.text
                 connectButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
                 connectButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-                connectButton.translatesAutoresizingMaskIntoConstraints = false
                 (rect.subviews[2] as! UIStackView).addArrangedSubview(connectButton)
 
                 let otherButton = UIButton()
@@ -216,7 +214,7 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
 
                 otherButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
                 otherButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-                otherButton.translatesAutoresizingMaskIntoConstraints = false
+                tAMC([connectButton, otherButton])
                 otherButton.accessibilityIdentifier = String(i)
 
                 (rectangles[connection].subviews[1] as! UIStackView).addArrangedSubview(otherButton)
@@ -238,11 +236,10 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             let addConnection = UIButton()
             addConnection.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
             addConnection.tintColor = Colors.highlight
-            addConnection.imageView?.translatesAutoresizingMaskIntoConstraints = false
             addConnection.addTarget(self, action: #selector(newConnection(_:)), for: .touchUpInside)
             (rect.subviews[2] as! UIStackView).addArrangedSubview(addConnection)
             addConnection.heightAnchor.constraint(equalToConstant: 30).isActive = true
-            addConnection.translatesAutoresizingMaskIntoConstraints = false
+            tAMC([addConnection.imageView!, addConnection])
             addConnection.widthAnchor.constraint(equalToConstant: 30).isActive = true
         }
         
@@ -289,14 +286,14 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         
         
         if(defaults.value(forKey: "isPaid") as! Bool != true){
-            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(view.frame.height, view.frame.width) - 50, height: 100)))
+            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(600, view.bounds.width), height: 100)))
             view.addSubview(bannerView)
             bannerView.delegate = self
             bannerView.adUnitID = "ca-app-pub-5124969442805102/1739631380"
             bannerView.rootViewController = self
             bannerView.load(GADRequest())
             
-            bannerView.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(bannerView)
             NSLayoutConstraint.activate([
                 bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
                 bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
@@ -563,14 +560,13 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
             topConnections.axis = .horizontal
             topConnections.alignment = .fill
             topConnections.distribution = .fillProportionally
-            topConnections.translatesAutoresizingMaskIntoConstraints = false
             topConnections.isUserInteractionEnabled = true
             topConnections.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
             topConnections.autoresizesSubviews = false
             bottomConnections.axis = .horizontal
             bottomConnections.alignment = .fill
             bottomConnections.distribution = .fillProportionally
-            bottomConnections.translatesAutoresizingMaskIntoConstraints = false
+            tAMC([topConnections, bottomConnections])
             bottomConnections.isUserInteractionEnabled = true
             bottomConnections.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
             bottomConnections.autoresizesSubviews = false
@@ -579,11 +575,10 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
 
             addConnection.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
             addConnection.tintColor = Colors.highlight
-            addConnection.imageView?.translatesAutoresizingMaskIntoConstraints = false
             addConnection.addTarget(self, action: #selector(newConnection(_:)), for: .touchUpInside)
             bottomConnections.addArrangedSubview(addConnection)
             addConnection.heightAnchor.constraint(equalToConstant: 30).isActive = true
-            addConnection.translatesAutoresizingMaskIntoConstraints = false
+            tAMC([addConnection.imageView!, addConnection])
             addConnection.widthAnchor.constraint(equalToConstant: 30).isActive = true
             rectangle.addSubview(topConnections)
             rectangle.addSubview(bottomConnections)
@@ -649,13 +644,13 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
                     addConnection.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
                     
                     addConnection.tintColor = Colors.highlight
-                    addConnection.imageView?.translatesAutoresizingMaskIntoConstraints = false
+                    tAMC([addConnection.imageView!, addConnection])
                     addConnection.imageView!.layoutIfNeeded()
                     addConnection.accessibilityIdentifier = String(index!)
                     addConnection.addTarget(self, action: #selector(finishConnection(_:)), for: .touchUpInside)
 
                     (rectangle.subviews[1] as! UIStackView).addArrangedSubview(addConnection)
-                    addConnection.translatesAutoresizingMaskIntoConstraints = false
+
                     addConnection.widthAnchor.constraint(equalToConstant: 30).isActive = true
                     addConnection.heightAnchor.constraint(equalToConstant: 30).isActive = true
                     addedButtons.append(addConnection)
@@ -679,12 +674,12 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         let addConnection = UIButton()
         addConnection.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
         addConnection.tintColor = Colors.highlight
-        addConnection.imageView?.translatesAutoresizingMaskIntoConstraints = false
+
 
         addConnection.addTarget(self, action: #selector(newConnection(_:)), for: .touchUpInside)
         (selectedButton?.superview as! UIStackView).addArrangedSubview(addConnection)
         
-        addConnection.translatesAutoresizingMaskIntoConstraints = false
+        tAMC([addConnection.imageView!, addConnection])
         addConnection.widthAnchor.constraint(equalToConstant: 30).isActive = true
         addConnection.heightAnchor.constraint(equalToConstant: 30).isActive = true
             

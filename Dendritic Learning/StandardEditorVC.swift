@@ -92,8 +92,7 @@ deinit {
             stackView.alignment = .leading
             scrollView.addSubview(stackView)
             view.addSubview(scrollView)
-            scrollView.translatesAutoresizingMaskIntoConstraints = false
-            stackView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC([scrollView, stackView])
             NSLayoutConstraint.activate([
                 scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
                 scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -109,7 +108,7 @@ deinit {
             let topBar = UIView()
             topBar.widthAnchor.constraint(equalToConstant: 530).isActive = true
             topBar.heightAnchor.constraint(equalToConstant: 50).isActive = true
-            topBar.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(topBar)
             stackView.addArrangedSubview(topBar)
             
             let backButton = UIButton()
@@ -164,7 +163,7 @@ deinit {
             
             allTermsStackView.axis = .vertical
             allTermsStackView.spacing = 10
-            allTermsStackView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(allTermsStackView)
             stackView.addArrangedSubview(allTermsStackView)
             NSLayoutConstraint.activate([
                 allTermsStackView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor),
@@ -173,7 +172,7 @@ deinit {
             for (i, card) in cards.enumerated(){
                 indexes.append(i)
                 let termDefinitionStackView = UIStackView()
-                termDefinitionStackView.translatesAutoresizingMaskIntoConstraints = false
+                tAMC(termDefinitionStackView)
                 let term = card["term"] as? String
                 let definition = card["def"] as? String
                 if(card["termType"] as! String == "t"){
@@ -182,18 +181,17 @@ deinit {
                     termView.text = term
                     termView.font = UIFont(name: "LilGrotesk-Regular", size: 20)
                     termView.delegate = self
-                    termView.translatesAutoresizingMaskIntoConstraints = false
+                    tAMC(termView)
                     termView.isScrollEnabled = false
                     termView.backgroundColor = .clear
                     termView.accessibilityIdentifier = "t" + String(i)
-                    termView.translatesAutoresizingMaskIntoConstraints = false
                     termView.widthAnchor.constraint(equalToConstant: (view.frame.width - 141)/2).isActive = true
                     termView.textColor = Colors.text
                     termDefinitionStackView.addArrangedSubview(termView)
 
                 }else if(card["termType"] as! String == "i"){
                     let termImage = UIButton(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-                    termImage.translatesAutoresizingMaskIntoConstraints = false
+                    tAMC(termImage)
 
                     termImage.widthAnchor.constraint(equalToConstant: (view.frame.width - 141)/2).isActive = true
                     termImage.heightAnchor.constraint(equalToConstant: (view.frame.width - 141)/3).isActive = true
@@ -208,7 +206,7 @@ deinit {
 
                 }else{
                     let drawingButton = UIButton(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-                    drawingButton.translatesAutoresizingMaskIntoConstraints = false
+                    
                     drawingButton.widthAnchor.constraint(equalToConstant: (view.frame.width - 141)/2).isActive = true
                     drawingButton.heightAnchor.constraint(equalToConstant: (view.frame.width - 141)/3).isActive = true
                     drawingButton.addTarget(self, action: #selector(editDrawing(_:)), for: .touchUpInside)
@@ -222,7 +220,7 @@ deinit {
 
                     termDrawing.isUserInteractionEnabled = false
                     loadDrawing(url: card["term"] as? String, canvas: termDrawing)
-                    termDrawing.translatesAutoresizingMaskIntoConstraints = false
+                    tAMC([drawingButton, termDrawing])
 
                     drawingButton.insertSubview(termDrawing, at: 0)
                     termDrawing.anchorPoint = CGPoint(x: 1, y: 1)
@@ -235,7 +233,7 @@ deinit {
                 
                 let breakView = UIView()
                 breakView.widthAnchor.constraint(equalToConstant: 1).isActive = true
-                breakView.translatesAutoresizingMaskIntoConstraints = false
+                tAMC(breakView)
                 breakView.backgroundColor = Colors.text.withAlphaComponent(0.5)
                 termDefinitionStackView.addArrangedSubview(breakView)
                 
@@ -245,7 +243,7 @@ deinit {
                     definitionView.text = definition
                     definitionView.font = UIFont(name: "LilGrotesk-Regular", size: 20)
                     definitionView.delegate = self
-                    definitionView.translatesAutoresizingMaskIntoConstraints = false
+                    tAMC(definitionView)
                     definitionView.isScrollEnabled = false
                     definitionView.backgroundColor = .clear
                     definitionView.accessibilityIdentifier = "d" + String(i)
@@ -254,7 +252,6 @@ deinit {
 
                 }else if card["defType"] as! String == "d"{
                     let drawingButton = UIButton(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-                    drawingButton.translatesAutoresizingMaskIntoConstraints = false
                     drawingButton.heightAnchor.constraint(equalToConstant: (view.frame.width - 141)/3).isActive = true
                     drawingButton.addTarget(self, action: #selector(editDrawing(_:)), for: .touchUpInside)
                     
@@ -267,7 +264,7 @@ deinit {
                     definitionDrawing.tool = Colors.pen
                     definitionDrawing.overrideUserInterfaceStyle = .light
                     loadDrawing(url: card["def"] as? String, canvas: definitionDrawing)
-                    definitionDrawing.translatesAutoresizingMaskIntoConstraints = false
+                    tAMC([drawingButton, definitionDrawing])
 
                     drawingButton.insertSubview(definitionDrawing, at: 0)
 
@@ -277,7 +274,7 @@ deinit {
                     termDefinitionStackView.addArrangedSubview(drawingButton)
                 }
                 
-                termDefinitionStackView.translatesAutoresizingMaskIntoConstraints = false
+                tAMC(termDefinitionStackView)
                 termDefinitionStackView.isLayoutMarginsRelativeArrangement = true
                 termDefinitionStackView.layoutMargins = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
                 termDefinitionStackView.axis = .horizontal
@@ -286,7 +283,7 @@ deinit {
                 termDefinitionStackView.layer.cornerRadius = 10
                 
                 let buttonsView = UIView()
-                buttonsView.translatesAutoresizingMaskIntoConstraints = false
+                tAMC(buttonsView)
                 con(buttonsView, view.frame.width - 100, 30)
                 let button1 = UIButton()
                 button1.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
@@ -385,7 +382,7 @@ deinit {
                 buttonsView.addSubview(deleteButton)
                 
                 let cardAndButtons = UIStackView()
-                cardAndButtons.translatesAutoresizingMaskIntoConstraints = false
+                tAMC(cardAndButtons)
                 cardAndButtons.axis = .vertical
                 cardAndButtons.spacing = 0
                 cardAndButtons.addArrangedSubview(termDefinitionStackView)
@@ -405,7 +402,7 @@ deinit {
             stackView.addArrangedSubview(newTerm)
             
             let buttonsView = UIView()
-            buttonsView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(buttonsView)
             con(buttonsView, view.frame.width - 100, 30)
             let button1 = UIButton()
             button1.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
@@ -473,7 +470,7 @@ deinit {
     
     @objc func addTerm(_ sender: UIButton){
         let termDefinitionStackView = UIStackView()
-        termDefinitionStackView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(termDefinitionStackView)
         var term : Any? = ""
         var definition : Any? = ""
         if(defaultTerm == "t"){
@@ -482,11 +479,10 @@ deinit {
             termView.text = term as? String
             termView.font = UIFont(name: "LilGrotesk-Regular", size: 20)
             termView.delegate = self
-            termView.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(termView)
             termView.isScrollEnabled = false
             termView.backgroundColor = .clear
             termView.accessibilityIdentifier = "t" + String(cards.count)
-            termView.translatesAutoresizingMaskIntoConstraints = false
             termView.widthAnchor.constraint(equalToConstant: (view.frame.width - 141)/2).isActive = true
             termView.textColor = Colors.text
             termDefinitionStackView.addArrangedSubview(termView)
@@ -494,7 +490,7 @@ deinit {
         }else if(defaultTerm == "i"){
             term = UIImage(named: "color1.png")!.pngData()!
             let termImage = UIButton(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-            termImage.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(termImage)
             //termImage.setImage(UIImage(named: "color1.png"), for: .normal)
             termImage.widthAnchor.constraint(equalToConstant: (view.frame.width - 141)/2).isActive = true
             termImage.heightAnchor.constraint(equalToConstant: (view.frame.width - 141)/3).isActive = true
@@ -509,7 +505,7 @@ deinit {
         }else{
             term = ""
             let drawingButton = UIButton(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-            drawingButton.translatesAutoresizingMaskIntoConstraints = false
+
             drawingButton.widthAnchor.constraint(equalToConstant: (view.frame.width - 141)/2).isActive = true
             drawingButton.heightAnchor.constraint(equalToConstant: (view.frame.width - 141)/3).isActive = true
             drawingButton.addTarget(self, action: #selector(editDrawing(_:)), for: .touchUpInside)
@@ -524,7 +520,7 @@ deinit {
             //definitionDrawing.heightAnchor.constraint(equalToConstant: (view.frame.width - 141)/3).isActive = true
             termDrawing.isUserInteractionEnabled = false
             termDrawing.drawing = recolor(PKDrawing())
-            termDrawing.translatesAutoresizingMaskIntoConstraints = false
+            tAMC([drawingButton, termDrawing])
             //definitionDrawing.backgroundColor = .red
             drawingButton.insertSubview(termDrawing, at: 0)
             termDrawing.anchorPoint = CGPoint(x: 1, y: 1)
@@ -541,7 +537,7 @@ deinit {
         
         let breakView = UIView()
         breakView.widthAnchor.constraint(equalToConstant: 1).isActive = true
-        breakView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(breakView)
         breakView.backgroundColor = Colors.text.withAlphaComponent(0.5)
         termDefinitionStackView.addArrangedSubview(breakView)
         //breakView.heightAnchor.constraint(equalTo: termDefinitionStackView.heightAnchor, multiplier: 0.5).isActive = true
@@ -552,7 +548,7 @@ deinit {
             definitionView.text = definition as? String
             definitionView.font = UIFont(name: "LilGrotesk-Regular", size: 20)
             definitionView.delegate = self
-            definitionView.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(definitionView)
             definitionView.isScrollEnabled = false
             definitionView.backgroundColor = .clear
             definitionView.accessibilityIdentifier = "d" + String(cards.count)
@@ -562,7 +558,7 @@ deinit {
         }else if defaultDefinition == "d"{
             definition = ""
             let drawingButton = UIButton(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-            drawingButton.translatesAutoresizingMaskIntoConstraints = false
+
             drawingButton.heightAnchor.constraint(equalToConstant: (view.frame.width - 141)/3).isActive = true
             drawingButton.addTarget(self, action: #selector(editDrawing(_:)), for: .touchUpInside)
             
@@ -576,7 +572,7 @@ deinit {
             definitionDrawing.tool = Colors.pen
             definitionDrawing.overrideUserInterfaceStyle = .light
             definitionDrawing.drawing = recolor(PKDrawing())
-            definitionDrawing.translatesAutoresizingMaskIntoConstraints = false
+            tAMC([drawingButton, definitionDrawing])
             //definitionDrawing.backgroundColor = .red
             drawingButton.insertSubview(definitionDrawing, at: 0)
 //                definitionDrawing.leadingAnchor.constraint(equalTo: drawingButton.leadingAnchor).isActive = true
@@ -592,7 +588,7 @@ deinit {
             
         }
         
-        termDefinitionStackView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(termDefinitionStackView)
         termDefinitionStackView.isLayoutMarginsRelativeArrangement = true
         termDefinitionStackView.layoutMargins = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         termDefinitionStackView.axis = .horizontal
@@ -612,7 +608,7 @@ deinit {
         indexes.append(i)
         
         let buttonsView = UIView()
-        buttonsView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(buttonsView)
         con(buttonsView, view.frame.width - 100, 30)
         let button1 = UIButton()
         button1.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
@@ -715,7 +711,7 @@ deinit {
         buttonsView.addSubview(deleteButton)
         
         let cardAndButtons = UIStackView()
-        cardAndButtons.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(cardAndButtons)
         cardAndButtons.axis = .vertical
         cardAndButtons.spacing = 0
         cardAndButtons.addArrangedSubview(termDefinitionStackView)
@@ -753,7 +749,7 @@ deinit {
                 termView.text = ""
                 termView.font = UIFont(name: "LilGrotesk-Regular", size: 20)
                 termView.delegate = self
-                termView.translatesAutoresizingMaskIntoConstraints = false
+                tAMC(termView)
                 termView.isScrollEnabled = false
                 termView.backgroundColor = .clear
                 termView.textColor = Colors.text
@@ -794,7 +790,7 @@ deinit {
                 termImage.layer.cornerRadius = 10
                 termImage.accessibilityIdentifier = String(i)
                 
-                termImage.translatesAutoresizingMaskIntoConstraints = false
+                tAMC(termImage)
                 termImage.addTarget(self, action: #selector(changeTermImage(_:)), for: .touchUpInside)
                 //termImage.setImage(UIImage(named: "DendriticLearning_icon_1024x1024_v2-2.png"), for: .normal)
                 termImage.accessibilityIdentifier = String(i)
@@ -824,7 +820,7 @@ deinit {
                 sender.superview!.subviews[1].tintColor = Colors.darkHighlight
                 cards[i]["termType"] = "d"
                 let drawingButton = UIButton(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-                drawingButton.translatesAutoresizingMaskIntoConstraints = false
+
                 drawingButton.widthAnchor.constraint(equalToConstant: (view.frame.width - 141)/2).isActive = true
                 drawingButton.heightAnchor.constraint(equalToConstant: (view.frame.width - 141)/3).isActive = true
                 drawingButton.addTarget(self, action: #selector(editDrawing(_:)), for: .touchUpInside)
@@ -835,7 +831,7 @@ deinit {
                 //definitionDrawing.heightAnchor.constraint(equalToConstant: (view.frame.width - 141)/3).isActive = true
                 termDrawing.isUserInteractionEnabled = false
                 termDrawing.drawing = recolor(PKDrawing())
-                termDrawing.translatesAutoresizingMaskIntoConstraints = false
+                tAMC([drawingButton, termDrawing])
                 termDrawing.layer.cornerRadius = 10
                 termDrawing.backgroundColor = .clear
                 termDrawing.tool = Colors.pen
@@ -877,7 +873,7 @@ deinit {
                 definitionView.text = ""
                 definitionView.font = UIFont(name: "LilGrotesk-Regular", size: 20)
                 definitionView.delegate = self
-                definitionView.translatesAutoresizingMaskIntoConstraints = false
+                tAMC(definitionView)
                 definitionView.isScrollEnabled = false
                 definitionView.backgroundColor = .clear
                 definitionView.accessibilityIdentifier = "d" + String(i)
@@ -897,7 +893,6 @@ deinit {
             cards[i]["defType"] = "d"
             
             let drawingButton = UIButton(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-            drawingButton.translatesAutoresizingMaskIntoConstraints = false
             drawingButton.heightAnchor.constraint(equalToConstant: (view.frame.width - 141)/3).isActive = true
             drawingButton.addTarget(self, action: #selector(editDrawing(_:)), for: .touchUpInside)
             drawingButton.accessibilityIdentifier = "d" + String(i)
@@ -907,7 +902,7 @@ deinit {
             //definitionDrawing.heightAnchor.constraint(equalToConstant: (view.frame.width - 141)/3).isActive = true
             definitionDrawing.isUserInteractionEnabled = false
             definitionDrawing.drawing = recolor(PKDrawing())
-            definitionDrawing.translatesAutoresizingMaskIntoConstraints = false
+            tAMC([drawingButton, definitionDrawing])
             definitionDrawing.layer.cornerRadius = 10
             definitionDrawing.backgroundColor = .clear
             definitionDrawing.tool = Colors.pen

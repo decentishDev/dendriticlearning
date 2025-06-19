@@ -21,21 +21,48 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     var destinationSet = ""
     var destinationType = ""
     var retrievedSets: [String: Any] = [:]
+    var ids: [String] = []
+    var sets: [[String: Any]] = []
     var likedSets: [String] = []
+    
+    var previousSize: CGSize?
+    
+    var previousSearch = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Colors.background
-        setup()
+        //setup()
+        previousSize = view.bounds.size
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        //setup()
+        setup()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.setup()
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if previousSize != view.bounds.size {
+            previousSize = view.bounds.size
+            setup()
+        }
     }
     
     func setup(){
         for subview in resultsStack.arrangedSubviews {
             resultsStack.removeArrangedSubview(subview)
+            subview.removeFromSuperview()
+        }
+        
+        resultsStack.removeFromSuperview()
+        for subview in view.subviews {
             subview.removeFromSuperview()
         }
         
@@ -61,9 +88,11 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         idButton.layer.cornerRadius = 10
         view.addSubview(idButton)
         
-        let searchLabel = UILabel(frame: CGRect(x: 50, y: 150, width: view.frame.width - 100, height: 50))
+        let searchLabel = UILabel(frame: CGRect(x: 50, y: 100, width: view.frame.width - 100, height: 100))
         searchLabel.text = "Enter the name of a set to search for it."
-        searchLabel.font = UIFont(name: "LilGrotesk-Regular", size: 30)
+        searchLabel.numberOfLines = 0
+        searchLabel.lineBreakStrategy = .pushOut
+        searchLabel.font = UIFont(name: "LilGrotesk-Regular", size: min(previousSize!.width/25, 30))
         searchLabel.textAlignment = .center
         searchLabel.textColor = Colors.text
         view.addSubview(searchLabel)
@@ -76,6 +105,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         searchBar.font = UIFont(name: "LilGrotesk-Regular", size: 25)
         searchBar.layer.cornerRadius = 10
         searchBar.delegate = self
+        searchBar.text = previousSearch
         view.addSubview(searchBar)
         
         let searchButton = UIButton(frame: CGRect(x: view.frame.width - 90, y: 210, width: 30, height: 30))
@@ -93,8 +123,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         resultsScroll.addSubview(resultsStack)
         view.addSubview(resultsScroll)
         //view.sendSubviewToBack(resultsScroll)
-        resultsScroll.translatesAutoresizingMaskIntoConstraints = false
-        resultsStack.translatesAutoresizingMaskIntoConstraints = false
+        tAMC([resultsStack, resultsScroll])
         NSLayoutConstraint.activate([
             resultsScroll.topAnchor.constraint(equalTo: view.topAnchor, constant: 270),
             resultsScroll.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
@@ -122,6 +151,10 @@ class SearchVC: UIViewController, UITextFieldDelegate {
             }
         } else {
             performSegue(withIdentifier: "searchVC_unwind", sender: nil)
+        }
+        
+        if retrievedSets.count > 0 {
+            addSets()
         }
     }
     
@@ -177,6 +210,8 @@ class SearchVC: UIViewController, UITextFieldDelegate {
     }
     
     @objc func searchButton(sender: UIButton){
+        previousSearch = searchBar.text ?? ""
+        
         for subview in resultsStack.arrangedSubviews {
             resultsStack.removeArrangedSubview(subview)
             subview.removeFromSuperview()
@@ -197,34 +232,43 @@ class SearchVC: UIViewController, UITextFieldDelegate {
                 }
                 loadView.removeFromSuperview()
                 self.retrievedSets = [:]
-                var ids: [String] = []
-                var sets: [[String: Any]] = []
+                self.ids = []
+                self.sets = []
                 for document in querySnapshot!.documents {
                     let data = document.data()
-                    sets.append(data)
+                    self.sets.append(data)
                     self.retrievedSets[document.documentID] = data
-                    ids.append(document.documentID)
+                    self.ids.append(document.documentID)
                 }
-                for i in 0...((sets.count - 1) / 3) {
-                    let row = UIStackView()
-                    row.axis = .horizontal
-                    row.spacing = 20
-                    row.alignment = .leading
-                    row.translatesAutoresizingMaskIntoConstraints = false
-                    self.resultsStack.addArrangedSubview(row)
-                    con(row, self.view.frame.width - 100, 150)
-                    for j in 3 * i...(3 * i) + 2 {
-                        if sets.count > j {
-                            let setView = self.createSetView(set: sets[j], id: ids[j])
-                            row.addArrangedSubview(setView)
-                        } else {
-                            let setView = UIView()
-                            row.addArrangedSubview(setView)
-                            NSLayoutConstraint.activate([
-                                setView.heightAnchor.constraint(equalTo: row.heightAnchor),
-                            ])
-                        }
-                    }
+                
+                self.addSets()
+            }
+        }
+    }
+    
+    func addSets(){
+        let minimumWidth: CGFloat = 400
+        let rowCount = Int(max((self.previousSize!.width - 100) / minimumWidth, 1))
+        
+        for i in 0...((self.sets.count - 1) / rowCount) {
+            let row = UIStackView()
+            row.axis = .horizontal
+            row.spacing = 20
+            row.alignment = .leading
+            row.distribution = .fillEqually
+            tAMC(row)
+            self.resultsStack.addArrangedSubview(row)
+            conW(row, self.view.frame.width - 100)
+            for j in rowCount * i...(rowCount * i) + rowCount {
+                if self.sets.count > j {
+                    let setView = self.createSetView(set: self.sets[j], id: self.ids[j])
+                    row.addArrangedSubview(setView)
+                } else {
+                    let setView = UIView()
+                    row.addArrangedSubview(setView)
+                    NSLayoutConstraint.activate([
+                        setView.heightAnchor.constraint(equalTo: row.heightAnchor),
+                    ])
                 }
             }
         }
@@ -232,58 +276,94 @@ class SearchVC: UIViewController, UITextFieldDelegate {
 
     
     func createSetView(set: [String: Any], id: String) -> UIView {
-        let w = (view.frame.width - 140)/3
-        let rect = UIButton(frame: CGRect(x: 0, y: 0, width: w, height: 150))
-        con(rect, w, 150)
-        rect.backgroundColor = Colors.secondaryBackground
-        rect.layer.cornerRadius = 10
-        let titleLabel = UILabel(frame: CGRect(x: 15, y: 15, width: w - 30, height: 100))
+        let button = UIButton()
+        button.backgroundColor = Colors.secondaryBackground
+        button.layer.cornerRadius = 10
+        button.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
+
+        var identifier = "s"
+        if set["type"] as? String == "web" {
+            identifier = "w"
+        }
+        button.accessibilityIdentifier = identifier + id
+
+        // --- Title Label ---
+        let titleLabel = UILabel()
         titleLabel.text = set["name"] as? String
         titleLabel.textColor = Colors.text
         titleLabel.font = UIFont(name: "LilGrotesk-Bold", size: 30)
         titleLabel.numberOfLines = 0
-        titleLabel.sizeToFit()
-        rect.addSubview(titleLabel)
-        let creatorLabel = UILabel(frame: CGRect(x: 15, y: 85, width: w - 30, height: 15))
-        creatorLabel.text = set["author"] as? String
-        creatorLabel.textColor = Colors.text
-        creatorLabel.font = UIFont(name: "LilGrotesk-Bold", size: 20)
-        rect.addSubview(creatorLabel)
-        let dateLabel = UILabel(frame: CGRect(x: 15, y: 115, width: w - 30, height: 15))
-        dateLabel.text = formatDate((set["date"] as! Timestamp).dateValue())
+
+        // --- Author and Likes ---
+        let authorLabel = UILabel()
+        authorLabel.text = set["author"] as? String
+        authorLabel.textColor = Colors.text
+        authorLabel.font = UIFont(name: "LilGrotesk-Bold", size: 20)
+
+        let heartImage = UIImageView()
+        heartImage.image = UIImage(systemName: likedSets.contains(id) ? "heart.fill" : "heart")
+        heartImage.tintColor = Colors.highlight
+        heartImage.contentMode = .scaleAspectFit
+
+        let heartCount = UILabel()
+        heartCount.text = String(set["likes"] as? Int ?? 0)
+        heartCount.textColor = Colors.highlight
+        heartCount.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+
+        let heartStack = UIStackView(arrangedSubviews: [heartCount, heartImage])
+        heartStack.axis = .horizontal
+        heartStack.spacing = 4
+        heartStack.alignment = .center
+
+        let authorLikesStack = UIStackView(arrangedSubviews: [authorLabel, UIView(), heartStack])
+        authorLikesStack.axis = .horizontal
+        authorLikesStack.spacing = 8
+        authorLikesStack.alignment = .center
+
+        // --- Date and Term Count ---
+        let dateLabel = UILabel()
+        if let timestamp = set["date"] as? Timestamp {
+            dateLabel.text = formatDate(timestamp.dateValue())
+        }
         dateLabel.textColor = Colors.text
         dateLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
-        rect.addSubview(dateLabel)
-        let heartLabel = UILabel(frame: CGRect(x: 15, y: 85, width: w - 55, height: 15))
-        heartLabel.text = String(set["likes"] as! Int)
-        heartLabel.textColor = Colors.highlight
-        heartLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
-        heartLabel.textAlignment = .right
-        rect.addSubview(heartLabel)
-        let heartImage = UIImageView(image: UIImage(systemName: "heart"))
-        if(likedSets.firstIndex(of: id) != nil){
-            heartImage.image = UIImage(systemName: "heart.fill")
-        }
-        heartImage.contentMode = .scaleAspectFit
-        heartImage.tintColor = Colors.highlight
-        heartImage.frame = CGRect(x: w - 35, y: 85, width: 15, height: 15)
-        rect.addSubview(heartImage)
-        let heartButton = UIButton(frame: CGRect(x: w - 85, y: 85, width: 70, height: 15))
-        rect.addSubview(heartButton)
-        let cardsLabel = UILabel(frame: CGRect(x: 15, y: 115, width: w - 30, height: 15))
-        cardsLabel.text = String((set["set"] as! [[String: Any]]).count) + " terms"
-        cardsLabel.textColor = Colors.text
-        cardsLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
-        cardsLabel.textAlignment = .right
+
+        let termsLabel = UILabel()
+        let count = (set["set"] as? [[String: Any]])?.count ?? 0
+        termsLabel.text = "\(count) terms"
+        termsLabel.textColor = Colors.text
+        termsLabel.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+        termsLabel.textAlignment = .right
+
+        let bottomStack = UIStackView(arrangedSubviews: [dateLabel, UIView(), termsLabel])
+        bottomStack.axis = .horizontal
+        bottomStack.spacing = 8
+        bottomStack.alignment = .center
+
+        // --- Main Vertical Stack ---
+        let stack = UIStackView(arrangedSubviews: [titleLabel, authorLikesStack, bottomStack])
+        stack.axis = .vertical
+        stack.spacing = 8
+        tAMC([button, heartImage, stack])
+
+        button.addSubview(stack)
+
+        // --- Constraints ---
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12),
+            stack.leadingAnchor.constraint(equalTo: button.leadingAnchor, constant: 12),
+            stack.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -12),
+            stack.bottomAnchor.constraint(equalTo: button.bottomAnchor, constant: -12),
+
+            heartImage.widthAnchor.constraint(equalToConstant: 16),
+            heartImage.heightAnchor.constraint(equalToConstant: 16),
+        ])
         
-        rect.addSubview(cardsLabel)
-        rect.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
-        var t = "s"
-        if set["type"] as! String == "web" {
-            t = "w"
+        for i in button.subviews {
+            i.isUserInteractionEnabled = false
         }
-        rect.accessibilityIdentifier = t + id
-        return rect
+
+        return button
     }
     
     @objc func buttonTapped(_ sender: UIButton) {

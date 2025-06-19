@@ -18,7 +18,7 @@ class ClassCardCell: UICollectionViewCell {
 
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(imageView)
 
         titleLabel.font = UIFont(name: "LilGrotesk-Bold", size: 25)
         titleLabel.textColor = Colors.text
@@ -32,7 +32,7 @@ class ClassCardCell: UICollectionViewCell {
         let textStack = UIStackView(arrangedSubviews: [titleLabel, setsLabel, teacherLabel])
         textStack.axis = .vertical
         textStack.spacing = 4
-        textStack.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(textStack)
 
         contentView.addSubview(imageView)
         contentView.addSubview(textStack)

@@ -53,6 +53,12 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
     
     var bottomSpace: CGFloat = 0
     
+    var previousSize: CGSize?
+    
+    var mainStack = UIStackView()
+    var optionsStack = UIStackView()
+    var fullStack = UIStackView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Colors.background
@@ -75,6 +81,8 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
                 self.handleUserData([:])
             }
         }
+        
+        previousSize = view.bounds.size
     }
 
     func handleUserData(_ userData: [String: Any]) {
@@ -103,18 +111,33 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         if random {
             cardOrder.shuffle()
         }
-        
         setup()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        setup()
+        //setup()
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        setup()
+        coordinator.animate(alongsideTransition: nil) { _ in
+            //self.setup()
+            self.layout()
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if previousSize != view.bounds.size {
+            previousSize = view.bounds.size
+            //setup()
+//            if previousSize!.width < 500 {
+//                IncorrectView.backgroundColor = .clear
+//                CorrectView.backgroundColor = .clear
+//            }
+            layout()
+        }
     }
     
     
@@ -124,14 +147,14 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         }
         
         if(defaults.value(forKey: "isPaid") as! Bool != true){
-            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(view.frame.height, view.frame.width) - 50, height: 100)))
+            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(600, view.bounds.width), height: 100)))
             view.addSubview(bannerView)
             bannerView.delegate = self
             bannerView.adUnitID = "ca-app-pub-5124969442805102/1739631380"
             bannerView.rootViewController = self
             bannerView.load(GADRequest())
             
-            bannerView.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(bannerView)
             NSLayoutConstraint.activate([
                 bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
                 bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
@@ -142,6 +165,8 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         }
         //print(bottomSpace)
         
+        
+        
         IncorrectView.backgroundColor = Colors.secondaryBackground
         IncorrectView.layer.cornerRadius = 20
         CardView.backgroundColor = Colors.secondaryBackground
@@ -150,28 +175,19 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         CorrectView.backgroundColor = Colors.secondaryBackground
         CorrectView.layer.cornerRadius = 20
         
-        view.addSubview(CorrectView)
-        view.addSubview(IncorrectView)
+//        view.addSubview(CorrectView)
+//        view.addSubview(IncorrectView)
         
         
-        if(view.layer.frame.width > view.layer.frame.height){
-            IncorrectView.frame = CGRect(x: 20, y: 60, width: (view.layer.frame.width - 80) * 0.15, height: view.frame.height - 80 - bottomSpace)
-            CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80 - bottomSpace)
-            CorrectView.frame = CGRect(x: 60 + IncorrectView.frame.width + CardView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.15, height: view.frame.height - 80 - bottomSpace)
-        }else{
-            let optionsHeight: CGFloat = (view.layer.frame.height - 100 - bottomSpace) * 0.3
-            let topHeight: CGFloat = (view.layer.frame.height - 100 - bottomSpace) * 0.7
-            
-            IncorrectView.frame = CGRect(x: 20, y: 80 + topHeight, width: (view.layer.frame.width - 60) * 0.5, height: optionsHeight)
-            CardView.frame = CGRect(x: 20, y: 60, width: view.layer.frame.width - 40, height: topHeight)
-            CorrectView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 80 + topHeight, width: (view.layer.frame.width - 60) * 0.5, height: optionsHeight)
-            
-        }
+        layout()
+        
+        
         
         let incorrectImage = UIImageView()
         incorrectImage.image = UIImage(systemName: "xmark")
         incorrectImage.tintColor = Colors.text
         incorrectImage.layer.frame = CGRect(x: (IncorrectView.layer.frame.width / 2) - 25, y: (IncorrectView.layer.frame.height / 2) - 25, width: 50, height: 50)
+        conH(incorrectImage, 50)
         incorrectImage.contentMode = .scaleAspectFit
         IncorrectView.addSubview(incorrectImage)
         let incorrectButton = UIButton()
@@ -179,7 +195,17 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         incorrectButton.layer.frame = CGRect(x: 0, y: 0, width: IncorrectView.frame.width, height: IncorrectView.frame.height)
         IncorrectView.addSubview(incorrectButton)
         
-        
+        tAMC([incorrectImage, incorrectButton])
+        NSLayoutConstraint.activate([
+            //stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12)
+            incorrectImage.leftAnchor.constraint(equalTo: IncorrectView.leftAnchor, constant: 0),
+            incorrectImage.rightAnchor.constraint(equalTo: IncorrectView.rightAnchor, constant: 0),
+            incorrectImage.centerYAnchor.constraint(equalTo: IncorrectView.centerYAnchor),
+            incorrectButton.leftAnchor.constraint(equalTo: IncorrectView.leftAnchor),
+            incorrectButton.rightAnchor.constraint(equalTo: IncorrectView.rightAnchor),
+            incorrectButton.topAnchor.constraint(equalTo: IncorrectView.topAnchor),
+            incorrectButton.bottomAnchor.constraint(equalTo: IncorrectView.bottomAnchor),
+        ])
         
         CardLabel.font = UIFont(name: "LilGrotesk-Regular", size: 40)
         CardLabel.textAlignment = .center
@@ -188,6 +214,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         CardLabel.textColor = Colors.text
         CardView.addSubview(CardLabel)
         CardDrawing.frame = CGRect(x: 0, y: 0, width: (view.frame.width - 161), height: 2*(view.frame.width - 161)/3 - bottomSpace)
+        
         CardDrawing.isUserInteractionEnabled = false
         CardDrawing.layer.cornerRadius = 20
         CardDrawing.backgroundColor = .clear
@@ -198,6 +225,28 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         CardImage.frame = CGRect(x: 20, y: 20, width: CardView.frame.width - 40, height: CardView.frame.height - 40)
         CardImage.contentMode = .scaleAspectFit
         CardView.addSubview(CardImage)
+        
+        tAMC([CardLabel, CardDrawing, CardImage])
+        
+        NSLayoutConstraint.activate([
+            //stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12)
+            
+            CardLabel.leadingAnchor.constraint(equalTo: CardView.leadingAnchor, constant: 20),
+            CardLabel.trailingAnchor.constraint(equalTo: CardView.trailingAnchor, constant: -20),
+            CardLabel.topAnchor.constraint(equalTo: CardView.topAnchor, constant: 20),
+            CardLabel.bottomAnchor.constraint(equalTo: CardView.bottomAnchor, constant: -20),
+            
+            CardDrawing.leadingAnchor.constraint(equalTo: CardView.leadingAnchor, constant: 20),
+            CardDrawing.trailingAnchor.constraint(equalTo: CardView.trailingAnchor, constant: -20),
+            CardDrawing.topAnchor.constraint(equalTo: CardView.topAnchor, constant: 20),
+            CardDrawing.bottomAnchor.constraint(equalTo: CardView.bottomAnchor, constant: -20),
+            
+            CardImage.leadingAnchor.constraint(equalTo: CardView.leadingAnchor, constant: 20),
+            CardImage.trailingAnchor.constraint(equalTo: CardView.trailingAnchor, constant: -20),
+            CardImage.topAnchor.constraint(equalTo: CardView.topAnchor, constant: 20),
+            CardImage.bottomAnchor.constraint(equalTo: CardView.bottomAnchor, constant: -20),
+        ])
+        
         if(onFront){
             if(cards[cardOrder[index]]["termType"] as! String == "t" || cards[cardOrder[index]]["termType"] as! String == "d-r"){
                 CardLabel.text = cards[cardOrder[index]]["term"] as? String
@@ -222,8 +271,6 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         CardView.addSubview(cardButton)
         CardView.bringSubviewToFront(cardButton)
         
-        
-        
         swipeLeft.addTarget(self, action: #selector(self.IncorrectSwipe(sender:)))
         swipeLeft.direction = .left
         swipeLeft.view?.layer.frame = CGRect(x: 0, y: 0, width: CardView.frame.width, height: CardView.frame.height)
@@ -238,14 +285,29 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         correctImage.tintColor = Colors.text
         correctImage.layer.position = CorrectView.center
         correctImage.layer.frame = CGRect(x: (CorrectView.layer.frame.width / 2) - 25, y: (CorrectView.layer.frame.height / 2) - 25, width: 50, height: 50)
+        conH(correctImage, 50)
+        
         correctImage.contentMode = .scaleAspectFit
         CorrectView.addSubview(correctImage)
         let correctButton = UIButton()
         correctButton.addTarget(self, action: #selector(self.CorrectButton(sender:)), for: .touchUpInside)
         correctButton.layer.frame = CGRect(x: 0, y: 0, width: CorrectView.frame.width, height: CorrectView.frame.height)
+        tAMC([correctImage, correctButton])
         CorrectView.addSubview(correctButton)
         
+        NSLayoutConstraint.activate([
+            //stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12)
+            correctImage.leftAnchor.constraint(equalTo: CorrectView.leftAnchor, constant: 0),
+            correctImage.rightAnchor.constraint(equalTo: CorrectView.rightAnchor, constant: 0),
+            correctImage.centerYAnchor.constraint(equalTo: CorrectView.centerYAnchor),
+            correctButton.leftAnchor.constraint(equalTo: CorrectView.leftAnchor),
+            correctButton.rightAnchor.constraint(equalTo: CorrectView.rightAnchor),
+            correctButton.topAnchor.constraint(equalTo: CorrectView.topAnchor),
+            correctButton.bottomAnchor.constraint(equalTo: CorrectView.bottomAnchor),
+        ])
+        
         let backButton = UIButton()
+        con(backButton, 30, 30)
         backButton.frame = CGRect(x: 15, y: 15, width: 30, height: 30)
         backButton.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
         backButton.tintColor = Colors.highlight
@@ -253,6 +315,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         backButton.addTarget(self, action: #selector(self.BackButton(sender:)), for: .touchUpInside)
         view.addSubview(backButton)
         let settingsButton = UIButton()
+        con(settingsButton, 30, 30)
         settingsButton.frame = CGRect(x: view.layer.frame.width - 45, y: 15, width: 30, height: 30)
         settingsButton.setImage(UIImage(systemName: "gearshape.fill"), for: .normal)
         settingsButton.tintColor = Colors.highlight
@@ -260,11 +323,25 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         settingsButton.addTarget(self, action: #selector(self.SettingsButton(sender:)), for: .touchUpInside)
         view.addSubview(settingsButton)
         cardCounter.frame = CGRect(x: 60, y: 20, width: view.frame.width - 120, height: 20)
+        conH(cardCounter, 30)
         cardCounter.font = UIFont(name: "LilGrotesk-Bold", size: 15)
         cardCounter.textAlignment = .center
         cardCounter.text = String(index + 1) + "/" + String(cardOrder.count)
         cardCounter.textColor = Colors.text
         view.addSubview(cardCounter)
+        
+        tAMC([backButton, settingsButton, cardCounter])
+        
+        NSLayoutConstraint.activate([
+            //stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12)
+            backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
+            cardCounter.leadingAnchor.constraint(equalTo: backButton.trailingAnchor, constant: 15),
+            cardCounter.trailingAnchor.constraint(equalTo: settingsButton.leadingAnchor, constant: -15),
+            settingsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15),
+            backButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 15),
+            cardCounter.topAnchor.constraint(equalTo: view.topAnchor, constant: 15),
+            settingsButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 15),
+        ])
         
         OverlayCard.frame = CardView.frame
         OverlayCard.layer.cornerRadius = 20
@@ -275,7 +352,8 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         OverlayLabel.numberOfLines = 0
         OverlayLabel.textColor = Colors.text
         OverlayCard.addSubview(OverlayLabel)
-        OverlayDrawing.frame = CGRect(x: 0, y: 0, width: (view.frame.width - 161), height: 2*(view.frame.width - 161)/3 - bottomSpace)
+        //OverlayDrawing.frame = CGRect(x: 0, y: 0, width: (view.frame.width - 161), height: 2*(view.frame.width - 161)/3 - bottomSpace)
+        OverlayDrawing.frame = CGRect(x: 0, y: 0, width: CardDrawing.frame.width, height: CardDrawing.frame.height)
         OverlayDrawing.isUserInteractionEnabled = false
         OverlayDrawing.layer.cornerRadius = 20
         OverlayDrawing.backgroundColor = .clear
@@ -288,6 +366,39 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         OverlayCard.addSubview(OverlayImage)
         OverlayCard.isHidden = true
         view.addSubview(OverlayCard)
+        
+        OverlayCard.frame = CardView.frame
+        OverlayLabel.frame = CGRect(x: 20, y: 0, width: CardView.frame.width - 40, height: CardView.frame.height)
+        OverlayDrawing.frame = CGRect(x: 0, y: 0, width: CardDrawing.frame.width, height: CardDrawing.frame.height)
+        OverlayDrawing.center = CGPoint(x: OverlayCard.frame.width/2, y: OverlayCard.frame.height/2)
+        OverlayImage.frame = CGRect(x: 20, y: 20, width: CardView.frame.width - 40, height: CardView.frame.height - 40)
+        
+        
+        tAMC([OverlayCard, OverlayLabel, OverlayDrawing, OverlayImage])
+        
+        NSLayoutConstraint.activate([
+            //stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12)
+            
+            OverlayCard.leadingAnchor.constraint(equalTo: CardView.leadingAnchor),
+            OverlayCard.trailingAnchor.constraint(equalTo: CardView.trailingAnchor),
+            OverlayCard.topAnchor.constraint(equalTo: CardView.topAnchor),
+            OverlayCard.bottomAnchor.constraint(equalTo: CardView.bottomAnchor),
+            
+            OverlayLabel.leadingAnchor.constraint(equalTo: OverlayCard.leadingAnchor, constant: 20),
+            OverlayLabel.trailingAnchor.constraint(equalTo: OverlayCard.trailingAnchor, constant: -20),
+            OverlayLabel.topAnchor.constraint(equalTo: OverlayCard.topAnchor, constant: 20),
+            OverlayLabel.bottomAnchor.constraint(equalTo: OverlayCard.bottomAnchor, constant: -20),
+            
+            OverlayDrawing.leadingAnchor.constraint(equalTo: OverlayCard.leadingAnchor, constant: 20),
+            OverlayDrawing.trailingAnchor.constraint(equalTo: OverlayCard.trailingAnchor, constant: -20),
+            OverlayDrawing.topAnchor.constraint(equalTo: OverlayCard.topAnchor, constant: 20),
+            OverlayDrawing.bottomAnchor.constraint(equalTo: OverlayCard.bottomAnchor, constant: -20),
+            
+            OverlayImage.leadingAnchor.constraint(equalTo: OverlayCard.leadingAnchor, constant: 20),
+            OverlayImage.trailingAnchor.constraint(equalTo: OverlayCard.trailingAnchor, constant: -20),
+            OverlayImage.topAnchor.constraint(equalTo: OverlayCard.topAnchor, constant: 20),
+            OverlayImage.bottomAnchor.constraint(equalTo: OverlayCard.bottomAnchor, constant: -20),
+        ])
         
         endScreen.frame = CGRect(x: 0, y: 0, width: CardView.frame.width, height: CardView.frame.height)
         CardView.addSubview(endScreen)
@@ -314,12 +425,32 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         
         view.bringSubviewToFront(OverlayCard)
         
-        CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80 - bottomSpace)
+        //CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80 - bottomSpace)
+        
+        tAMC([endScreen, endLabel, endButton])
+        
+        NSLayoutConstraint.activate([
+            //stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12)
+            endScreen.leadingAnchor.constraint(equalTo: CardView.leadingAnchor),
+            endScreen.trailingAnchor.constraint(equalTo: CardView.trailingAnchor),
+            endScreen.topAnchor.constraint(equalTo: CardView.topAnchor),
+            endScreen.bottomAnchor.constraint(equalTo: CardView.bottomAnchor),
+            
+            endLabel.leadingAnchor.constraint(equalTo: CardView.leadingAnchor, constant: 10),
+            endLabel.trailingAnchor.constraint(equalTo: CardView.trailingAnchor, constant: -10),
+            endLabel.topAnchor.constraint(equalTo: CardView.topAnchor, constant: 10),
+            endLabel.bottomAnchor.constraint(equalTo: endButton.topAnchor, constant: 10),
+            
+            endButton.leadingAnchor.constraint(equalTo: CardView.leadingAnchor, constant: 10),
+            endButton.trailingAnchor.constraint(equalTo: CardView.trailingAnchor, constant: -10),
+            endButton.heightAnchor.constraint(equalToConstant: 100),
+            endButton.bottomAnchor.constraint(equalTo: CardView.bottomAnchor, constant: -10),
+        ])
         
         //overlayCrosshairAndBorder(CardDrawing)
         
-        view.addSubview(CardView)
-        view.bringSubviewToFront(CardView)
+//        view.addSubview(CardView)
+//        view.bringSubviewToFront(CardView)
     }
     
     @objc func nextRound(sender: UIButton){
@@ -646,6 +777,81 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
     
     @objc func SettingsButton(sender: UIButton){
         
+    }
+    
+    func layout(){
+        mainStack.removeFromSuperview()
+        fullStack.removeFromSuperview()
+        optionsStack.removeFromSuperview()
+        CardView.removeFromSuperview()
+        IncorrectView.removeFromSuperview()
+        CorrectView.removeFromSuperview()
+        
+        if(view.layer.frame.width > view.layer.frame.height){
+            IncorrectView.frame = CGRect(x: 20, y: 60, width: (view.layer.frame.width - 80) * 0.15, height: view.frame.height - 80 - bottomSpace)
+            CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80 - bottomSpace)
+            CorrectView.frame = CGRect(x: 60 + IncorrectView.frame.width + CardView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.15, height: view.frame.height - 80 - bottomSpace)
+            
+            mainStack = UIStackView(arrangedSubviews: [IncorrectView, CardView, CorrectView])
+            mainStack.spacing = 20
+            mainStack.axis = .horizontal
+            view.addSubview(mainStack)
+            
+            NSLayoutConstraint.activate([
+                //stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12)
+                
+                mainStack.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
+                mainStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+                mainStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+                mainStack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20 - bottomSpace),
+                
+                IncorrectView.heightAnchor.constraint(equalTo: mainStack.heightAnchor, multiplier: 1),
+                
+                CardView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.7),
+                CardView.heightAnchor.constraint(equalTo: mainStack.heightAnchor, multiplier: 1),
+                
+                CorrectView.heightAnchor.constraint(equalTo: mainStack.heightAnchor, multiplier: 1),
+                CorrectView.widthAnchor.constraint(equalTo: IncorrectView.widthAnchor, multiplier: 1)
+            ])
+            
+            tAMC([mainStack, IncorrectView, CardView, CorrectView])
+        }else{
+            let optionsHeight: CGFloat = (view.layer.frame.height - 100 - bottomSpace) * 0.3
+            let topHeight: CGFloat = (view.layer.frame.height - 100 - bottomSpace) * 0.7
+            
+            IncorrectView.frame = CGRect(x: 20, y: 80 + topHeight, width: (view.layer.frame.width - 60) * 0.5, height: optionsHeight)
+            CardView.frame = CGRect(x: 20, y: 60, width: view.layer.frame.width - 40, height: topHeight)
+            CorrectView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 80 + topHeight, width: (view.layer.frame.width - 60) * 0.5, height: optionsHeight)
+            
+            optionsStack = UIStackView(arrangedSubviews: [IncorrectView, CorrectView])
+            optionsStack.spacing = 20
+            optionsStack.axis = .horizontal
+            optionsStack.distribution = .fillEqually
+            
+            fullStack = UIStackView(arrangedSubviews: [CardView, optionsStack])
+            fullStack.spacing = 20
+            fullStack.axis = .vertical
+            fullStack.distribution = .fill
+            view.addSubview(fullStack)
+            
+            NSLayoutConstraint.activate([
+                //stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12)
+                
+                fullStack.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
+                fullStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+                fullStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+                fullStack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20 - bottomSpace),
+                
+                CardView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.5),
+                CardView.widthAnchor.constraint(equalTo: fullStack.widthAnchor),
+                
+                IncorrectView.heightAnchor.constraint(equalTo: optionsStack.heightAnchor),
+                CorrectView.heightAnchor.constraint(equalTo: optionsStack.heightAnchor),
+                optionsStack.widthAnchor.constraint(equalTo: fullStack.widthAnchor)
+            ])
+            
+            tAMC([fullStack, optionsStack, IncorrectView, CardView, CorrectView])
+        }
     }
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
         

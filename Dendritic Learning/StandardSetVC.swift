@@ -157,7 +157,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         let backgroundImage = UIImageView()
         backgroundImage.contentMode = .scaleAspectFill
         view.addSubview(backgroundImage)
-        backgroundImage.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(backgroundImage)
         NSLayoutConstraint.activate([
             backgroundImage.topAnchor.constraint(equalTo: view.topAnchor),
             backgroundImage.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -173,8 +173,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         stackView.alignment = .leading
         scrollView.addSubview(stackView)
         view.addSubview(scrollView)
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC([scrollView, stackView])
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -262,7 +261,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         buttonsStackView.axis = .horizontal
         buttonsStackView.spacing = 20
         buttonsStackView.distribution = .fill
-        buttonsStackView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(buttonsStackView)
         buttonsStackView.widthAnchor.constraint(equalToConstant: 600).isActive = true
         stackView.addArrangedSubview(buttonsStackView)
         
@@ -280,7 +279,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         allTermsStackView.spacing = 10
         allTermsStackView.alignment = .center
         //allTermsStackView.alignment = .fill
-        allTermsStackView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(allTermsStackView)
         stackView.addArrangedSubview(allTermsStackView)
         
         NSLayoutConstraint.activate([
@@ -323,7 +322,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
 
     private func createTermDefinitionStackView(for card: [String: Any?]) -> UIStackView {
         let termDefinitionStackView = UIStackView()
-        termDefinitionStackView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(termDefinitionStackView)
         termDefinitionStackView.isLayoutMarginsRelativeArrangement = true
         termDefinitionStackView.layoutMargins = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15)
         termDefinitionStackView.axis = .horizontal
@@ -361,7 +360,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
             let termView = UILabel(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
             termView.text = term
             termView.font = UIFont(name: "LilGrotesk-Regular", size: 20)
-            termView.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(termView)
             termView.backgroundColor = .clear
             termView.numberOfLines = 0
             termView.textColor = Colors.text
@@ -370,7 +369,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
             //termView.backgroundColor = .green
         }else if(card["termType"] as! String == "i"){
             let termImage = UIButton(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-            termImage.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(termImage)
             //termImage.setImage(UIImage(named: "color1.png"), for: .normal)
             termImage.widthAnchor.constraint(equalToConstant: (view.frame.width - 156)/2).isActive = true
             termImage.heightAnchor.constraint(equalToConstant: (view.frame.width - 156)/3).isActive = true
@@ -386,9 +385,8 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
             termDrawing.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             drawingsuperview.addSubview(termDrawing)
             termDrawing.anchorPoint = drawingsuperview.anchorPoint
-            drawingsuperview.translatesAutoresizingMaskIntoConstraints = false
+            tAMC([drawingsuperview,termDrawing])
             termDrawing.isUserInteractionEnabled = false
-            termDrawing.translatesAutoresizingMaskIntoConstraints = false
             termDrawing.tool = Colors.pen
             termDrawing.overrideUserInterfaceStyle = .light
             loadDrawing(url: card["term"] as? String, canvas: termDrawing)
@@ -405,7 +403,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         let breakView = UIView()
         breakView.backgroundColor = Colors.text.withAlphaComponent(0.5)
         breakView.widthAnchor.constraint(equalToConstant: 1).isActive = true
-        breakView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(breakView)
         stackView.addArrangedSubview(breakView)
         //breakView.heightAnchor.constraint(equalTo: termDefinitionStackView.heightAnchor, multiplier: 0.5).isActive = true
         
@@ -415,13 +413,12 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
             definitionView.text = definition
             definitionView.textColor = Colors.text
             definitionView.font = UIFont(name: "LilGrotesk-Regular", size: 20)
-            definitionView.translatesAutoresizingMaskIntoConstraints = false
+            tAMC(definitionView)
             definitionView.backgroundColor = .clear
             stackView.addArrangedSubview(definitionView)
             //definitionView.backgroundColor = .blue
         }else if card["defType"] as! String == "d"{
             let drawingsuperview = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: (view.frame.width - 156)/3))
-            drawingsuperview.translatesAutoresizingMaskIntoConstraints = false
             drawingsuperview.widthAnchor.constraint(equalToConstant: (view.frame.width - 156)/2).isActive = true
             drawingsuperview.heightAnchor.constraint(equalToConstant: (view.frame.width - 156)/3).isActive = true
             let definitionDrawing = PKCanvasView(frame: CGRect(x: 0, y: 0, width: view.frame.width - 156, height: 2*(view.frame.width - 156)/3))
@@ -431,7 +428,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
             definitionDrawing.tool = Colors.pen
             definitionDrawing.overrideUserInterfaceStyle = .light
             loadDrawing(url: card["def"] as? String, canvas: definitionDrawing)
-            definitionDrawing.translatesAutoresizingMaskIntoConstraints = false
+            tAMC([drawingsuperview, definitionDrawing])
             
             drawingsuperview.addSubview(definitionDrawing)
             definitionDrawing.anchorPoint = CGPoint(x: 1, y: 1)
@@ -450,7 +447,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         button.layer.cornerRadius = 10
         button.setTitleColor(Colors.text, for: .normal)
         button.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
+        tAMC(button)
         button.heightAnchor.constraint(equalToConstant: 70).isActive = true
         conW(button, (title as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont(name: "LilGrotesk-Bold", size: 30)!]).width + 40)
         button.layer.masksToBounds = true
@@ -625,20 +622,6 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         //bannerView.rootViewController = getRootViewController()
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
-
-//        let container = UIView()
-//        container.translatesAutoresizingMaskIntoConstraints = false
-//        container.addSubview(bannerView)
-//
-//        bannerView.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            bannerView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-//            bannerView.topAnchor.constraint(equalTo: container.topAnchor),
-//            bannerView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-//            bannerView.widthAnchor.constraint(equalToConstant: adWidth)
-//        ])
-//
-//        container.heightAnchor.constraint(equalToConstant: adSize.size.height).isActive = true
 
         return bannerView
     }

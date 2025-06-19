@@ -73,8 +73,7 @@ class SettingsVC: UIViewController {
         stackView.alignment = .leading
         scrollView.addSubview(stackView)
         view.addSubview(scrollView)
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.translatesAutoresizingMaskIntoConstraints = false
+        tAMC([scrollView, stackView])
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -115,7 +114,6 @@ class SettingsVC: UIViewController {
         
         // Setup horizontal scroll view for color themes
         let colorScroll = UIScrollView()
-        colorScroll.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(colorScroll)
         
         let colorStack = UIStackView()
@@ -123,7 +121,7 @@ class SettingsVC: UIViewController {
         colorStack.spacing = 10
         colorStack.alignment = .leading
         colorScroll.addSubview(colorStack)
-        colorStack.translatesAutoresizingMaskIntoConstraints = false
+        tAMC([colorScroll, colorStack])
         
         NSLayoutConstraint.activate([
             colorScroll.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),

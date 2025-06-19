@@ -220,8 +220,8 @@
 			<string>None</string>
 		</dict>
 	</array>
-	<key>NSSpeechRecognititionUsageDescription</key>
-	<string>Used for speech recognition in learn mode</string>
+<!--	<key>NSSpeechRecognititionUsageDescription</key>-->
+<!--	<string>Used for speech recognition in learn mode</string>-->
 	<key>UIAppFonts</key>
 	<array>
 		<string>LilGrotesk-Black.ttf</string>
