@@ -71,6 +71,21 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
         
         previousSize = view.bounds.size
     }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.reformat()
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if previousSize != view.bounds.size {
+            previousSize = view.bounds.size
+            reformat()
+        }
+    }
 
     func fetchDataAndInitialize() {
         guard let data = defaults.value(forKey: "set") as? [String: Any] else { return }
@@ -545,14 +560,6 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
             }
             
             currentInput = cards[cardOrder[index]]["defType"] as! String
-            if(currentInput == "t"){
-                TextField.isHidden = false
-                topHeight = view.frame.height - 90
-            }else if(currentInput == "d" || currentInput == "d-r"){
-                TextField.resignFirstResponder()
-                DrawingView.isHidden = false
-                topHeight = view.frame.height - 290
-            }
             reformat()
         }
     }
@@ -615,6 +622,14 @@ class StandardLearnVC: UIViewController, PKCanvasViewDelegate, UITextFieldDelega
     }
     
     func reformat(){
+        if(currentInput == "t"){
+            TextField.isHidden = false
+            topHeight = view.frame.height - 90
+        }else if(currentInput == "d" || currentInput == "d-r"){
+            TextField.resignFirstResponder()
+            DrawingView.isHidden = false
+            topHeight = view.frame.height - 290
+        }
         UIView.animate(withDuration: 0.5, animations: {
             self.CardLabel.frame = CGRect(x: 20, y: 0, width: self.view.frame.width - 40, height: self.topHeight-self.keyboard)
             self.CardDrawing.frame = CGRect(x: 0, y: 0, width: (self.view.frame.width - 161), height: 2*(self.view.frame.width - 161)/3)

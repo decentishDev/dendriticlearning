@@ -44,8 +44,13 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     
     var isLiked = false
     
+    var previousSize: CGSize?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print("Standard:")
+        print(view.bounds)
         //print(goToEditor)
         view.backgroundColor = Colors.background
         if goToEditor {
@@ -73,8 +78,10 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
             //UIView.setAnimationsEnabled(true)
         }
         
+        previousSize = view.bounds.size
+        
         loadingImage = createLoadingIcon()
-        loadingImage.center = view.center
+        loadingImage.center = CGPoint(x: previousSize!.width/2, y: previousSize!.height/2)
         view.addSubview(loadingImage)
 //        print(data)
 //        print("//////////////////////////////////////////////")
@@ -85,6 +92,21 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
     override func viewDidAppear(_ animated: Bool) {
         view.backgroundColor = Colors.background
         setup()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.setup()
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if previousSize != view.bounds.size {
+            previousSize = view.bounds.size
+            setup()
+        }
     }
     
     func setup() {
@@ -394,6 +416,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
             termDrawing.backgroundColor = .clear
             termDrawing.layer.cornerRadius = 10
             stackView.addArrangedSubview(drawingsuperview)
+            //centerAndZoomDrawing(termDrawing)
             //centerDrawing(termDrawing)
             //termDrawing.backgroundColor = .red
             
@@ -435,7 +458,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
             definitionDrawing.backgroundColor = .clear
             //definitionDrawing.backgroundColor = .red
             stackView.addArrangedSubview(drawingsuperview)
-            
+            //centerAndZoomDrawing(definitionDrawing)
             //centerDrawing(definitionDrawing)
         }
     }

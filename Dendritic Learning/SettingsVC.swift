@@ -24,8 +24,11 @@ class SettingsVC: UIViewController {
     
     let db = Firestore.firestore()
     
+    var previousSize = CGSize()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        previousSize = view.bounds.size
         view.backgroundColor = Colors.background
         if let uid = Auth.auth().currentUser?.uid {
             let dataRef = db.collection("users").document(uid)
@@ -47,6 +50,21 @@ class SettingsVC: UIViewController {
             }
         }
         //setup()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.setup()
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if previousSize != view.bounds.size {
+            previousSize = view.bounds.size
+            setup()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {

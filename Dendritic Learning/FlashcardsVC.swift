@@ -124,6 +124,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         coordinator.animate(alongsideTransition: nil) { _ in
             //self.setup()
             self.layout()
+            self.layoutOverlay()
         }
     }
     
@@ -137,6 +138,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
 //                CorrectView.backgroundColor = .clear
 //            }
             layout()
+            layoutOverlay()
         }
     }
     
@@ -255,6 +257,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
                 CardImage.isHidden = true
             }else if(cards[cardOrder[index]]["termType"] as! String == "d"){
                 loadDrawing(url: cards[cardOrder[index]]["term"] as? String, canvas: self.CardDrawing)
+                
                 CardLabel.isHidden = true
                 CardDrawing.isHidden = false
                 CardImage.isHidden = true
@@ -367,38 +370,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
         OverlayCard.isHidden = true
         view.addSubview(OverlayCard)
         
-        OverlayCard.frame = CardView.frame
-        OverlayLabel.frame = CGRect(x: 20, y: 0, width: CardView.frame.width - 40, height: CardView.frame.height)
-        OverlayDrawing.frame = CGRect(x: 0, y: 0, width: CardDrawing.frame.width, height: CardDrawing.frame.height)
-        OverlayDrawing.center = CGPoint(x: OverlayCard.frame.width/2, y: OverlayCard.frame.height/2)
-        OverlayImage.frame = CGRect(x: 20, y: 20, width: CardView.frame.width - 40, height: CardView.frame.height - 40)
-        
-        
-        tAMC([OverlayCard, OverlayLabel, OverlayDrawing, OverlayImage])
-        
-        NSLayoutConstraint.activate([
-            //stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12)
-            
-            OverlayCard.leadingAnchor.constraint(equalTo: CardView.leadingAnchor),
-            OverlayCard.trailingAnchor.constraint(equalTo: CardView.trailingAnchor),
-            OverlayCard.topAnchor.constraint(equalTo: CardView.topAnchor),
-            OverlayCard.bottomAnchor.constraint(equalTo: CardView.bottomAnchor),
-            
-            OverlayLabel.leadingAnchor.constraint(equalTo: OverlayCard.leadingAnchor, constant: 20),
-            OverlayLabel.trailingAnchor.constraint(equalTo: OverlayCard.trailingAnchor, constant: -20),
-            OverlayLabel.topAnchor.constraint(equalTo: OverlayCard.topAnchor, constant: 20),
-            OverlayLabel.bottomAnchor.constraint(equalTo: OverlayCard.bottomAnchor, constant: -20),
-            
-            OverlayDrawing.leadingAnchor.constraint(equalTo: OverlayCard.leadingAnchor, constant: 20),
-            OverlayDrawing.trailingAnchor.constraint(equalTo: OverlayCard.trailingAnchor, constant: -20),
-            OverlayDrawing.topAnchor.constraint(equalTo: OverlayCard.topAnchor, constant: 20),
-            OverlayDrawing.bottomAnchor.constraint(equalTo: OverlayCard.bottomAnchor, constant: -20),
-            
-            OverlayImage.leadingAnchor.constraint(equalTo: OverlayCard.leadingAnchor, constant: 20),
-            OverlayImage.trailingAnchor.constraint(equalTo: OverlayCard.trailingAnchor, constant: -20),
-            OverlayImage.topAnchor.constraint(equalTo: OverlayCard.topAnchor, constant: 20),
-            OverlayImage.bottomAnchor.constraint(equalTo: OverlayCard.bottomAnchor, constant: -20),
-        ])
+        layoutOverlay()
         
         endScreen.frame = CGRect(x: 0, y: 0, width: CardView.frame.width, height: CardView.frame.height)
         CardView.addSubview(endScreen)
@@ -527,7 +499,7 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
     
     func nextCard(_ correct: Bool){
         let overlayI = index
-        CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80 - bottomSpace)
+        //CardView.frame = CGRect(x: 40 + IncorrectView.frame.width, y: 60, width: (view.layer.frame.width - 80) * 0.7, height: view.frame.height - 80 - bottomSpace)
         view.bringSubviewToFront(OverlayCard)
         CardView.sendSubviewToBack(endScreen)
         if(correct){
@@ -625,23 +597,36 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
 //                OverlayImage.isHidden = false
 //            }
         }
+        OverlayCard.layer.transform = CATransform3DIdentity
         OverlayCard.isHidden = false
-        OverlayCard.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 0, 0, 0)
         OverlayCard.alpha = 1
-        OverlayCard.layer.position = CardView.layer.position
+
+        var initialTransform = CATransform3DIdentity
+        initialTransform.m34 = -1.0 / 500
+        initialTransform = CATransform3DRotate(initialTransform, .pi, 0, 0, 0)
+        OverlayCard.layer.transform = initialTransform
+
         CardView.layer.opacity = 0
         if(correct){
             UIView.animate(withDuration: 0.5, animations: {
-                self.OverlayCard.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 1, 1, 1)
+                var finalTransform = CATransform3DIdentity
+                finalTransform.m34 = -1.0 / 500
+                finalTransform = CATransform3DRotate(finalTransform, .pi, 0, 0.5, 1)
+                finalTransform = CATransform3DTranslate(finalTransform, -700, -700, -500)
+                self.OverlayCard.layer.transform = finalTransform
+
                 self.OverlayCard.alpha = 0
-                self.OverlayCard.layer.position = CGPoint(x: self.view.frame.width, y: self.view.frame.height / 2)
                 self.CardView.layer.opacity = 1
             })
         }else{
             UIView.animate(withDuration: 0.5, animations: {
-                self.OverlayCard.layer.transform = CATransform3DMakeRotation(CGFloat.pi, 1, 1, 1)
+                var finalTransform = CATransform3DIdentity
+                finalTransform.m34 = -1.0 / 500
+                finalTransform = CATransform3DRotate(finalTransform, .pi, 0, 0.5, -1)
+                finalTransform = CATransform3DTranslate(finalTransform, 700, 700, -500)
+                self.OverlayCard.layer.transform = finalTransform
+
                 self.OverlayCard.alpha = 0
-                self.OverlayCard.layer.position = CGPoint(x: 0, y: self.view.frame.height / 2)
                 self.CardView.layer.opacity = 1
             })
         }
@@ -853,6 +838,42 @@ class FlashcardsVC: UIViewController, GADBannerViewDelegate {
             tAMC([fullStack, optionsStack, IncorrectView, CardView, CorrectView])
         }
     }
+    
+    func layoutOverlay(){
+        OverlayCard.frame = CardView.frame
+        OverlayLabel.frame = CGRect(x: 20, y: 0, width: CardView.frame.width - 40, height: CardView.frame.height)
+        OverlayDrawing.frame = CGRect(x: 0, y: 0, width: CardDrawing.frame.width, height: CardDrawing.frame.height)
+        OverlayDrawing.center = CGPoint(x: OverlayCard.frame.width/2, y: OverlayCard.frame.height/2)
+        OverlayImage.frame = CGRect(x: 20, y: 20, width: CardView.frame.width - 40, height: CardView.frame.height - 40)
+        
+        
+        tAMC([OverlayCard, OverlayLabel, OverlayDrawing, OverlayImage])
+        
+        NSLayoutConstraint.activate([
+            //stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12)
+            
+            OverlayCard.leadingAnchor.constraint(equalTo: CardView.leadingAnchor),
+            OverlayCard.trailingAnchor.constraint(equalTo: CardView.trailingAnchor),
+            OverlayCard.topAnchor.constraint(equalTo: CardView.topAnchor),
+            OverlayCard.bottomAnchor.constraint(equalTo: CardView.bottomAnchor),
+            
+            OverlayLabel.leadingAnchor.constraint(equalTo: OverlayCard.leadingAnchor, constant: 20),
+            OverlayLabel.trailingAnchor.constraint(equalTo: OverlayCard.trailingAnchor, constant: -20),
+            OverlayLabel.topAnchor.constraint(equalTo: OverlayCard.topAnchor, constant: 20),
+            OverlayLabel.bottomAnchor.constraint(equalTo: OverlayCard.bottomAnchor, constant: -20),
+            
+            OverlayDrawing.leadingAnchor.constraint(equalTo: OverlayCard.leadingAnchor, constant: 20),
+            OverlayDrawing.trailingAnchor.constraint(equalTo: OverlayCard.trailingAnchor, constant: -20),
+            OverlayDrawing.topAnchor.constraint(equalTo: OverlayCard.topAnchor, constant: 20),
+            OverlayDrawing.bottomAnchor.constraint(equalTo: OverlayCard.bottomAnchor, constant: -20),
+            
+            OverlayImage.leadingAnchor.constraint(equalTo: OverlayCard.leadingAnchor, constant: 20),
+            OverlayImage.trailingAnchor.constraint(equalTo: OverlayCard.trailingAnchor, constant: -20),
+            OverlayImage.topAnchor.constraint(equalTo: OverlayCard.topAnchor, constant: 20),
+            OverlayImage.bottomAnchor.constraint(equalTo: OverlayCard.bottomAnchor, constant: -20),
+        ])
+    }
+    
     @IBAction func cancel (_ unwindSegue: UIStoryboardSegue){
         
     }

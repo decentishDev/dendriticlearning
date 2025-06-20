@@ -37,8 +37,12 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
     let db = Firestore.firestore()
     let storage = Storage.storage()
     
+    var previousSize = CGSize()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        previousSize = view.bounds.size
         view.backgroundColor = Colors.background
         imagePicker.delegate = self
         imagePicker.sourceType = .photoLibrary
@@ -86,6 +90,8 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         
         view.addSubview(titleField)
         
+        
+        
         let addButton = UIButton()
         addButton.setTitle("+ Add term", for: .normal)
         addButton.setTitleColor(Colors.highlight, for: .normal)
@@ -130,6 +136,27 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         deleteButton.tintColor = Colors.highlight
         
         view.addSubview(deleteButton)
+        
+        tAMC([backButton, titleField, addButton, deleteButton])
+        con(backButton, 50, 50)
+        con(titleField, 300, 50)
+        con(deleteButton, 50, 50)
+        con(addButton, 150, 50)
+        
+        NSLayoutConstraint.activate([
+            backButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 30),
+            backButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
+            
+            titleField.leftAnchor.constraint(equalTo: backButton.rightAnchor, constant: 10),
+            titleField.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
+            titleField.rightAnchor.constraint(lessThanOrEqualTo: addButton.leftAnchor, constant: -10),
+            
+            deleteButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30),
+            deleteButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
+            
+            addButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
+            addButton.rightAnchor.constraint(equalTo: deleteButton.leftAnchor, constant: -10),
+        ])
         
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handleBackgroundPan(_:)))
         scrollView.addGestureRecognizer(panGesture)
@@ -285,21 +312,42 @@ class WebEditorVC: UIViewController, UIScrollViewDelegate, EditorDelegate, UITex
         }
         
         
-        if(defaults.value(forKey: "isPaid") as! Bool != true){
-            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(600, view.bounds.width), height: 100)))
-            view.addSubview(bannerView)
-            bannerView.delegate = self
-            bannerView.adUnitID = "ca-app-pub-5124969442805102/1739631380"
-            bannerView.rootViewController = self
-            bannerView.load(GADRequest())
-            
-            tAMC(bannerView)
-            NSLayoutConstraint.activate([
-                bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-                bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-            ])
+//        if(defaults.value(forKey: "isPaid") as! Bool != true){
+//            let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(600, view.bounds.width), height: 100)))
+//            view.addSubview(bannerView)
+//            bannerView.delegate = self
+//            bannerView.adUnitID = "ca-app-pub-5124969442805102/1739631380"
+//            bannerView.rootViewController = self
+//            bannerView.load(GADRequest())
+//            
+//            tAMC(bannerView)
+//            NSLayoutConstraint.activate([
+//                bannerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+//                bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+//            ])
+//        }
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.setup()
         }
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if previousSize != view.bounds.size {
+            previousSize = view.bounds.size
+            setup()
+        }
+    }
+    
+    func setup(){
+        scrollView.frame = view.bounds
+        scrollView.contentSize = CGSize(width: view.bounds.width, height: view.bounds.height)
+    }
+    
     @objc func exitIntro(_ sender: UIButton) {
         let introView = sender.superview!
         UIView.animate(withDuration: 0.5, animations: {

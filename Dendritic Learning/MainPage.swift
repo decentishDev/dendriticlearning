@@ -37,6 +37,8 @@ class MainPage: UIViewController, NewSetDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("Main:")
+        print(view.bounds)
 //        for family in UIFont.familyNames {
 //            print("family: \(family)")
 //            for name in UIFont.fontNames(forFamilyName: family){
@@ -71,6 +73,7 @@ class MainPage: UIViewController, NewSetDelegate {
         loadingImage = createLoadingIcon()
         loadingImage.center = view.center
         view.addSubview(loadingImage)
+        //setup()
     }
     
     override func viewDidAppear(_ animated: Bool) {

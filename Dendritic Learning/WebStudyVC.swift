@@ -31,8 +31,12 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
     var endLabel = UILabel()
     var perfectCounter: [Bool] = []
     
+    var previousSize = CGSize()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        previousSize = view.bounds.size
         
         let hideKeyboard = UITapGestureRecognizer()
         hideKeyboard.addTarget(self, action: #selector(dismissKeyboards(_:)))
@@ -74,6 +78,23 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
             termCounter.textColor = Colors.text
             view.addSubview(termCounter)
             
+            tAMC([backButton, settingsButton, termCounter])
+            
+            con(backButton, 30, 30)
+            con(settingsButton, 30, 30)
+            conH(termCounter, 20)
+            
+            NSLayoutConstraint.activate([
+                //stack.topAnchor.constraint(equalTo: button.topAnchor, constant: 12)
+                backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+                termCounter.leadingAnchor.constraint(equalTo: backButton.trailingAnchor, constant: 20),
+                termCounter.trailingAnchor.constraint(equalTo: settingsButton.leadingAnchor, constant: -20),
+                settingsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+                backButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+                termCounter.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+                settingsButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+            ])
+            
             mainLabel.frame = CGRect(x: 20, y: 60, width: view.frame.width - 40, height: view.frame.height - 60 - 210)
             mainLabel.font = UIFont(name: "LilGrotesk-Bold", size: 50)
             mainLabel.textColor = Colors.text
@@ -91,6 +112,7 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
             
             inputField.frame = CGRect(x: 20, y: 80 + mainLabel.frame.height + 20 + answerList.frame.height, width: view.frame.width - 40, height: 50)
             inputField.font = UIFont(name: "LilGrotesk-Regular", size: 30)
+            inputField.textColor = Colors.text
             inputField.placeholder = "Type your answer here . . ."
             inputField.delegate = self
             inputField.backgroundColor = Colors.secondaryBackground
@@ -141,6 +163,45 @@ class WebStudyVC: UIViewController, UITextFieldDelegate {
         }else{
            placeholder()
         }
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.removeKeyboard()
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if previousSize != view.bounds.size {
+            previousSize = view.bounds.size
+            removeKeyboard()
+        }
+    }
+    
+    func removeKeyboard(){
+        inputField.resignFirstResponder()
+        let keyboardSize: CGFloat = 0
+        var t = view.frame.height - 60 - 210 - keyboardSize
+        let rect1 = CGRect(x: 20, y: 60, width: view.frame.width - 40, height: t)
+        t = view.frame.height - 190 - keyboardSize
+        let rect2 = CGRect(x: 20, y: t, width: view.frame.width - 40, height: 100)
+        t = view.frame.height - 170 - keyboardSize + answerList.frame.height
+        let rect3 = CGRect(x: 20, y: t, width: view.frame.width - 40, height: 50)
+        let rect4 = CGRect(x: view.frame.width - 70, y: rect3.minY, width: 50, height: 50)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.mainLabel.frame = rect1
+        })
+        UIView.animate(withDuration: 0.5, animations: {
+            self.answerList.frame = rect2
+        })
+        UIView.animate(withDuration: 0.5, animations: {
+            self.inputField.frame = rect3
+        })
+        UIView.animate(withDuration: 0.5, animations: {
+            self.unknownButton.frame = rect4
+        })
     }
     
     func placeholder(){

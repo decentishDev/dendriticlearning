@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0E83658E2DC2A8B800B0E1E2 /* ClassesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E83658D2DC2A8B800B0E1E2 /* ClassesVC.swift */; };
 		0ECADE692DDB7D95000777D7 /* JoinClassVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ECADE682DDB7D85000777D7 /* JoinClassVC.swift */; };
+		34A4DA332E050E9D0030CD05 /* AddTermsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A4DA322E050E910030CD05 /* AddTermsVC.swift */; };
 		8D873A702C2B60480036A928 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 8D873A6F2C2B60480036A928 /* GoogleMobileAds */; };
 		8D873A732C2B66D40036A928 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D873A722C2B66D40036A928 /* WebKit.framework */; };
 		8D90809A2C1FE88500DB36AB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9080992C1FE88500DB36AB /* AppDelegate.swift */; };
@@ -58,6 +59,7 @@
 /* Begin PBXFileReference section */
 		0E83658D2DC2A8B800B0E1E2 /* ClassesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassesVC.swift; sourceTree = "<group>"; };
 		0ECADE682DDB7D85000777D7 /* JoinClassVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinClassVC.swift; sourceTree = "<group>"; };
+		34A4DA322E050E910030CD05 /* AddTermsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTermsVC.swift; sourceTree = "<group>"; };
 		8D873A722C2B66D40036A928 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		8D9080962C1FE88500DB36AB /* Dendritic Learning.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Dendritic Learning.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D9080992C1FE88500DB36AB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 		8D9080982C1FE88500DB36AB /* Dendritic Learning */ = {
 			isa = PBXGroup;
 			children = (
+				34A4DA322E050E910030CD05 /* AddTermsVC.swift */,
 				34CC41152E0245B40000F56E /* fonts */,
 				0ECADE682DDB7D85000777D7 /* JoinClassVC.swift */,
 				8DE6FA2E2C21DA93004E0C58 /* GoogleService-Info.plist */,
@@ -262,6 +265,7 @@
 				8D9080CE2C1FEAC200DB36AB /* WebViewerVC.swift in Sources */,
 				8D9080C42C1FEAAF00DB36AB /* NewSetVC.swift in Sources */,
 				8D9080C02C1FEAA600DB36AB /* DrawingEditorVC.swift in Sources */,
+				34A4DA332E050E9D0030CD05 /* AddTermsVC.swift in Sources */,
 				8D9080C82C1FEAB700DB36AB /* StandardEditorVC.swift in Sources */,
 				8D9080BC2C1FEA9E00DB36AB /* WebEditorVC.swift in Sources */,
 				8D9080BE2C1FEAA100DB36AB /* WebSetVC.swift in Sources */,

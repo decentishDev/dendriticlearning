@@ -236,6 +236,26 @@ class WebViewerVC: UIViewController, UIScrollViewDelegate, GADBannerViewDelegate
         }
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.setup()
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if previousSize != view.bounds.size {
+            previousSize = view.bounds.size
+            setup()
+        }
+    }
+    
+    func setup(){
+        scrollView.frame = view.bounds
+        scrollView.contentSize = CGSize(width: view.bounds.width, height: view.bounds.height)
+    }
+    
 //    @objc func addButtonTapped(_ sender: UIButton) {
 //        currentEdit = -1
 //        

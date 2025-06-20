@@ -11,7 +11,8 @@ import FirebaseAuth
 import FirebaseFirestore
 import FirebaseStorage
 
-class StandardEditorVC: UIViewController, UITextFieldDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DrawingEditorDelegate {
+class StandardEditorVC: UIViewController, UITextFieldDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DrawingEditorDelegate, AddTermsDelegate {
+    
     
     let defaults = UserDefaults.standard
     
@@ -43,8 +44,11 @@ class StandardEditorVC: UIViewController, UITextFieldDelegate, UITextViewDelegat
     let db = Firestore.firestore()
     let storage = Storage.storage()
     
+    var previousSize: CGSize?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        previousSize = view.bounds.size
         let data = defaults.value(forKey: "set") as! [String: Any]
         name = data["name"] as! String
         //date = data["date"] as! String
@@ -64,6 +68,21 @@ class StandardEditorVC: UIViewController, UITextFieldDelegate, UITextViewDelegat
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         
         setup()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.setup()
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if previousSize != view.bounds.size {
+            previousSize = view.bounds.size
+            setup()
+        }
     }
 
 deinit {
@@ -105,12 +124,18 @@ deinit {
                 stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, constant: -100)
             ])
             
-            let topBar = UIView()
-            topBar.widthAnchor.constraint(equalToConstant: 530).isActive = true
-            topBar.heightAnchor.constraint(equalToConstant: 50).isActive = true
+            let topBar = UIStackView()
+        topBar.axis = .horizontal
+        topBar.spacing = 10
+        topBar.distribution = .fill
+        topBar.alignment = .fill
+        
+        
         tAMC(topBar)
             stackView.addArrangedSubview(topBar)
-            
+        NSLayoutConstraint.activate([
+            topBar.widthAnchor.constraint(equalTo: stackView.widthAnchor)
+            ])
             let backButton = UIButton()
             backButton.setImage(UIImage(systemName: "arrowshape.backward.fill"), for: .normal)
             backButton.addTarget(self, action: #selector(back(_:)), for: .touchUpInside)
@@ -118,8 +143,10 @@ deinit {
             backButton.backgroundColor = Colors.secondaryBackground
             backButton.layer.cornerRadius = 10
             backButton.tintColor = Colors.highlight
+        
+        con(backButton, 50, 50)
             
-            topBar.addSubview(backButton)
+            topBar.addArrangedSubview(backButton)
             
             let titleField = UITextField()
             titleField.delegate = self
@@ -133,21 +160,34 @@ deinit {
             let paddingView = UIView(frame: CGRectMake(0, 0, 15, titleField.frame.height))
             titleField.leftView = paddingView
             titleField.leftViewMode = .always
+        
             
-            topBar.addSubview(titleField)
+            topBar.addArrangedSubview(titleField)
             
-            if(image == ""){
-                imageButton.setImage(UIImage(systemName: "photo"), for: .normal)
-            }else{
-                imageButton.setImage(UIImage(systemName: "rectangle.badge.xmark.fill"), for: .normal)
-            }
-            imageButton.addTarget(self, action: #selector(changeImage(_:)), for: .touchUpInside)
-            imageButton.frame = CGRect(x: 420, y: 0, width: 50, height: 50)
-            imageButton.backgroundColor = Colors.secondaryBackground
-            imageButton.layer.cornerRadius = 10
-            imageButton.tintColor = Colors.highlight
-            
-            topBar.addSubview(imageButton)
+//            if(image == ""){
+//                imageButton.setImage(UIImage(systemName: "photo"), for: .normal)
+//            }else{
+//                imageButton.setImage(UIImage(systemName: "rectangle.badge.xmark.fill"), for: .normal)
+//            }
+//            imageButton.addTarget(self, action: #selector(changeImage(_:)), for: .touchUpInside)
+//            imageButton.frame = CGRect(x: 420, y: 0, width: 50, height: 50)
+//            imageButton.backgroundColor = Colors.secondaryBackground
+//            imageButton.layer.cornerRadius = 10
+//            imageButton.tintColor = Colors.highlight
+//            
+//            topBar.addSubview(imageButton)
+        
+        let addButton = UIButton()
+        addButton.setImage(UIImage(systemName: "plus.square.fill.on.square.fill"), for: .normal)
+        addButton.addTarget(self, action: #selector(addTerms(_:)), for: .touchUpInside)
+        addButton.frame = CGRect(x: 480, y: 0, width: 50, height: 50)
+        addButton.backgroundColor = Colors.secondaryBackground
+        addButton.layer.cornerRadius = 10
+        addButton.tintColor = Colors.highlight
+    
+    con(addButton, 50, 50)
+        
+        topBar.addArrangedSubview(addButton)
             
             let deleteButton = UIButton()
             deleteButton.setImage(UIImage(systemName: "trash"), for: .normal)
@@ -156,8 +196,12 @@ deinit {
             deleteButton.backgroundColor = Colors.secondaryBackground
             deleteButton.layer.cornerRadius = 10
             deleteButton.tintColor = Colors.highlight
+        
+        con(deleteButton, 50, 50)
             
-            topBar.addSubview(deleteButton)
+            topBar.addArrangedSubview(deleteButton)
+        
+        
             
         addBreakView(stackView, 30)
             
@@ -1307,6 +1351,159 @@ deinit {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
             self.setup()
         }
+    }
+    
+    @objc func addTerms(_ sender: UIButton){
+        let popupVC = AddTermsVC()
+        popupVC.delegate = self
+        popupVC.modalPresentationStyle = .overCurrentContext
+        popupVC.modalTransitionStyle = .crossDissolve
+        present(popupVC, animated: true, completion: nil)
+    }
+    
+    func addBasicTerm(_ term: String, _ definition: String){
+        let termDefinitionStackView = UIStackView()
+        tAMC(termDefinitionStackView)
+        let termView = UITextView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
+        termView.isEditable = true
+        termView.text = term
+        termView.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+        termView.delegate = self
+        tAMC(termView)
+        termView.isScrollEnabled = false
+        termView.backgroundColor = .clear
+        termView.accessibilityIdentifier = "t" + String(cards.count)
+        termView.widthAnchor.constraint(equalToConstant: (view.frame.width - 141)/2).isActive = true
+        termView.textColor = Colors.text
+        termDefinitionStackView.addArrangedSubview(termView)
+        
+        let breakView = UIView()
+        breakView.widthAnchor.constraint(equalToConstant: 1).isActive = true
+        tAMC(breakView)
+        breakView.backgroundColor = Colors.text.withAlphaComponent(0.5)
+        termDefinitionStackView.addArrangedSubview(breakView)
+        //breakView.heightAnchor.constraint(equalTo: termDefinitionStackView.heightAnchor, multiplier: 0.5).isActive = true
+        
+        let definitionView = UITextView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
+        definitionView.isEditable = true
+        definitionView.text = definition as? String
+        definitionView.font = UIFont(name: "LilGrotesk-Regular", size: 20)
+        definitionView.delegate = self
+        tAMC(definitionView)
+        definitionView.isScrollEnabled = false
+        definitionView.backgroundColor = .clear
+        definitionView.accessibilityIdentifier = "d" + String(cards.count)
+        definitionView.textColor = Colors.text
+        termDefinitionStackView.addArrangedSubview(definitionView)
+        //definitionView.backgroundColor = .blue
+        
+        tAMC(termDefinitionStackView)
+        termDefinitionStackView.isLayoutMarginsRelativeArrangement = true
+        termDefinitionStackView.layoutMargins = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        termDefinitionStackView.axis = .horizontal
+        termDefinitionStackView.spacing = 10
+        termDefinitionStackView.backgroundColor = Colors.secondaryBackground
+        termDefinitionStackView.layer.cornerRadius = 10
+        
+        cards.append([
+            "termType": "t",
+            "term": term,
+            "defType": "t",
+            "def": definition
+        ])
+        save()
+        
+        let i = indexes[cards.count - 2] + 1
+        indexes.append(i)
+        
+        let buttonsView = UIView()
+        tAMC(buttonsView)
+        con(buttonsView, view.frame.width - 100, 30)
+        let button1 = UIButton()
+        button1.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        button1.setImage(UIImage(systemName: "text.alignleft"), for: .normal)
+            button1.tintColor = Colors.highlight
+
+        button1.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
+        button1.accessibilityIdentifier = "1" + String(i)
+        let button2 = UIButton()
+        if isPaid {
+            button2.frame = CGRect(x: 30, y: 0, width: 30, height: 30)
+            button2.setImage(UIImage(systemName: "photo"), for: .normal)
+
+                button2.tintColor = Colors.darkHighlight
+            button2.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
+            button2.accessibilityIdentifier = "2" + String(i)
+        }else{
+            con(button2, 0, 0)
+            button2.isEnabled = false
+        }
+        let button3 = UIButton()
+        button3.frame = CGRect(x: 60, y: 0, width: 30, height: 30)
+        button3.setImage(UIImage(systemName: "pencil.and.scribble"), for: .normal)
+
+            button3.tintColor = Colors.darkHighlight
+        button3.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
+        button3.accessibilityIdentifier = "3" + String(i)
+        let button4 = UIButton()
+        button4.frame = CGRect(x: ((view.frame.width - 100) / 2), y: 0, width: 30, height: 30)
+        button4.setImage(UIImage(systemName: "text.alignleft"), for: .normal)
+        
+        button4.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
+        button4.accessibilityIdentifier = "4" + String(i)
+//            let button5 = UIButton()
+//            button5.frame = CGRect(x: ((view.frame.width - 100) / 2) + 30, y: 0, width: 30, height: 30)
+//            button5.setImage(UIImage(systemName: "photo"), for: .normal)
+//            button5.tintColor = Colors.darkHighlight
+//            button5.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
+//            button5.accessibilityIdentifier = "5" + String(i)
+        let button6 = UIButton()
+        button6.frame = CGRect(x: ((view.frame.width - 100) / 2) + 30, y: 0, width: 30, height: 30)
+        button6.setImage(UIImage(systemName: "pencil.and.scribble"), for: .normal)
+
+            button6.tintColor = Colors.darkHighlight
+        button6.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
+        button6.accessibilityIdentifier = "5" + String(i)
+        let recognize = UILabel(frame: CGRect(x: ((view.frame.width - 100) / 2) + 60, y: 0, width: 100, height: 30))
+        recognize.text = "Recognize:"
+        recognize.textAlignment = .right
+        recognize.textColor = Colors.text
+        recognize.font = UIFont(name: "LilGrotesk-Regular", size: 15)
+        let button7 = UIButton()
+        button7.frame = CGRect(x: ((view.frame.width - 100) / 2) + 160, y: 0, width: 30, height: 30)
+        
+        button7.tintColor = Colors.highlight
+        button7.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
+        button7.accessibilityIdentifier = "6" + String(i)
+        
+        let deleteButton = UIButton()
+        deleteButton.frame = CGRect(x: view.frame.width - 130, y: 0, width: 30, height: 30)
+        deleteButton.tintColor = .init(red: 0.6, green: 0.3, blue: 0.3, alpha: 1)
+        deleteButton.addTarget(self, action: #selector(deleteTerm(_:)), for: .touchUpInside)
+        deleteButton.accessibilityIdentifier = String(i)
+        deleteButton.setImage(UIImage(systemName: "trash"), for: .normal)
+
+            button4.tintColor = Colors.highlight
+            button7.setImage(UIImage(systemName: "circle"), for: .normal)
+        
+        buttonsView.addSubview(button1)
+        buttonsView.addSubview(button2)
+        buttonsView.addSubview(button3)
+        buttonsView.addSubview(button4)
+        //buttonsView.addSubview(button5)
+        buttonsView.addSubview(button6)
+        buttonsView.addSubview(recognize)
+        buttonsView.addSubview(button7)
+        buttonsView.addSubview(deleteButton)
+        
+        let cardAndButtons = UIStackView()
+        tAMC(cardAndButtons)
+        cardAndButtons.axis = .vertical
+        cardAndButtons.spacing = 0
+        cardAndButtons.addArrangedSubview(termDefinitionStackView)
+        cardAndButtons.addArrangedSubview(buttonsView)
+        
+        allTermsStackView.addArrangedSubview(cardAndButtons)
     }
     
 }

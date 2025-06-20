@@ -44,6 +44,40 @@ func recolor(_ drawing: PKDrawing) -> PKDrawing {
     return PKDrawing(strokes: newStrokes)
 }
 
+func centerAndZoomDrawing(_ canvasView: PKCanvasView) {
+    let drawing = canvasView.drawing
+
+    guard !drawing.bounds.isEmpty else { return }
+
+    // Add padding to the drawing bounds
+    let paddedDrawingBounds = drawing.bounds.insetBy(dx: -20, dy: -20)
+
+    // Calculate scale to fit drawing in canvasView
+    let canvasSize = canvasView.bounds.size
+    let scaleX = canvasSize.width / paddedDrawingBounds.width
+    let scaleY = canvasSize.height / paddedDrawingBounds.height
+    let scale = min(scaleX, scaleY, 1)
+
+    // Set content size and zoom scale
+    canvasView.minimumZoomScale = scale
+    canvasView.maximumZoomScale = scale
+    canvasView.zoomScale = scale
+
+    // Set the content offset to center the drawing
+    let scaledDrawingSize = CGSize(width: paddedDrawingBounds.width * scale,
+                                   height: paddedDrawingBounds.height * scale)
+
+    let offsetX = max((canvasSize.width - scaledDrawingSize.width) / 2, 0)
+    let offsetY = max((canvasSize.height - scaledDrawingSize.height) / 2, 0)
+
+    let contentOffset = CGPoint(x: paddedDrawingBounds.origin.x * scale - offsetX,
+                                y: paddedDrawingBounds.origin.y * scale - offsetY)
+
+    canvasView.contentOffset = contentOffset
+}
+
+
+
 func centerDrawing(_ canvasView: PKCanvasView) {
         let drawing = canvasView.drawing
         let boundingBox = calculateBoundingBox(for: drawing)
@@ -124,6 +158,7 @@ func loadDrawing(url: String?, canvas: PKCanvasView){
     }else{
         canvas.drawing = PKDrawing()
     }
+    centerAndZoomDrawing(canvas)
 }
 
 func loadImage(url: String?, imageView: UIImageView){
