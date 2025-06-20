@@ -2,8 +2,25 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Flashcards Document</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>dendriticlearning.dlset</string>
+			</array>
+		</dict>
+		<dict>
+			<key>LSHandlerRank</key>
+			<string>None</string>
+		</dict>
+	</array>
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-5124969442805102~9751334417</string>
+	<string>ca-app-pub-5124969442805102~1109129542</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
@@ -203,25 +220,6 @@
 			<string>3qcr597p9d.skadnetwork</string>
 		</dict>
 	</array>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeName</key>
-			<string>Flashcards Document</string>
-			<key>LSHandlerRank</key>
-			<string>Owner</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>dendriticlearning.dlset</string>
-			</array>
-		</dict>
-		<dict>
-			<key>LSHandlerRank</key>
-			<string>None</string>
-		</dict>
-	</array>
-<!--	<key>NSSpeechRecognititionUsageDescription</key>-->
-<!--	<string>Used for speech recognition in learn mode</string>-->
 	<key>UIAppFonts</key>
 	<array>
 		<string>LilGrotesk-Black.ttf</string>

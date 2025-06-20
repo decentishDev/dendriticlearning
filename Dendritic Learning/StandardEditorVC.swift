@@ -1166,7 +1166,7 @@ deinit {
         let actualI = indexes.firstIndex(of: i)!
         allTermsStackView.arrangedSubviews[actualI].removeFromSuperview()
         //allTermsStackView.removeArrangedSubview(allTermsStackView.arrangedSubviews[i])
-        if(self.cards[actualI]["defType"] as! String == "d" || self.cards[i]["defType"] as! String == "i"){
+        if(self.cards[actualI]["defType"] as! String == "d" || self.cards[i]["defType"] as! String == "i"){ //MARK: INDEX OUT OF RANGE ERROR
             self.defaults.removeObject(forKey: self.cards[actualI]["def"] as! String)
             let imageRef = self.storage.reference().child(self.cards[actualI]["def"] as! String)
             imageRef.delete(){ error in

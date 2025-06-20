@@ -270,7 +270,7 @@ class WebSetVC: UIViewController {
             let bannerView = GADBannerView(adSize: GADAdSizeFromCGSize(CGSize(width: min(600, view.bounds.width), height: 100)))
             view.addSubview(bannerView)
             bannerView.delegate = self
-            bannerView.adUnitID = "ca-app-pub-5124969442805102/1739631380"
+            bannerView.adUnitID = "ca-app-pub-5124969442805102/7426291738"
             bannerView.rootViewController = self
             bannerView.load(GADRequest())
             

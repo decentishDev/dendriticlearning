@@ -641,7 +641,7 @@ class StandardSetVC: UIViewController, GADBannerViewDelegate {
         let adSize = GADCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(adWidth)
 
         let bannerView = GADBannerView(adSize: adSize)
-        bannerView.adUnitID = "ca-app-pub-5124969442805102/1739631380"
+        bannerView.adUnitID = "ca-app-pub-5124969442805102/7426291738"
         //bannerView.rootViewController = getRootViewController()
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
