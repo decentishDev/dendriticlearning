@@ -34,6 +34,7 @@ class SearchVC: UIViewController, UITextFieldDelegate {
         view.backgroundColor = Colors.background
         //setup()
         previousSize = view.bounds.size
+        setup()
     }
     
     override func viewDidAppear(_ animated: Bool) {

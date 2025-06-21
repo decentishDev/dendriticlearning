@@ -384,7 +384,7 @@ deinit {
                 button6.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
                 button6.accessibilityIdentifier = "5" + String(i)
                 let recognize = UILabel(frame: CGRect(x: ((view.frame.width - 100) / 2) + 60, y: 0, width: 100, height: 30))
-                recognize.text = "Recognize:"
+                recognize.text = "Written:"
                 recognize.textAlignment = .right
                 recognize.font = UIFont(name: "LilGrotesk-Regular", size: 15)
                 recognize.textColor = Colors.text
@@ -486,7 +486,7 @@ deinit {
             button6.addTarget(self, action: #selector(changeDefaultInput(_:)), for: .touchUpInside)
             button6.accessibilityIdentifier = "5" + String(cards.count)
             let recognize = UILabel(frame: CGRect(x: ((view.frame.width - 100) / 2) + 60, y: 0, width: 100, height: 30))
-            recognize.text = "Recognize:"
+            recognize.text = "Written:"
             recognize.textAlignment = .right
             recognize.textColor = Colors.text
             recognize.font = UIFont(name: "LilGrotesk-Regular", size: 15)
@@ -712,7 +712,7 @@ deinit {
         button6.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
         button6.accessibilityIdentifier = "5" + String(i)
         let recognize = UILabel(frame: CGRect(x: ((view.frame.width - 100) / 2) + 60, y: 0, width: 100, height: 30))
-        recognize.text = "Recognize:"
+        recognize.text = "Written:"
         recognize.textAlignment = .right
         recognize.textColor = Colors.text
         recognize.font = UIFont(name: "LilGrotesk-Regular", size: 15)
@@ -1164,9 +1164,12 @@ deinit {
     @objc func deleteTerm(_ sender: UIButton){
         let i = Int(sender.accessibilityIdentifier!)!
         let actualI = indexes.firstIndex(of: i)!
+        print(i)
+        print(actualI)
+        print(indexes)
         allTermsStackView.arrangedSubviews[actualI].removeFromSuperview()
         //allTermsStackView.removeArrangedSubview(allTermsStackView.arrangedSubviews[i])
-        if(self.cards[actualI]["defType"] as! String == "d" || self.cards[i]["defType"] as! String == "i"){ //MARK: INDEX OUT OF RANGE ERROR
+        if(self.cards[actualI]["defType"] as! String == "d" || self.cards[actualI]["defType"] as! String == "i"){ //MARK: INDEX OUT OF RANGE ERROR
             self.defaults.removeObject(forKey: self.cards[actualI]["def"] as! String)
             let imageRef = self.storage.reference().child(self.cards[actualI]["def"] as! String)
             imageRef.delete(){ error in
@@ -1465,7 +1468,7 @@ deinit {
         button6.addTarget(self, action: #selector(changeInput(_:)), for: .touchUpInside)
         button6.accessibilityIdentifier = "5" + String(i)
         let recognize = UILabel(frame: CGRect(x: ((view.frame.width - 100) / 2) + 60, y: 0, width: 100, height: 30))
-        recognize.text = "Recognize:"
+        recognize.text = "Written:"
         recognize.textAlignment = .right
         recognize.textColor = Colors.text
         recognize.font = UIFont(name: "LilGrotesk-Regular", size: 15)

@@ -110,8 +110,8 @@ class AddTermsVC: UIViewController, PKCanvasViewDelegate {
             NSLayoutConstraint.activate([
                 self.centeredView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
                 self.centeredView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
-                self.centeredView.widthAnchor.constraint(equalToConstant: self.view.frame.width * 0.8),
-                self.centeredView.heightAnchor.constraint(equalToConstant: self.view.frame.height * 0.8)
+                self.centeredView.widthAnchor.constraint(equalToConstant: self.view.frame.width * 0.7),
+                self.centeredView.heightAnchor.constraint(equalToConstant: self.view.frame.height * 0.7)
             ])
             self.spawnBulkAddMenu(on: self.centeredView)
             UIView.animate(withDuration: 0.3, animations: {
@@ -142,10 +142,10 @@ class AddTermsVC: UIViewController, PKCanvasViewDelegate {
         centerView.addSubview(container)
 
         NSLayoutConstraint.activate([
-            container.leftAnchor.constraint(equalTo: centerView.leftAnchor, constant: 50),
-            container.rightAnchor.constraint(equalTo: centerView.rightAnchor, constant: -50),
-            container.topAnchor.constraint(equalTo: centerView.topAnchor, constant: 50),
-            container.bottomAnchor.constraint(equalTo: centerView.bottomAnchor, constant: -50),
+            container.leftAnchor.constraint(equalTo: centerView.leftAnchor, constant: 20),
+            container.rightAnchor.constraint(equalTo: centerView.rightAnchor, constant: -20),
+            container.topAnchor.constraint(equalTo: centerView.topAnchor, constant: 20),
+            container.bottomAnchor.constraint(equalTo: centerView.bottomAnchor, constant: -20),
         ])
 
         // MARK: - Labels
@@ -162,7 +162,7 @@ class AddTermsVC: UIViewController, PKCanvasViewDelegate {
         entrySeparatorLabel.translatesAutoresizingMaskIntoConstraints = false
 
         let inputTextLabel = UILabel()
-        inputTextLabel.text = "Text to Paste In"
+        inputTextLabel.text = "Terms and Definitions"
         inputTextLabel.font = UIFont(name: "LilGrotesk-Regular", size: 15)
         inputTextLabel.textColor = Colors.text
         inputTextLabel.translatesAutoresizingMaskIntoConstraints = false
