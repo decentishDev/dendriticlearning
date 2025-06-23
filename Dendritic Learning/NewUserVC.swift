@@ -8,6 +8,8 @@
 import UIKit
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseCore
+import GoogleSignIn
 
 class NewUserVC: UIViewController {
     
@@ -113,7 +115,7 @@ class NewUserVC: UIViewController {
         info1.textAlignment = .center
         infoView.addSubview(info1)
         
-        let signUpButton = UIButton(frame: CGRect(x: midX - 150, y: midY - 70, width: 300, height: 50))
+        let signUpButton = UIButton(frame: CGRect(x: midX - 150, y: midY - 120, width: 300, height: 50))
         signUpButton.backgroundColor = Colors.secondaryBackground
         signUpButton.setTitle("Create a new account", for: .normal)
         signUpButton.setTitleColor(Colors.text, for: .normal)
@@ -122,7 +124,7 @@ class NewUserVC: UIViewController {
         signUpButton.addTarget(self, action: #selector(signUp(_:)), for: .touchUpInside)
         signUpOrIn.addSubview(signUpButton)
         
-        let signInButton = UIButton(frame: CGRect(x: midX - 150, y: midY, width: 300, height: 50))
+        let signInButton = UIButton(frame: CGRect(x: midX - 150, y: midY - 50, width: 300, height: 50))
         signInButton.backgroundColor = Colors.secondaryBackground
         signInButton.setTitle("Sign in to an account", for: .normal)
         signInButton.setTitleColor(Colors.text, for: .normal)
@@ -131,10 +133,39 @@ class NewUserVC: UIViewController {
         signInButton.addTarget(self, action: #selector(signIn(_:)), for: .touchUpInside)
         signUpOrIn.addSubview(signInButton)
         
+//        let gSignInButton = GIDSignInButton()
+//        gSignInButton.style = .wide
+//        gSignInButton.colorScheme = .dark
+//        gSignInButton.center = CGPoint(x: view.center.x, y: view.center.y + 100)
+//        signUpOrIn.addSubview(gSignInButton)
+//        gSignInButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(signInWithGoogle)))
+        
+//        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(signInWithGoogle))
+//        gSignInButton.addGestureRecognizer(tapRecognizer)
+        
+        let gSignInView = UIView(frame: CGRect(x: midX - 120, y: midY + 90, width: 240, height: 50))
+        gSignInView.backgroundColor = Colors.secondaryBackground
+        gSignInView.layer.cornerRadius = 10
+        gSignInView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(signInWithGoogle)))
+        signUpOrIn.addSubview(gSignInView)
+        
+        let gLogo = UIImageView(frame: CGRect(x: 15, y: 15, width: 20, height: 20))
+        gLogo.image = UIImage(named: "white-google-logo.png")
+        gLogo.contentMode = .scaleAspectFit
+        gSignInView.addSubview(gLogo)
+        
+        let gText = UILabel(frame: CGRect(x: 50, y: 0, width: 190, height: 50))
+        gText.text = "Sign in with Google"
+        gText.font = UIFont(name: "LilGrotesk-Bold", size: 20)
+        gText.textAlignment = .left
+        gText.textColor = Colors.text
+        gSignInView.addSubview(gText)
+        
         let signUpLabel = UILabel(frame: CGRect(x: 0, y: midY - 230 - 100, width: fullX, height: 50))
         signUpLabel.font = UIFont(name: "LilGrotesk-Regular", size: 30)
         signUpLabel.text = "Sign up"
         signUpLabel.textAlignment = .center
+        signUpLabel.textColor = Colors.text
         signUp.addSubview(signUpLabel)
         
         signUpName = UITextField(frame: CGRect(x: midX - 200, y: midY - 160 - 80, width: 400, height: 40))
@@ -525,6 +556,80 @@ class NewUserVC: UIViewController {
 //        signUp.frame = CGRect(x: signUp.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
 //        signIn.frame = CGRect(x: signIn.frame.minX, y: 0, width: fullX, height: fullY - keyboard - 100)
 //        success.frame = CGRect(x: success.frame.minX, y: 0, width: fullX, height: fullY - keyboard)
+    }
+    
+    @objc func signInWithGoogle() {
+        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
+
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+
+        GIDSignIn.sharedInstance.signIn(withPresenting: self) { result, error in
+            if let error = error {
+                print("Google Sign-In failed: \(error.localizedDescription)")
+                return
+            }
+
+            guard let user = result?.user,
+                  let idToken = user.idToken?.tokenString else {
+                print("Failed to retrieve tokens.")
+                return
+            }
+            
+            let accessToken = user.accessToken.tokenString
+
+            let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
+
+            Auth.auth().signIn(with: credential) { authResult, error in
+                if let error = error {
+                    print("Firebase Auth failed: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let authResult = authResult else { return }
+
+                let isNew = authResult.additionalUserInfo?.isNewUser ?? false
+                let email = authResult.user.email ?? ""
+                let username = email.components(separatedBy: "@").first ?? "user"
+
+                if isNew {
+                    self.db.collection("users").document(authResult.user.uid).setData([
+                        "name": authResult.user.displayName ?? "",
+                        "username": username,
+                        "email": email,
+                        "subscription": ["status": "inactive"],
+                        "transactions": [],
+                        "createdSets": [],
+                        "studiedSets": [],
+                        "likedSets": [],
+                        "settings": ["theme": "Dark"]
+                    ]) { err in
+                        if let err = err {
+                            print("Firestore error: \(err)")
+                        } else {
+                            print("New user created")
+                        }
+                    }
+                } else {
+                    print("Welcome back!")
+                }
+                
+                self.backButton.isEnabled = false
+                self.nextButton.isEnabled = true
+                self.page = 5
+                
+                let fullX = self.view.frame.width
+                let fullY = self.view.frame.height
+                
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.signUpOrIn.frame = CGRect(x: -fullX, y: 0, width: fullX, height: fullY)
+                    self.success.frame = CGRect(x: 0, y: 0, width: fullX, height: fullY)
+                    self.backButton.alpha = 0.5
+                    self.nextButton.alpha = 1
+                })
+                
+            }
+        }
     }
 }
 extension NewUserVC {

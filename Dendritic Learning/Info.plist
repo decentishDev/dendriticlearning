@@ -19,6 +19,17 @@
 			<string>None</string>
 		</dict>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.826569511187-3k275pdo5qfabnruattdevpm4n706u7a</string>
+			</array>
+		</dict>
+	</array>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-5124969442805102~1109129542</string>
 	<key>SKAdNetworkItems</key>
